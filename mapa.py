@@ -40,7 +40,7 @@ class Map:
                 elif p == GHOST:
                     self._ghost_spawn = (x, y)
                 
-                if not self.is_wall(p):
+                if not self.is_wall((x,y)):
                     self._pathways.append((x,y))
                 #logging.debug("{}, {}   {:x}".format(x, y, p))
 
