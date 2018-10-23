@@ -25,18 +25,22 @@ async def agent_loop(server_address = "localhost:8000", agent_name="student"):
         energy = mapa.energy
         boost = mapa.boost
 
-        # create list of adjacent coordinates
+        # create list of adjacent coordinates (verified!)
         domain = []
         for (x,y) in pathways:
-            domain += [[(x,y),(a,b)] for (a,b) in pathways \
-                                if a == x+1 \
-                                or a == x-1 \
-                                or b == y+1 \
-                                or b == y-1 \
-                                or (x == 0 and a == mapa.hor_tiles-1) \
-                                or (a == 0 and x == mapa.hor_tiles-1) \
-                                or (y == 0 and b == mapa.ver_tiles-1) \
-                                or (b == 0 and y == mapa.ver_tiles-1)]
+            domain += [ ((x,y),(a,b)) for (a,b) in pathways \
+                                if (a == x+1 and b == y) \
+                                or (a == x-1 and b == y) \
+                                or (b == y+1 and a == x) \
+                                or (b == y-1 and a == x) \
+                                or (x == 0 and a == mapa.hor_tiles-1 and b == y) \
+                                or (a == 0 and x == mapa.hor_tiles-1 and b == y) \
+                                or (y == 0 and b == mapa.ver_tiles-1 and a == x) \
+                                or (b == 0 and y == mapa.ver_tiles-1 and a == x)]
+
+        for ((x,y),(a,b)) in domain:
+            if domain.__contains__(((a,b),(x,y))):
+                domain.remove(((a,b),(x,y)))
 
         
         #init agent properties 
@@ -60,27 +64,31 @@ async def agent_loop(server_address = "localhost:8000", agent_name="student"):
             # create the vector for every element in the game
             vectors = []
             for (x,y) in energy:
-                my_prob = SearchProblem(Pathways(domain),(x,y),state['pacman'])
-                my_tree = SearchTree(my_prob, 'a*')
-                path, depth, cost, avDepth = my_tree.search()
 
-                last_pos = path[len(path)-1]
-                penult_pos = None
-                if len(path) > 1:
-                    penult_pos = path[len(path)-2]
+                pac_pos = state['pacman']
+                
+                my_prob = SearchProblem(Pathways(domain),(x,y),pac_pos)
+                my_tree = SearchTree(my_prob, 'a*')
+                #path = my_tree.search()
+                last_pos = my_tree.search()
+
+                print("###############\n" + str(last_pos))
+
+                goal_pos = pac_pos
+                #last_pos = path[len(path)-2]
 
                 dir = None
-                if penult_pos:
-                    x = last_pos[0] - penult_pos[0]
-                    y = last_pos[1] - penult_pos[1]
+                if last_pos:
+                    x = goal_pos[0] - last_pos[0]
+                    y = goal_pos[1] - last_pos[1]
                     if (x > 0):
-                        dir = (-1/cost,0)
+                        dir = (-1/my_tree.cost,0)
                     if (x < 0):
-                        dir = (1/cost,0)
+                        dir = (1/my_tree.cost,0)
                     if (y > 0):
-                        dir = (0,-1/cost)
+                        dir = (0,-1/my_tree.cost)
                     if (y < 0):
-                        dir = (0,1/cost)
+                        dir = (0,1/my_tree.cost)
 
                 vectors += [dir]
 
@@ -106,13 +114,13 @@ async def agent_loop(server_address = "localhost:8000", agent_name="student"):
                 # preencher esta parte que raramente irá acontecer
 
 
-            x, y = state['pacman']
-            if x == cur_x and y == cur_y:
-                if key in "ad":
-                    key = random.choice("ws")
-                elif key in "ws":
-                    key = random.choice("ad")
-            cur_x, cur_y = x, y
+            # x, y = state['pacman']
+            # if x == cur_x and y == cur_y:
+            #     if key in "ad":
+            #         key = random.choice("ws")
+            #     elif key in "ws":
+            #         key = random.choice("ad")
+            # cur_x, cur_y = x, y
             
             
             

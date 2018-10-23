@@ -5,6 +5,7 @@ class Pathways(SearchDomain):
 
     def __init__(self, adjacencies):
         self.adjacencies = adjacencies
+        #print(self.adjacencies)
 
     def actions(self,coordinate):
         actlist = []
@@ -24,15 +25,9 @@ class Pathways(SearchDomain):
         (orig, dest) = action
         if (orig != cur_pos):
             return None
-        
-        for (c1,c2) in self.adjacencies:
-            if (orig == c1 and dest == c2) or\
-            (orig == c2 and dest == c1):
-                return 1
-        
-        return None
+        return 1
 
-    def heuristic(self, cur, goal):
-        cur_x, cur_y = cur
-        g_x, g_y = goal
-        return math.hypot((g_x-cur_x), (g_y-cur_y))
+    def heuristic(self, new_state, goal):
+        x, y = new_state
+        gx, gy = goal
+        return math.hypot((gx-x), (gy-y))
