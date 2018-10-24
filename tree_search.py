@@ -140,7 +140,7 @@ class SearchTree:
             for newNode in lnewnodes:
                 if not node.inParent(newNode.state):
                     lista += [newNode]
-                    print(newNode)
+                    #print(newNode)
             self.add_to_open(lista)
         return None
 
