@@ -148,6 +148,7 @@ async def main_loop(q):
 
     newgame_json = json.loads(state)
     mapa = Map(newgame_json["map"])
+    GAME_SPEED = newgame_json["fps"]
     SCREEN = pygame.display.set_mode(scale(mapa.size))
    
     draw_background(mapa, SCREEN)
@@ -185,7 +186,7 @@ async def main_loop(q):
             state = json.loads(q.get_nowait())
             
         except asyncio.queues.QueueEmpty:
-            await asyncio.sleep(0.05)
+            await asyncio.sleep(1./GAME_SPEED)
             continue 
         
 
