@@ -7,6 +7,9 @@ import os
 from mapa import Map
 from student import *
 
+
+debug = False
+
 async def agent_loop(server_address = "localhost:8000", agent_name="student"):
     async with websockets.connect("ws://{}/player".format(server_address)) as websocket:
 
@@ -34,9 +37,10 @@ async def agent_loop(server_address = "localhost:8000", agent_name="student"):
                 return
             #------------------------------------------------------------------#
 
-            print(state)
+            if debug: 
+                print(state)
             # get next move from pacman agent
-            key = pacman.get_next_move(state['ghosts'])
+            key = pacman.get_next_move(state)
             
             
             #-send new key-----------------------------------------------------#

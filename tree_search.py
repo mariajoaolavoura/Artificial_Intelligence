@@ -118,7 +118,10 @@ class SearchTree:
             if self.problem.goal_test(node.state):
                 self.cost = node.cost
                 #return self.get_path(node)
-                return node.parent
+                if node.parent != None:
+                    return node.parent.state
+                else:
+                    return None
 
             lnewnodes = []
             #print(self.open_nodes)
