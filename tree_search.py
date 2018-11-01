@@ -14,6 +14,8 @@
 from abc import ABC, abstractmethod
 
 
+
+
 # DOMAIN ----------------------------------------------------------------------
 # -----------------------------------------------------------------------------
 
@@ -55,6 +57,11 @@ class SearchProblem:
         self.domain = domain
         self.initial = initial
         self.goal = goal
+        # print("\t### SearchProblem was created!")
+        # print("\t### Domain is: ")
+        # print(self.domain)
+        # print("\t### Initial is: " + str(self.initial))
+        # print("\t### Goal is: " + str(self.goal))
     
     def goal_test(self, state):
         return state == self.goal
@@ -90,6 +97,7 @@ class SearchNode:
 # -----------------------------------------------------------------------------
 # Arvores de pesquisa
 class SearchTree:
+    debug = False
 
     # construtor
     def __init__(self,problem, strategy='breadth'): 
@@ -99,6 +107,11 @@ class SearchTree:
         self.open_nodes = [root]
         self.strategy = strategy
         self.cost = None
+        self.lvisited = [root.state]
+        # print("\t### SearchTree was created!")
+        # print("\t### open nodes starts with only root: " + str(self.open_nodes))
+        # print("\t### root heuristic is: " + str(heur))
+        # print("\t### root is: " + str(root))
 
     # obter o caminho (sequencia de estados) da raiz ate um no
     def get_path(self,node):
@@ -110,10 +123,24 @@ class SearchTree:
 
     # procurar a solucao
     def search(self, limit=None):
+
+        #print("*** Entering Tree search() method")
+        #print("*** open_nodes is empty? " + str(len(self.open_nodes) == 0))
         
+        count = 100
+
         while self.open_nodes != []:
             
+            if self.debug and count > 0:
+                print("\n*** open_nodes is empty? " + str(len(self.open_nodes) == 0))
+            
             node = self.open_nodes.pop(0)
+            
+            # if self.debug and count > 0:
+            #     print(self.lvisited)
+
+            if self.debug and count > 0:
+                print("*** popped node: " + str(node))
 
             if self.problem.goal_test(node.state):
                 self.cost = node.cost
@@ -127,24 +154,44 @@ class SearchTree:
             #print(self.open_nodes)
 
             for action in self.problem.domain.actions(node.state):
+
+                if self.debug and count > 0:
+                    print("*** *** action: " + str(action))
+
                 # calculate next state
                 newstate = self.problem.domain.result(node.state,action)
+                if self.debug and count > 0:
+                    print("*** *** newstate: " + str(newstate))
                 # calculate cost of next node
                 cost = node.cost + self.problem.domain.cost(node.state, action)
                 # calculate heuristic of next node
                 heuristic = self.problem.domain.heuristic(newstate, self.problem.goal)
                 # create new node
                 newnode = SearchNode(newstate,node,cost,heuristic)
+                
+                if self.debug and count > 0:
+                    print("*** *** newnode: " + str(newnode))
+                    print("LVISITED")
+                    print(self.lvisited)
                 # add new node to list of new nodes
                 lnewnodes += [newnode]
+                
 
-            #self.add_to_open(newNode for newNode in lnewnodes if not node.inParent(newNode.state))
-            lista = []
-            for newNode in lnewnodes:
-                if not node.inParent(newNode.state):
-                    lista += [newNode]
-                    #print(newNode)
-            self.add_to_open(lista)
+            filterednn = [ newNode for newNode in lnewnodes if newNode.state not in self.lvisited ]
+            if self.debug and count > 0:
+               print("*** *** filtered newnodes: " + str(filterednn))
+
+            self.add_to_open(filterednn)
+            self.lvisited.extend([node.state for node in filterednn])
+            
+            # lista = []
+            # for newNode in lnewnodes:
+            #     if not node.inParent(newNode.state):
+            #         lista += [newNode]
+            #         #print(newNode)
+            # self.add_to_open(lista)
+
+            count -= 1
         return None
 
     # juntar novos nos a lista de nos abertos de acordo com a estrategia

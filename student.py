@@ -1,11 +1,11 @@
 from tree_search import *
-import math
+import random
 from pathways import Pathways
 
 
 #$ PORT=80 SERVER=pacman-aulas.ws.atnog.av.it.pt python client.py
 
-debug = True
+debug = False
 
 
 class Pacman_agent():
@@ -14,7 +14,7 @@ class Pacman_agent():
         # get map and pathways info
         self.mapa = mapa
         self.pathways = mapa.pathways
-        self.domain = self.create_search_domain(self.pathways)
+        self.adjacencies = self.create_adjacencies_map(self.pathways)
         self.energy = mapa.energy
         self.boost = mapa.boost
         self.ghosts = None
@@ -25,8 +25,8 @@ class Pacman_agent():
     #
     # creates a list of tuples with all adjacent coordinates
     #
-    def create_search_domain(self, pathways):
-        domain = [ ((x,y),(a,b)) for ((x,y),(a,b)) in self.combinations(pathways, 2) \
+    def create_adjacencies_map(self, pathways):
+        adjacencies = [ ((x,y),(a,b)) for ((x,y),(a,b)) in self.combinations(pathways, 2) \
                         if ((a == x+1 and b == y) \
                         or (a == x-1 and b == y) \
                         or (b == y+1 and a == x) \
@@ -36,41 +36,68 @@ class Pacman_agent():
                         or (y == 0 and b == self.mapa.ver_tiles-1 and a == x) \
                         or (b == 0 and y == self.mapa.ver_tiles-1 and a == x)) ]
 
-        return domain
-
         # TODO this only works to avoid the den in the example map
         # TODO must find a way to eliminate den from domain/pathways 
         # not needed for pacman, as no vector will point that way
         # only needed as a more to make calculations more efficient
-        domain.remove(((8,15),(8,16)))
-        domain.remove(((8,14),(8,15)))
+        adjacencies.remove(((8,15),(8,16)))
+        adjacencies.remove(((8,14),(8,15)))
+
+        # if debug:
+        #     for ((x,y),(a,b)) in adjacencies:
+        #         if (x,y) == (11,18) or (a,b) == (11,18):
+        #             print(((x,y),(a,b)))
+        #         if (x,y) == (11,12) or (a,b) == (11,12):
+        #             print(((x,y),(a,b)))
+
+        return adjacencies
+
+        
 
 
     #
     # calculates and returns the next move of pacman_agent (format 'wasd')
     #
     def get_next_move(self, state):
-
+        print("\nEnergy size is : " + str(len(state['energy'])) + "\n")
         # create a vector for every element in the game
         # every element points pacman teh next move to get to it
         vectors = []
         #vectors = test_search(self.domain, self.energy)
+        if debug:
+            i = 0
+        i = 0
         for (x,y) in state['energy']:
-
+        #for i in range(1):
+            #(x,y) = (1,1)
             if debug:
-                print("\t cycling for position " + str((x,y)))
+                print("\t cycle  for position " + str((x,y)))
 
-            pac_pos = state['pacman']
+            pac_pos = (state['pacman'][0], state['pacman'][1])
+            if debug:
+                print("\t pacman is in position " + str(pac_pos))
             
             # search the path
-            my_prob = SearchProblem(Pathways(self.domain),(x,y),pac_pos)
-            my_tree = SearchTree(my_prob, 'a*')
-            next_pos = my_tree.search()
+            if debug:
+                print("SearchDomain being called to create")
+            domain = Pathways(self.adjacencies)
 
             if debug:
-                print('\t Searching path for energy ' + str((x,y)))
+                print("SearchProblem " + str(i) + " being called to create")
+            my_prob = SearchProblem(domain,(x,y),pac_pos)
+            
+            if debug:
+                print("SearchTree " + str(i) + " being called to create")
+            my_tree = SearchTree(my_prob, 'a*')
+            
+            next_pos = my_tree.search()
+            
+            print("\t search " + str(i) + " was completed!")
+            i += 1
 
-            #print("###############\n" + str(next_pos))
+            if debug:
+                print('\t Calculating next move for position: ' + str((x,y)))
+
 
             # calculate vector for every element
             dir = None
@@ -101,7 +128,7 @@ class Pacman_agent():
             vec_y += y
         
         if debug:
-            print('Sum of all vectors is: ' + str(vec_x) + ', ' + vec_y)
+            print('Sum of all vectors is: ' + str(vec_x) + ', ' + str(vec_y))
 
 
         # calculate the key to send

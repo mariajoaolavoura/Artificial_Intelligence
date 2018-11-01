@@ -5,7 +5,7 @@ class Pathways(SearchDomain):
 
     def __init__(self, adjacencies):
         self.adjacencies = adjacencies
-        #print(self.adjacencies)
+        #print("### " + str(self.adjacencies))
 
     def actions(self,coordinate):
         actlist = []
