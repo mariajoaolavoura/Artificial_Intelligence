@@ -100,10 +100,10 @@ class SearchTree:
     debug = False
 
     # construtor
-    def __init__(self,problem, strategy='breadth'): 
+    def __init__(self,problem, initial_cost, strategy='breadth'): 
         self.problem = problem
         heur = self.problem.domain.heuristic(problem.initial, self.problem.goal)
-        root = SearchNode(problem.initial, parent=None, cost=0, heuristic=heur)
+        root = SearchNode(problem.initial, parent=None, cost=initial_cost, heuristic=heur)
         self.open_nodes = [root]
         self.strategy = strategy
         self.cost = None

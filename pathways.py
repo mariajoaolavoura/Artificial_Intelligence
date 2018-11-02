@@ -1,4 +1,4 @@
-from tree_search import *
+from tree_search import SearchDomain
 import math
 
 class Pathways(SearchDomain):
@@ -6,6 +6,11 @@ class Pathways(SearchDomain):
     def __init__(self, adjacencies):
         self.adjacencies = adjacencies
         #print("### " + str(self.adjacencies))
+        for ((x,y),(a,b)) in adjacencies:
+            if (x,y) == (7,15):
+                    print(((x,y),(a,b)))
+            if (a,b) == (7,15):
+                print(((x,y),(a,b)))
 
     def actions(self,coordinate):
         actlist = []
@@ -17,12 +22,12 @@ class Pathways(SearchDomain):
         return actlist 
 
     def result(self,coordinate,action):
-        ((x,y),(a,b)) = action
+        (x,y),(a,b) = action
         if (x,y) == coordinate:
             return (a,b)
         
     def cost(self, cur_pos, action):
-        (orig, dest) = action
+        orig, _ = action
         if (orig != cur_pos):
             return None
         return 1

@@ -4,6 +4,7 @@ from pathways import Pathways
 
 
 #$ PORT=80 SERVER=pacman-aulas.ws.atnog.av.it.pt python client.py
+# to kill server: fuser 8000/tcp
 
 debug = False
 
@@ -40,8 +41,8 @@ class Pacman_agent():
         # TODO must find a way to eliminate den from domain/pathways 
         # not needed for pacman, as no vector will point that way
         # only needed as a more to make calculations more efficient
-        adjacencies.remove(((8,15),(8,16)))
-        adjacencies.remove(((8,14),(8,15)))
+        adjacencies.remove(((6,15),(7,15)))
+        adjacencies.remove(((7,15),(8,15)))
 
         # if debug:
         #     for ((x,y),(a,b)) in adjacencies:
@@ -49,7 +50,12 @@ class Pacman_agent():
         #             print(((x,y),(a,b)))
         #         if (x,y) == (11,12) or (a,b) == (11,12):
         #             print(((x,y),(a,b)))
-
+        #print(adjacencies)
+        for ((x,y),(a,b)) in adjacencies:
+            if (x,y) == (7,15):
+                    print(((x,y),(a,b)))
+            if (a,b) == (7,15):
+                print(((x,y),(a,b)))
         return adjacencies
 
         
@@ -59,77 +65,22 @@ class Pacman_agent():
     # calculates and returns the next move of pacman_agent (format 'wasd')
     #
     def get_next_move(self, state):
-        print("\nEnergy size is : " + str(len(state['energy'])) + "\n")
+        #print("\nEnergy size is : " + str(len(state['energy'])) + "\n")
         # create a vector for every element in the game
         # every element points pacman teh next move to get to it
         vectors = []
         #vectors = test_search(self.domain, self.energy)
-        if debug:
-            i = 0
-        i = 0
-        for (x,y) in state['energy']:
-        #for i in range(1):
-            #(x,y) = (1,1)
-            if debug:
-                print("\t cycle  for position " + str((x,y)))
-
-            pac_pos = (state['pacman'][0], state['pacman'][1])
-            if debug:
-                print("\t pacman is in position " + str(pac_pos))
-            
-            # search the path
-            if debug:
-                print("SearchDomain being called to create")
-            domain = Pathways(self.adjacencies)
-
-            if debug:
-                print("SearchProblem " + str(i) + " being called to create")
-            my_prob = SearchProblem(domain,(x,y),pac_pos)
-            
-            if debug:
-                print("SearchTree " + str(i) + " being called to create")
-            my_tree = SearchTree(my_prob, 'a*')
-            
-            next_pos = my_tree.search()
-            
-            print("\t search " + str(i) + " was completed!")
-            i += 1
-
-            if debug:
-                print('\t Calculating next move for position: ' + str((x,y)))
-
-
-            # calculate vector for every element
-            dir = None
-            if next_pos:
-                pac_x, pac_y = pac_pos
-                next_x, next_y = next_pos
-                x = pac_x - next_x
-                y = pac_y - next_y
-                if (x > 0):
-                    dir = (-1/my_tree.cost,0)
-                elif (x < 0):
-                    dir = (1/my_tree.cost,0)
-                elif (y > 0):
-                    dir = (0,-1/my_tree.cost)
-                elif (y < 0):
-                    dir = (0,1/my_tree.cost)
-                vectors += [dir]
-            
-            if debug:
-                print('\t Vector is ' + str(dir))
-
-
-        # sum all the vectors
-        vec_x = 0
-        vec_y = 0
-        for (x,y) in vectors:
-            vec_x += x
-            vec_y += y
         
+        pac_pos = (state['pacman'][0], state['pacman'][1])
         if debug:
-            print('Sum of all vectors is: ' + str(vec_x) + ', ' + str(vec_y))
+            print("\t pacman is in position " + str(pac_pos))
 
+        (ex, ey) = self.get_vector(state['energy'], pac_pos, 0)
+        (gx, gy) = self.get_vector(state['ghosts'], pac_pos, 5000)
+
+        #sum the vectors
+        vec_x = ex + (-10*gx)
+        vec_y = ey + (-10*gy)
 
         # calculate the key to send
         if abs(vec_x) > abs(vec_y):
@@ -143,15 +94,15 @@ class Pacman_agent():
             else:
                 key = 'w'
         elif abs(vec_x) == abs(vec_y):
-            if x > 0 and y > 0:
+            if vec_x > 0 and vec_y > 0:
                 key = random.choice('sd')
-            elif x > 0 and y < 0:
+            elif vec_x > 0 and vec_y < 0:
                 key = random.choice('dw')
-            elif x < 0 and y > 0:
+            elif vec_x < 0 and vec_y < 0:
                 key = random.choice('aw')
-            elif x < 0 and y > 0:
+            elif vec_x < 0 and vec_y > 0:
                 key = random.choice('as')
-            elif x == 0:
+            elif vec_x == 0:
                 print("There is a problem not solved yet in this line of code!")
         
         if debug:
@@ -167,6 +118,68 @@ class Pacman_agent():
         # cur_x, cur_y = x, y
 
         return key
+
+
+    def get_vector(self, list_, pac_pos, initial_cost):
+        i = 0
+        vectors = []
+        for (x,y) in list_:
+        
+            if debug:
+                print("\t cycle  for position " + str((x,y)))
+
+            # search the path
+            if debug:
+                print("SearchDomain being called to create")
+            domain = Pathways(self.adjacencies)
+
+            if debug:
+                print("SearchProblem " + str(i) + " being called to create")
+            my_prob = SearchProblem(domain,(x,y),pac_pos)
+            
+            if debug:
+                print("SearchTree " + str(i) + " being called to create")
+            my_tree = SearchTree(my_prob, initial_cost, 'a*')
+            
+            next_pos = my_tree.search()
+            
+            #print("\t search " + str(i) + " was completed!")
+
+            if debug:
+                print('\t Calculating next move for position: ' + str((x,y)))
+
+
+            # calculate vector for every element
+            dir = None
+            if next_pos:
+                pac_x, pac_y = pac_pos
+                next_x, next_y = next_pos
+                x = pac_x - next_x
+                y = pac_y - next_y
+                if (x > 0):
+                    dir = (-(2**(-my_tree.cost)),0)
+                elif (x < 0):
+                    dir = ((2**(-my_tree.cost)),0)
+                elif (y > 0):
+                    dir = (0,-(2**(-my_tree.cost)))
+                elif (y < 0):
+                    dir = (0,(2**(-my_tree.cost)))
+                vectors += [dir]
+            
+            if debug:
+                print('\t Vector is ' + str(dir))
+
+        # sum all the vectors
+        vec_x = 0
+        vec_y = 0
+        for (x,y) in vectors:
+            vec_x += x
+            vec_y += y
+        
+        #print("\npacman is in position " + str(pac_pos[0], pac_pos[1]))
+        #print('Sum of all vectors is: ' + str(vec_x) + ', ' + str(vec_y) + "\n")
+
+        return (vec_x, vec_y)
 
 
 
