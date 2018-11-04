@@ -69,13 +69,13 @@ class Pacman_agent():
         # create a vector for every element in the game
         # every element points pacman teh next move to get to it
         vectors = []
-        #vectors = test_search(self.domain, self.energy)
+        #print(state['energy'])
         
         pac_pos = (state['pacman'][0], state['pacman'][1])
         # if debug:
         #     print("\t pacman is in position " + str(pac_pos))
 
-        (ex, ey) = self.get_vector(state['energy'][0:30], pac_pos)
+        ex, ey = self.get_vector(nodes_to_search=state['energy'], pac_pos=pac_pos)
         #(gx, gy) = self.get_vector(state['ghosts'], pac_pos)
 
         #sum the vectors
@@ -120,15 +120,19 @@ class Pacman_agent():
         return key
 
 
-    def get_vector(self, list_, pac_pos):
+    def get_vector(self, nodes_to_search, pac_pos):
         i = 0
+        next_pos = []
         vectors = []
         # if debug:
         #     print("***********************************************************")
         #     print('\t get vector was called! ')
         #     print("***********************************************************")
 
-        for (x,y) in list_:
+        # convert list to dictionary with zero weight for each element
+        weight_dict = { (x,y):1 for [x,y] in nodes_to_search }
+
+        for [x,y] in nodes_to_search:
 
             # if debug:
                 # print("#######################################################")
@@ -149,37 +153,58 @@ class Pacman_agent():
             
             # if debug:
             #     print("SearchTree " + str(i) + " being called to create")
-            my_tree = SearchTree(my_prob, 'a*')
+            my_tree = SearchTree(my_prob, weight_dict, 'breadth')
             
-            next_pos = my_tree.search(list_)
+            next_result = my_tree.search()
+
+            if next_result != None:
+                next_res, next_cost = next_result
+                next_pos += [((x,y) , next_res, next_cost)]
+            else:
+                next_pos += [((x,y), pac_pos, 0)]
+
+            print((x,y))
+            print(next_result)
             
             #print("\t search " + str(i) + " was completed!")
 
             # if debug:
             #     print('\t Calculating next move for position: ' + str((x,y)))
 
+        #print(next_pos)
 
-            # calculate vector for every element
-            dir = None
-            if next_pos:
+        for i in range(len(next_pos)):
+            if next_pos[i][1] != pac_pos:
                 pac_x, pac_y = pac_pos
-                next_x, next_y = next_pos
+                next_x, next_y = (next_pos[i])[1]
                 x = pac_x - next_x
                 y = pac_y - next_y
-                if (x > 0):
-                    dir = (-(2**(-my_tree.cost)),0)
-                elif (x < 0):
-                    dir = ((2**(-my_tree.cost)),0)
-                elif (y > 0):
-                    dir = (0,-(2**(-my_tree.cost)))
-                elif (y < 0):
-                    dir = (0,(2**(-my_tree.cost)))
+                if (x == 1):
+                    dir = ( ( -weight_dict[next_pos[i][0]])*(1/next_pos[i][2]) , 0 )
+                elif (x == -1):
+                    dir = ( ( weight_dict[next_pos[i][0]])*(1/next_pos[i][2]) , 0 )
+                elif (y == 1):
+                    dir = ( 0 , (-weight_dict[next_pos[i][0]])*(1/next_pos[i][2]) )
+                elif (y == -1):
+                    dir = ( 0 , (weight_dict[next_pos[i][0]])*(1/next_pos[i][2]) )
+                elif (x > 1):
+                    dir = ( (weight_dict[next_pos[i][0]])*(1/next_pos[i][2]) , 0 )
+                elif (x < 1):
+                    dir = ( (-weight_dict[next_pos[i][0]])*(1/next_pos[i][2]) , 0 )
+                elif (y > 1):
+                    dir = ( 0 , (weight_dict[next_pos[i][0]])*(1/next_pos[i][2]) )
+                elif (y < 1):
+                    dir = ( 0 , (-weight_dict[next_pos[i][0]])*(1/next_pos[i][2]) )
                 vectors += [dir]
             
             # if debug:
             #     print("#######################################################")
             #     print('\t Vector is ' + str(dir))
             #     print("#######################################################")
+
+        print(weight_dict)
+
+
 
         # sum all the vectors
         vec_x = 0
@@ -196,7 +221,7 @@ class Pacman_agent():
             print('\t Vector is ' + str((vec_x, vec_y)))
             print("#######################################################")
 
-        return (vec_x, vec_y)
+        return [vec_x, vec_y]
 
 
 

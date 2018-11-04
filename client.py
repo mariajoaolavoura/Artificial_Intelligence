@@ -22,7 +22,7 @@ async def agent_loop(server_address = "localhost:8000", agent_name="student"):
         
         
         # Create the pacman agent
-        pacman = Pacman_agent(Map(game_properties['map']))
+        pacman = Pacman_agent(Map(game_properties['map']), strategy='breadth')
 
         done = 1000
         # play!

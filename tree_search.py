@@ -100,14 +100,15 @@ class SearchTree:
     debug = False
 
     # construtor
-    def __init__(self,problem, strategy='breadth'): 
+    def __init__(self,problem, weight_dict, strategy='breadth'): 
         self.problem = problem
         heur = self.problem.domain.heuristic(problem.initial, self.problem.goal)
-        root = SearchNode(problem.initial, parent=None, cost=0, heuristic=heur)
+        root = SearchNode(problem.initial, parent=None, cost=weight_dict[problem.initial], heuristic=heur)
         self.open_nodes = [root]
         self.strategy = strategy
-        self.cost = None
         self.lvisited = [root.state]
+        self.weight_dict = weight_dict
+        self.cost = None
         # print("\t### SearchTree was created!")
         # print("\t### open nodes starts with only root: " + str(self.open_nodes))
         # print("\t### root heuristic is: " + str(heur))
@@ -122,63 +123,60 @@ class SearchTree:
         return(path)
 
     # procurar a solucao
-    def search(self, adjacencies):
+    def search(self):
 
-        #print("*** Entering Tree search() method")
-        #print("*** open_nodes is empty? " + str(len(self.open_nodes) == 0))
-        
+        #print()
+        #print(self.open_nodes[0])
+
+        #print(self.weight_dict)
         count = 100
         #print(adjacencies)
         while self.open_nodes != []:
-            
-            if self.debug and count > 0:
-                print("\n*** open_nodes is empty? " + str(len(self.open_nodes) == 0))
                 
             node = self.open_nodes.pop(0)
-            
-            # if self.debug and count > 0:
-            #     print(self.lvisited)
-
-            if self.debug and count > 0:
-                print("*** popped node: " + str(node))
+            self.lvisited.extend(node.state)
 
             if self.problem.goal_test(node.state):
                 self.cost = node.cost
-                #return self.get_path(node)
                 if node.parent != None:
-                    return node.parent.state
+                    return (node.parent.state, self.cost)
                 else:
                     return None
 
             lnewnodes = []
-            #print(self.open_nodes)
 
             for action in self.problem.domain.actions(node.state):
-
-                if self.debug and count > 0:
-                    print("*** *** action: " + str(action))
-
+                
+                #print('action: ' + str(action))
                 # calculate next state
                 newstate = self.problem.domain.result(node.state,action)
-                if self.debug and count > 0:
-                    print("*** *** newstate: " + str(newstate))
-                # calculate cost of next node
-                cost = node.cost + self.problem.domain.cost(node.state, action)
-                # calculate heuristic of next node
-                heuristic = self.problem.domain.heuristic(newstate, self.problem.goal)
-                # create new node
-                newnode = SearchNode(newstate,node,cost,heuristic)
+                #print('node.state is: ' + str(node.state))
+                #print('newstate is: ' + str(newstate) + str(newstate in self.weight_dict))
+                # if newstate is already in the list, add this weight to it
+                if newstate in self.lvisited:
+                    pass
+                if newstate in self.weight_dict.keys():
+                    self.weight_dict[newstate] += node.cost
+                else:
+                    # calculate cost of next node
+                    cost = node.cost + self.problem.domain.cost(node.state, action)
+                    # calculate heuristic of next node
+                    heuristic = self.problem.domain.heuristic(newstate, self.problem.goal)
+                    # create new node
+                    newnode = SearchNode(newstate,node,cost,heuristic)
+                    
+                    # if self.debug and count > 0:
+                    #     print("*** *** newnode: " + str(newnode))
+                    #     print("LVISITED")
+                    #     print(self.lvisited)
+                    # add new node to list of new nodes
+                    lnewnodes += [newnode]
                 
-                # if self.debug and count > 0:
-                #     print("*** *** newnode: " + str(newnode))
-                #     print("LVISITED")
-                #     print(self.lvisited)
-                # add new node to list of new nodes
-                lnewnodes += [newnode]
-                
+            if lnewnodes == []:
+                node.cost = 0
+
             filterednn = [ newNode for newNode in lnewnodes \
-                                    if newNode.state not in self.lvisited \
-                                    and [newnode.state[0],newnode.state[1]] not in adjacencies ]
+                                    if newNode.state not in self.lvisited ]
             if self.debug and count > 0:
                print("*** *** filtered newnodes: " + str(filterednn))
 
