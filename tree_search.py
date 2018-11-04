@@ -100,10 +100,10 @@ class SearchTree:
     debug = False
 
     # construtor
-    def __init__(self,problem, initial_cost, strategy='breadth'): 
+    def __init__(self,problem, strategy='breadth'): 
         self.problem = problem
         heur = self.problem.domain.heuristic(problem.initial, self.problem.goal)
-        root = SearchNode(problem.initial, parent=None, cost=initial_cost, heuristic=heur)
+        root = SearchNode(problem.initial, parent=None, cost=0, heuristic=heur)
         self.open_nodes = [root]
         self.strategy = strategy
         self.cost = None
@@ -122,18 +122,18 @@ class SearchTree:
         return(path)
 
     # procurar a solucao
-    def search(self, limit=None):
+    def search(self, adjacencies):
 
         #print("*** Entering Tree search() method")
         #print("*** open_nodes is empty? " + str(len(self.open_nodes) == 0))
         
         count = 100
-
+        #print(adjacencies)
         while self.open_nodes != []:
             
             if self.debug and count > 0:
                 print("\n*** open_nodes is empty? " + str(len(self.open_nodes) == 0))
-            
+                
             node = self.open_nodes.pop(0)
             
             # if self.debug and count > 0:
@@ -169,15 +169,16 @@ class SearchTree:
                 # create new node
                 newnode = SearchNode(newstate,node,cost,heuristic)
                 
-                if self.debug and count > 0:
-                    print("*** *** newnode: " + str(newnode))
-                    print("LVISITED")
-                    print(self.lvisited)
+                # if self.debug and count > 0:
+                #     print("*** *** newnode: " + str(newnode))
+                #     print("LVISITED")
+                #     print(self.lvisited)
                 # add new node to list of new nodes
                 lnewnodes += [newnode]
                 
-
-            filterednn = [ newNode for newNode in lnewnodes if newNode.state not in self.lvisited ]
+            filterednn = [ newNode for newNode in lnewnodes \
+                                    if newNode.state not in self.lvisited \
+                                    and [newnode.state[0],newnode.state[1]] not in adjacencies ]
             if self.debug and count > 0:
                print("*** *** filtered newnodes: " + str(filterednn))
 

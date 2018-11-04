@@ -6,7 +6,7 @@ from pathways import Pathways
 #$ PORT=80 SERVER=pacman-aulas.ws.atnog.av.it.pt python client.py
 # to kill server: fuser 8000/tcp
 
-debug = False
+debug = True
 
 
 class Pacman_agent():
@@ -72,15 +72,15 @@ class Pacman_agent():
         #vectors = test_search(self.domain, self.energy)
         
         pac_pos = (state['pacman'][0], state['pacman'][1])
-        if debug:
-            print("\t pacman is in position " + str(pac_pos))
+        # if debug:
+        #     print("\t pacman is in position " + str(pac_pos))
 
-        (ex, ey) = self.get_vector(state['energy'], pac_pos, 0)
-        (gx, gy) = self.get_vector(state['ghosts'], pac_pos, 5000)
+        (ex, ey) = self.get_vector(state['energy'][0:30], pac_pos)
+        #(gx, gy) = self.get_vector(state['ghosts'], pac_pos)
 
         #sum the vectors
-        vec_x = ex + (-10*gx)
-        vec_y = ey + (-10*gy)
+        vec_x = ex #+ (-10*gx)
+        vec_y = ey #+ (-10*gy)
 
         # calculate the key to send
         if abs(vec_x) > abs(vec_y):
@@ -120,33 +120,43 @@ class Pacman_agent():
         return key
 
 
-    def get_vector(self, list_, pac_pos, initial_cost):
+    def get_vector(self, list_, pac_pos):
         i = 0
         vectors = []
+        # if debug:
+        #     print("***********************************************************")
+        #     print('\t get vector was called! ')
+        #     print("***********************************************************")
+
         for (x,y) in list_:
+
+            # if debug:
+                # print("#######################################################")
+                # print('\t calculating vector for pos: ' + str((x,y)))
+                # print("#######################################################")
         
-            if debug:
-                print("\t cycle  for position " + str((x,y)))
+            # if debug:
+            #     print("\t cycle  for position " + str((x,y)))
 
             # search the path
-            if debug:
-                print("SearchDomain being called to create")
+            # if debug:
+            #     print("SearchDomain being called to create")
             domain = Pathways(self.adjacencies)
 
-            if debug:
-                print("SearchProblem " + str(i) + " being called to create")
+            # if debug:
+            #     print("SearchProblem " + str(i) + " being called to create")
             my_prob = SearchProblem(domain,(x,y),pac_pos)
             
-            if debug:
-                print("SearchTree " + str(i) + " being called to create")
-            my_tree = SearchTree(my_prob, initial_cost, 'a*')
+            # if debug:
+            #     print("SearchTree " + str(i) + " being called to create")
+            my_tree = SearchTree(my_prob, 'a*')
             
-            next_pos = my_tree.search()
+            next_pos = my_tree.search(list_)
             
             #print("\t search " + str(i) + " was completed!")
 
-            if debug:
-                print('\t Calculating next move for position: ' + str((x,y)))
+            # if debug:
+            #     print('\t Calculating next move for position: ' + str((x,y)))
 
 
             # calculate vector for every element
@@ -166,8 +176,10 @@ class Pacman_agent():
                     dir = (0,(2**(-my_tree.cost)))
                 vectors += [dir]
             
-            if debug:
-                print('\t Vector is ' + str(dir))
+            # if debug:
+            #     print("#######################################################")
+            #     print('\t Vector is ' + str(dir))
+            #     print("#######################################################")
 
         # sum all the vectors
         vec_x = 0
@@ -178,6 +190,11 @@ class Pacman_agent():
         
         #print("\npacman is in position " + str(pac_pos[0], pac_pos[1]))
         #print('Sum of all vectors is: ' + str(vec_x) + ', ' + str(vec_y) + "\n")
+
+        if debug:
+            print("#######################################################")
+            print('\t Vector is ' + str((vec_x, vec_y)))
+            print("#######################################################")
 
         return (vec_x, vec_y)
 

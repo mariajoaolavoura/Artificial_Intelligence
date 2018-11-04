@@ -24,7 +24,7 @@ async def agent_loop(server_address = "localhost:8000", agent_name="student"):
         # Create the pacman agent
         pacman = Pacman_agent(Map(game_properties['map']))
 
-        #done = False
+        done = 1000
         # play!
         while True:
             #------------------------------------------------------------------#
@@ -41,9 +41,9 @@ async def agent_loop(server_address = "localhost:8000", agent_name="student"):
             if debug:
                 print(state)
             # get next move from pacman agent
-            #if not done:
-            key = pacman.get_next_move(state)
-            #    done = True
+            if done > 0:
+                key = pacman.get_next_move(state)
+                done -= 1
             
             
             #-send new key-----------------------------------------------------#

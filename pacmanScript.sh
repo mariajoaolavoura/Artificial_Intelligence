@@ -26,12 +26,12 @@ c()
 	python client.py
 }
 
-killserver()
+ks()
 {
 	fuser 8000/tcp
 }
 
-kil()
+k()
 {
-	ps a | grep " python client.py"
+	pkill -f "python client.py"
 }
