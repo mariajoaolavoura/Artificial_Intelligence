@@ -14,6 +14,7 @@ class Pacman_agent():
     def __init__(self, mapa, strategy='a*'): 
         # get map and pathways info
         self.mapa = mapa
+        self.strategy = strategy
         self.pathways = mapa.pathways
         self.adjacencies = self.create_adjacencies_map(self.pathways)
         self.energy = mapa.energy
@@ -132,7 +133,7 @@ class Pacman_agent():
         # convert list to dictionary with zero weight for each element
         weight_dict = { (x,y):1 for [x,y] in nodes_to_search }
 
-        for [x,y] in nodes_to_search:
+        for (x,y) in nodes_to_search:
 
             # if debug:
                 # print("#######################################################")
@@ -153,7 +154,7 @@ class Pacman_agent():
             
             # if debug:
             #     print("SearchTree " + str(i) + " being called to create")
-            my_tree = SearchTree(my_prob, weight_dict, 'breadth')
+            my_tree = SearchTree(my_prob, weight_dict, self.strategy)
             
             next_result = my_tree.search()
 
@@ -163,8 +164,8 @@ class Pacman_agent():
             else:
                 next_pos += [((x,y), pac_pos, 0)]
 
-            print((x,y))
-            print(next_result)
+            #print((x,y))
+            #print(next_result)
             
             #print("\t search " + str(i) + " was completed!")
 
@@ -180,29 +181,31 @@ class Pacman_agent():
                 x = pac_x - next_x
                 y = pac_y - next_y
                 if (x == 1):
-                    dir = ( ( -weight_dict[next_pos[i][0]])*(1/next_pos[i][2]) , 0 )
+                    dir = ( ( -(1/next_pos[i][2])) , 0 )
                 elif (x == -1):
-                    dir = ( ( weight_dict[next_pos[i][0]])*(1/next_pos[i][2]) , 0 )
+                    dir = ( ( (1/next_pos[i][2])) , 0 )
                 elif (y == 1):
-                    dir = ( 0 , (-weight_dict[next_pos[i][0]])*(1/next_pos[i][2]) )
+                    dir = ( 0 , (-(1/next_pos[i][2])) )
                 elif (y == -1):
-                    dir = ( 0 , (weight_dict[next_pos[i][0]])*(1/next_pos[i][2]) )
+                    dir = ( 0 , ((1/next_pos[i][2])) )
                 elif (x > 1):
-                    dir = ( (weight_dict[next_pos[i][0]])*(1/next_pos[i][2]) , 0 )
+                    dir = ( ((1/next_pos[i][2])) , 0 )
                 elif (x < 1):
-                    dir = ( (-weight_dict[next_pos[i][0]])*(1/next_pos[i][2]) , 0 )
+                    dir = ( (-(1/next_pos[i][2])) , 0 )
                 elif (y > 1):
-                    dir = ( 0 , (weight_dict[next_pos[i][0]])*(1/next_pos[i][2]) )
+                    dir = ( 0 , ((1/next_pos[i][2])) )
                 elif (y < 1):
-                    dir = ( 0 , (-weight_dict[next_pos[i][0]])*(1/next_pos[i][2]) )
+                    dir = ( 0 , (-(1/next_pos[i][2])) )
                 vectors += [dir]
+
+                print(str(next_pos[i][0]) + " : vector is: " + str(dir))
             
             # if debug:
             #     print("#######################################################")
             #     print('\t Vector is ' + str(dir))
             #     print("#######################################################")
 
-        print(weight_dict)
+        #print(weight_dict)
 
 
 
