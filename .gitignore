@@ -110,3 +110,5 @@ venv.bak/
 gnome-terminal
 
 *.score
+
+pacmanScript\.sh
