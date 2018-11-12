@@ -1,6 +1,5 @@
 from tree_search import *
 import random
-from pathways import Pathways
 
 
 #$ PORT=80 SERVER=pacman-aulas.ws.atnog.av.it.pt python client.py
@@ -11,61 +10,118 @@ debug = True
 
 class Pacman_agent():
 
-    def __init__(self, mapa, strategy='a*'): 
+
+    def __init__(self, map_, strategy='a*'): 
         # get map and pathways info
-        self.mapa = mapa
+        self.map_ = map_
         self.strategy = strategy
-        self.pathways = mapa.pathways
-        self.adjacencies = self.create_adjacencies_map(self.pathways)
-        self.energy = mapa.energy
-        self.boost = mapa.boost
+        self.pathways = self.create_pathways_list()
+        self.adjacencies = self.create_adjacencies_map(self.pathways, map_.ghost_spawn)
+        self.energy = map_.energy
+        self.boost = map_.boost
         self.ghosts = None
         if debug:
             print('CREATED PACMAN AGENT')
         
 
-    #
-    # creates a list of tuples with all adjacent coordinates
-    #
-    def create_adjacencies_map(self, pathways):
-        adjacencies = [ ((x,y),(a,b)) for ((x,y),(a,b)) in self.combinations(pathways, 2) \
-                        if ((a == x+1 and b == y) \
-                        or (a == x-1 and b == y) \
-                        or (b == y+1 and a == x) \
-                        or (b == y-1 and a == x) \
-                        or (x == 0 and a == self.mapa.hor_tiles-1 and b == y) \
-                        or (a == 0 and x == self.mapa.hor_tiles-1 and b == y) \
-                        or (y == 0 and b == self.mapa.ver_tiles-1 and a == x) \
-                        or (b == 0 and y == self.mapa.ver_tiles-1 and a == x)) ]
 
-        # TODO this only works to avoid the den in the example map
-        # TODO must find a way to eliminate den from domain/pathways 
-        # not needed for pacman, as no vector will point that way
-        # only needed as a more to make calculations more efficient
-        adjacencies.remove(((6,15),(7,15)))
-        adjacencies.remove(((7,15),(8,15)))
+    def create_pathways_list(self):
+        """Create a list with all coordinates that are not walls
 
-        # if debug:
-        #     for ((x,y),(a,b)) in adjacencies:
-        #         if (x,y) == (11,18) or (a,b) == (11,18):
-        #             print(((x,y),(a,b)))
-        #         if (x,y) == (11,12) or (a,b) == (11,12):
-        #             print(((x,y),(a,b)))
-        #print(adjacencies)
-        for ((x,y),(a,b)) in adjacencies:
-            if (x,y) == (7,15):
-                    print(((x,y),(a,b)))
-            if (a,b) == (7,15):
-                print(((x,y),(a,b)))
-        return adjacencies
+        Keyword arguments:
+        map_ -- instance of Map for the current level
+
+        Returns tuple of lists (for efficiency purposes):
+        pathways_hor - pathways organized by row
+        pathways_ver - pathways organized by column
+        """
+
+        pathways_hor = []
+        for y in range(self.map_.ver_tiles):
+            for x in range(self.map_.hor_tiles):
+                
+                if not self.map_.is_wall((x,y)): 
+                    pathways_hor.extend((x,y))
+
+        pathways_ver = []
+        for x in range(self.map_.hor_tiles):
+            for y in range(self.map_.ver_tiles):
+            
+                if not self.map_.is_wall((x,y)): 
+                    pathways_ver.extend((x,y))
+
+        return pathways_hor, pathways_ver
+    
+
+
+    def create_adjacencies_map(self, pathways, ghost_spawn):
+        """Create a list with all adjacencies of coordinates that are not walls
+
+        Keyword arguments:
+        pathways -- a tuple of list of the coordinates that are not walls
+        """
+
+        pathways_hor, pathways_ver = pathways
+        corridors = []
+        # using two cicles for horizontal and vertical adjancencies for
+        # efficiency purposes
+        (x,y) = pathways_hor[0]
+        corridor = [(x,y)]
+        for i in range(1,len(pathways_hor)):
+
+            (a,b) = pathways_hor[i]
+            
+            if b != y:
+                (x,y) = (a,b)
+                corridors += [corridor]
+                corridor = []
+                continue
+
+            if a == x+1:
+                adjacencies += [((x,y),(a,b))]
+                corridor += [(a,b)]
+            elif (x == 0 and a == self.map_.hor_tiles-1 and b == y) \
+                or (a == 0 and x == self.map_.hor_tiles-1 and b == y):
+                adjacencies += [((x,y),(a,b))]
+
+            (x,y) = (a,b)
+        corridors + [corridor]
+
+        (x,y) = pathways_ver[0]
+        corridor = [(x,y)]
+        for i in range(1,len(pathways_ver)):
+
+            (a,b) = pathways_ver[i]
+            
+            if a != x:
+                (x,y) = (a,b)
+                corridors += [corridor]
+                corridor = []
+                continue
+
+            if b == y+1:
+                adjacencies += [((x,y),(a,b))]
+                corridor += [(a,b)]
+            elif (y == 0 and b == self.map_.hor_tiles-1 and a == x) \
+                or (b == 0 and y == self.map_.hor_tiles-1 and a == x):
+                adjacencies += [((x,y),(a,b))]
+
+            (x,y) = (a,b)
+        corridors + [corridor]
+
+        return adjacencies, corridors
 
         
 
 
-    #
-    # calculates and returns the next move of pacman_agent (format 'wasd')
-    #
     def get_next_move(self, state):
+        """Objective of Pacman_agent - calculates the next position using
+        multiple auxiliar methods
+
+        Keyword arguments:
+        state -- a list of lists with the state of every element in the game
+        """
+
         #print("\nEnergy size is : " + str(len(state['energy'])) + "\n")
         # create a vector for every element in the game
         # every element points pacman teh next move to get to it
@@ -122,6 +178,12 @@ class Pacman_agent():
 
 
     def get_vector(self, nodes_to_search, pac_pos):
+        """Calculates the vector given by an element
+
+        Keyword arguments:
+        nodes_to_search -- 
+        pac_pos         -- coordinates of PACMAN position
+        """
         i = 0
         next_pos = []
         vectors = []
@@ -228,9 +290,93 @@ class Pacman_agent():
 
 
 
+
+
+    def calculate_key(self, vector):
+        """Calculates the 'wasd' key that corresponds to the next move
+
+        Keyword arguments:
+        vector -- the vector that represents next PACMAN move
+        """
+
+
+
+    def calculate_next_move_direction(self, pac_pos, next_pos):
+        """Calculates direction of next PACMAN move
+
+        Keyword arguments:
+        pac_pos     -- coordinates of PACMAN position
+        next_pos    -- coordinates of next PACMAN move
+        """
+
+
+
+    def sum_vectors(self, vectors):
+        """Sums all vectors
+
+        Keyword arguments:
+        vectors -- a list of vectors
+        """
+
+
+
     def combinations(self, list_, n):
+        """Generates all combinations of the elements in a list
+
+        Keyword arguments:
+        list_   -- a list
+        n       -- number of elements per combination
+        """
         if n==0: yield []
         else:
             for i in range(len(list_)):
                 for elem in self.combinations(list_[i+1:],n-1):
                     yield [list_[i]] + elem
+
+    
+
+    def print_debug_block(self, string, var):
+        """Prints a debug bar
+
+        Keyword arguments:
+        list_   -- a list
+        n       -- number of elements per combination
+        """
+        print("#######################################################")
+        print('\t ' + string + ': ' + str(var))
+        print("#######################################################")
+
+
+
+class Corridor():
+    """Represents an uninterrupted path of adjacente coordinates with a
+    crossroad at each end
+
+    Args:
+        coordinates: list of coordinates of the Corridor
+
+    Attributes:
+        coordinates: list of coordinates of the Corridor
+        length: length of coordinates without crossroad ends
+
+    """
+    def __init__(self, coordinates):
+        self.coordinates = coordinates
+        self.length = len(coordinates) -2
+        self.ends = (coordinates[0], coordinates[self.length-1])
+        
+    def dist_end1(coord):
+        return len(coordinates[0:coord])
+
+    def dist_end2(coord):
+        return len(coordinates[coord:self.length])
+
+    def dist_end(coord, end):
+        if end == ends[0]:
+            return self.dist_end1(coord)
+        return self.dist_end2(coord)
+
+    def closest_end(coord):
+        return self.dist_end1(coord)
+            if self.dist_end1(coord) <= self.dist_end2(coord)
+            else self.dist_end2(coord)

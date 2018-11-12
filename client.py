@@ -8,7 +8,7 @@ from mapa import Map
 from student import *
 
 
-debug = False
+debug = True
 
 async def agent_loop(server_address = "localhost:8000", agent_name="student"):
     async with websockets.connect("ws://{}/player".format(server_address)) as websocket:
@@ -31,7 +31,7 @@ async def agent_loop(server_address = "localhost:8000", agent_name="student"):
             r = await websocket.recv()
             state = json.loads(r) #receive game state
 
-            # game over (unnecessary for actuak play
+            # game over (unnecessary for actual play
             if not state['lives']:
                 print("GAME OVER")
                 return
