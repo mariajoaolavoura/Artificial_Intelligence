@@ -44,6 +44,8 @@ class Game_server:
 
         except websockets.exceptions.ConnectionClosed as c:
             logger.info("Client disconnected")
+            if websocket in self.viewers:
+                self.viewers.remove(websocket)
 
     async def mainloop(self):
         while True:
@@ -63,6 +65,8 @@ class Game_server:
                     await self.current_player.ws.send(self.game.state)
                     if self.viewers:
                         await asyncio.wait([client.send(self.game.state) for client in self.viewers])
+                await self.current_player.ws.send(json.dumps({"score": self.game.score}))
+
                 logger.info("Disconnecting <{}>".format(self.current_player.name))
             except websockets.exceptions.ConnectionClosed as c:
                 self.current_player = None
@@ -73,7 +77,7 @@ class Game_server:
             
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("--bind", help="IP address to bind to", default="localhost")
+    parser.add_argument("--bind", help="IP address to bind to", default="")
     parser.add_argument("--port", help="TCP port", type=int, default=8000)
     parser.add_argument("--ghosts", help="Number of ghosts", type=int, default=1)
     parser.add_argument("--lives", help="Number of lives", type=int, default=3)

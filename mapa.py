@@ -23,9 +23,6 @@ class Map:
 
         self._energy = []
         self._boost = []
-        # stores all coordinates that are not walls,
-        # thus, potentially reachable by pacman
-        self._pathways = []
 
         for x in range(self.hor_tiles):
             for y in range(self.ver_tiles):
@@ -39,9 +36,7 @@ class Map:
                     self._pacman_spawn = (x, y)
                 elif p == GHOST:
                     self._ghost_spawn = (x, y)
-                
-                if not self.is_wall((x,y)):
-                    self._pathways.append((x,y))
+
                 #logging.debug("{}, {}   {:x}".format(x, y, p))
 
 
@@ -68,10 +63,6 @@ class Map:
     @property
     def ghost_spawn(self):
         return self._ghost_spawn
-    
-    @property
-    def pathways(self):
-        return self._pathways
 
     def is_wall(self, pos):
         x, y = pos
