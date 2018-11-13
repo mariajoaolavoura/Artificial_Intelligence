@@ -8,21 +8,21 @@ s()
 		ghosts=0
 	fi
 
-	source ~/venv/bin/activate
+	source venv/bin/activate
 	python server.py --ghosts $ghosts
 	pacman > gnome-terminal
 }
 
 v()
 {
-	source ~/venv/bin/activate	
+	source venv/bin/activate	
 	python viewer.py
 	pacman > gnome-terminal
 }
 
 c()
 {
-	source ~/venv/bin/activate	
+	source venv/bin/activate	
 	python client.py
 }
 
