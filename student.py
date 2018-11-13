@@ -28,12 +28,13 @@ class Pacman_agent():
     def create_pathways_list(self):
         """Create a list with all coordinates that are not walls
 
-        Keyword arguments:
-        map_ -- instance of Map for the current level
+        Args:
+        map_: instance of Map for the current level
 
-        Returns tuple of lists (for efficiency purposes):
-        pathways_hor - pathways organized by row
-        pathways_ver - pathways organized by column
+        Returns:
+        Tuple of lists (for efficiency purposes):
+        pathways_hor: pathways organized by row
+        pathways_ver: pathways organized by column
         """
 
         pathways_hor = []
@@ -51,35 +52,68 @@ class Pacman_agent():
                     pathways_ver.extend((x,y))
 
         return pathways_hor, pathways_ver
+
+
+    
+
+    def create crossroads_list(self, pathways):
+        """Create a list with all coordinates that are crossroads
+
+        Args:
+        pathways: tuple with two list with all coordinates that are not walls
+
+        Returns:
+        crossroads: list of all coordinates that are crossroads:
+        """
+
+        pathways_hor, pathways_ver = pathways
+
+        crossroads = [ (x,y) for (x,y) in pathways_hor if (x,y+1) in pathways_hor ]
+
+
     
 
 
-    def create_adjacencies_map(self, pathways, ghost_spawn):
-        """Create a list with all adjacencies of coordinates that are not walls
+    def create_static_maps(self, pathways, ghost_spawn):
+        """Creates a list with all adjacencies of coordinates that are not walls
+        Uses two cycles for horizontal and vertical adjacencies for efficiency
+        purposes
 
-        Keyword arguments:
-        pathways -- a tuple of list of the coordinates that are not walls
+        Args:
+        pathways: a tuple of list of the coordinates that are not walls
+
+        Returns: A tuple with 2 lists
+        adjacencies: list with pairs of adjacent coordinates
+        corridors: list with groups of horizontal and vertical Corridors
         """
 
         pathways_hor, pathways_ver = pathways
         corridors = []
-        # using two cicles for horizontal and vertical adjancencies for
-        # efficiency purposes
+        crossroads = []
+
+        # horizontal search
         (x,y) = pathways_hor[0]
         corridor = [(x,y)]
         for i in range(1,len(pathways_hor)):
 
             (a,b) = pathways_hor[i]
             
+            # check for row change (coordinates are not adjacent)
             if b != y:
                 (x,y) = (a,b)
                 corridors += [corridor]
                 corridor = []
                 continue
 
+            # if horizontally adjacent, add to adjacencies, add to current
+            # horizontal corridor and verify if it is a crossroad
             if a == x+1:
                 adjacencies += [((x,y),(a,b))]
                 corridor += [(a,b)]
+                #TODO test efficiency of calculating i+1 and a+1 vs map_.is_wall
+                if not self.map_.is_wall(a,b+1) and pathways_hor[i+1][0] == a+1:
+                    crossroads += [(a,b)]
+            # check for spherical map adjacencies
             elif (x == 0 and a == self.map_.hor_tiles-1 and b == y) \
                 or (a == 0 and x == self.map_.hor_tiles-1 and b == y):
                 adjacencies += [((x,y),(a,b))]
@@ -87,21 +121,37 @@ class Pacman_agent():
             (x,y) = (a,b)
         corridors + [corridor]
 
+
+        # extra crossroad verification for the last row in the map
+        last_row = [ (x,y) for (x,y) in pathways_hor if y == self.map_.ver_tiles ]
+        (x,y) = last_row[0]
+        for i in range(1,len(last_row)):
+
+            (a,b) = last_row[i]
+
+            if a == x+1 and not self.map_.is_wall(a,b+1) and pathways_hor[i+1][0] == a+1:
+                crossroads += [(a,b)]
+
+        # vertical search
         (x,y) = pathways_ver[0]
         corridor = [(x,y)]
         for i in range(1,len(pathways_ver)):
 
             (a,b) = pathways_ver[i]
-            
+
+            # check for column change (coordinates are not adjacent)
             if a != x:
                 (x,y) = (a,b)
                 corridors += [corridor]
                 corridor = []
                 continue
 
+            # if vertically adjacent, add to adjacencies, add to current
+            # vertical corridor
             if b == y+1:
                 adjacencies += [((x,y),(a,b))]
                 corridor += [(a,b)]
+            # check for spherical map adjacencies
             elif (y == 0 and b == self.map_.hor_tiles-1 and a == x) \
                 or (b == 0 and y == self.map_.hor_tiles-1 and a == x):
                 adjacencies += [((x,y),(a,b))]
@@ -109,7 +159,28 @@ class Pacman_agent():
             (x,y) = (a,b)
         corridors + [corridor]
 
-        return adjacencies, corridors
+
+        # connect vertical and horizontal adjacent corridors
+        buffer = corridors
+        corridors = []
+        while buffer != []:
+
+            corr = buffer.pop(len(buffer))
+            found = True
+            for c in buffer:
+                if corr.ends[0] == c.ends[0]:
+
+                if corr.ends[0] == c.ends[1]:
+
+                if corr.ends[1] == c.ends[0]:
+
+                if corr.ends[1] == c.ends[1]:
+
+
+
+
+
+        return adjacencies, corridors, crossroads
 
         
 
@@ -118,8 +189,10 @@ class Pacman_agent():
         """Objective of Pacman_agent - calculates the next position using
         multiple auxiliar methods
 
-        Keyword arguments:
-        state -- a list of lists with the state of every element in the game
+        Args:
+        state: a list of lists with the state of every element in the game
+
+        Returns: the key corresponding to the next move of PACMAN
         """
 
         #print("\nEnergy size is : " + str(len(state['energy'])) + "\n")
@@ -180,9 +253,12 @@ class Pacman_agent():
     def get_vector(self, nodes_to_search, pac_pos):
         """Calculates the vector given by an element
 
-        Keyword arguments:
+        Args:
         nodes_to_search -- 
         pac_pos         -- coordinates of PACMAN position
+
+        Returns:
+
         """
         i = 0
         next_pos = []
