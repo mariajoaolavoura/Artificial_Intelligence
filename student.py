@@ -286,7 +286,7 @@ class Pacman_agent():
 ################################################################################
     
     """##########   TESTED AND VERIFIED   ##########"""
-    # TODO how to remove ghosts den from the crossroads
+    # TODO how to remove ghosts den from the crossroads (is it needed? see method)
     def create_pathways_list(self):
         """Create a list with all coordinates that are not walls
 
@@ -345,7 +345,7 @@ class Pacman_agent():
 
 #------------------------------------------------------------------------------#
 
-    def get_ghosts_den(self, ghost_spawn):
+    def get_ghosts_den(self, map_, den):
         """delimit the coordinates that make up the ghosts den
 
         Args:
@@ -355,11 +355,44 @@ class Pacman_agent():
         crossroads: list of coordinates tht make up the ghosts den:
         """
 
-        if is_wall(ghost_spawn):
-            return []
+        # TODO - work in progress. before continuing, verify if it will be needed
+        # TODO   Using searchTree with corridors, there is no risk of entering the
+        # TODO   den during the search.
 
-        x,y = ghost_spawn
-        if 
+
+        buffer = den
+        #while 
+        if den == []:
+            return den
+
+        # get neighbors
+        neighbors = []
+        count = 0
+        for (x,y) in den:
+
+            if not map_.is_wall((x-1,y)):
+                neighbors += [(x-1,y)]
+                count += 1
+            if not map_.is_wall((x+1,y)):
+                neighbors += [(x+1,y)]
+                count += 1
+            if not map_.is_wall((x,y-1)):
+                neighbors += [(x,y-1)]
+                count += 1
+            if not map_.is_wall((x,y+1)):
+                neighbors += [(x,y+1)]
+                count += 1
+
+        if count < 2:
+            return [(x,y)]
+        if count == 2:
+            pass
+            #found entrance
+        if count > 2:
+            return [den] + get_ghosts_den(map_, neighbors)
+        
+
+        return [ghost_spawn] + get_ghosts_den(map_, ...)
     
 
 #------------------------------------------------------------------------------#
@@ -385,37 +418,46 @@ class Pacman_agent():
         (x,y) = pathways_hor[0]
         corridor = [(x,y)]
         i = 0
-        for i in range(1,len(pathways_hor)-1):
+        for i in range(1,len(pathways_hor)):
             # print()
             # print('horizontal iteration number: ' +)
             (a,b) = pathways_hor[i]
             
             # check for row change (coordinates are not adjacent)
             if b != y:
-                (x,y) = (a,b)
                 if len(corridor) > 1: # length 1 is a section of a vertical corridor
-                    corridors += [Corridor(corridor)]
-                corridor = []
+                    corridors += [corridor]
+                corridor = [(a,b)]
+                (x,y) = (a,b)
                 continue
 
             # if horizontally adjacent, add to adjacencies, add to current
-            # horizontal corridor and verify if it is a crossroad
+            # horizontal corridor
             if a == x+1:
                 adjacencies += [((x,y),(a,b))]
                 corridor += [(a,b)]
+                if (a,b) in crossroads:
+                    corridors += [corridor]
+                    corridor = [(a,b)]
             # check for spherical map adjacencies
             elif (x == 0 and a == self.map_.hor_tiles-1 and b == y) \
                 or (a == 0 and x == self.map_.hor_tiles-1 and b == y):
                 adjacencies += [((x,y),(a,b))]
+            else:
+                if len(corridor) > 1: # length 1 is a section of a vertical corridor
+                    corridors += [corridor]
+                corridor = [(a,b)]
 
             (x,y) = (a,b)
         
         # add last horizontal adjacency
         if i == len(pathways_hor) -1:
             adjacencies += [(pathways_hor[len(pathways_hor) -2], pathways_hor[len(pathways_hor) -1])]
-            corridor += [pathways_hor[len(pathways_hor)-1]]
         if len(corridor) > 1:
-            corridors += [Corridor(corridor)]
+            corridors += [corridor]
+
+        if debug:
+            self.print_debug_block('horizontal corridors', corridors)
 
 
         # vertical search
@@ -428,10 +470,10 @@ class Pacman_agent():
 
             # check for column change (coordinates are not adjacent)
             if a != x:
-                (x,y) = (a,b)
                 if len(corridor) > 1:
-                    corridors += [Corridor(corridor)] # length 1 is a section of a horizontal corridor
-                corridor = []
+                    corridors += [corridor] # length 1 is a section of a horizontal corridor
+                corridor = [(a,b)]
+                (x,y) = (a,b)
                 continue
 
             # if vertically adjacent, add to adjacencies, add to current
@@ -439,19 +481,28 @@ class Pacman_agent():
             if b == y+1:
                 adjacencies += [((x,y),(a,b))]
                 corridor += [(a,b)]
+                if (a,b) in crossroads:
+                    corridors += [corridor]
+                    corridor = [(a,b)]
             # check for spherical map adjacencies
             elif (y == 0 and b == self.map_.hor_tiles-1 and a == x) \
                 or (b == 0 and y == self.map_.hor_tiles-1 and a == x):
                 adjacencies += [((x,y),(a,b))]
+            else:
+                if len(corridor) > 1: # length 1 is a section of a vertical corridor
+                    corridors += [corridor]
+                corridor = [(a,b)]
 
             (x,y) = (a,b)
+
+        if debug:
+            self.print_debug_block('horizontal + vertical corridors', corridors)
 
         # add last vertical adjacency
         if i == len(pathways_ver) -1:
             adjacencies += [(pathways_ver[len(pathways_ver) -2], pathways_ver[len(pathways_ver) -1])]
-            corridor += [pathways_ver[len(pathways_ver)-1]]
         if len(corridor) > 1:
-            corridors += [Corridor(corridor)]
+            corridors += [corridor]
 
 
         # connect vertical and horizontal adjacent corridors
@@ -463,30 +514,33 @@ class Pacman_agent():
             found = True
             while found:
                 found = False
-                end0, end1 = corr.ends
+                end0 = corr[0]
+                end1 = corr[len(corr)-1]
                 for c in buffer[:]: # copy of list to allow removals while iterating
-                    if end0 == c.ends[0] and end0 not in crossroads:
-                        corr = Corridor(end0[::-1] + c.ends[0])
+                    if end0 == c[0] and end0 not in crossroads:
+                        corr = corr[::-1] + c[1:]
                         buffer.remove(c)
                         found = True
                         break
-                    elif end0 == c.ends[1] and end0 not in crossroads:
-                        corr = Corridor(c.ends[1] + end0)
+                    elif end0 == c[len(c)-1] and end0 not in crossroads:
+                        corr = c[1:] + corr
                         buffer.remove(c)
                         found = True
                         break
-                    elif end1 == c.ends[0] and end1 not in crossroads:
-                        corr = Corridor(end1 + c.ends[0])
+                    elif end1 == c[0] and end1 not in crossroads:
+                        corr = corr + c[1:]
                         buffer.remove(c)
                         found = True
                         break
-                    elif end1 == c.ends[1] and end1 not in crossroads:
-                        corr = Corridor(c.ends[1] + end1[::-1])
+                    elif end1 == c[len(c)-1] and end1 not in crossroads:
+                        corr = c[1:len(c)-1] + corr[::-1]
                         buffer.remove(c)
                         found = True
                         break
 
             corridors += [corr]
+
+        corridors = [ Corridor(corr) for corr in corridors ]
 
         if debug:
             self.print_debug_block('adjacencies', adjacencies)
