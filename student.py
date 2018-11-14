@@ -413,6 +413,7 @@ class Pacman_agent():
         pathways_hor, pathways_ver = pathways
         adjacencies = []
         corridors = []
+        tunnel_points = []
 
         # horizontal search
         (x,y) = pathways_hor[0]
@@ -422,7 +423,7 @@ class Pacman_agent():
             # print()
             # print('horizontal iteration number: ' +)
             (a,b) = pathways_hor[i]
-            
+
             # check for row change (coordinates are not adjacent)
             if b != y:
                 if len(corridor) > 1: # length 1 is a section of a vertical corridor
@@ -439,14 +440,19 @@ class Pacman_agent():
                 if (a,b) in crossroads:
                     corridors += [corridor]
                     corridor = [(a,b)]
-            # check for spherical map adjacencies
-            elif (x == 0 and a == self.map_.hor_tiles-1 and b == y) \
-                or (a == 0 and x == self.map_.hor_tiles-1 and b == y):
-                adjacencies += [((x,y),(a,b))]
             else:
                 if len(corridor) > 1: # length 1 is a section of a vertical corridor
                     corridors += [corridor]
                 corridor = [(a,b)]
+
+            # check for spherical map adjacencies
+            if a == self.map_.hor_tiles-1:
+                (i,j) = [ (i,j) for (i,j) in pathways_hor if i == 0 and j = b ][0]
+                adjacencies += [((i,j),(a,b))]
+                tunnels_points += [(i,j)]
+                tunnels_points += [(a,b)]
+
+            
 
             (x,y) = (a,b)
         
@@ -484,69 +490,119 @@ class Pacman_agent():
                 if (a,b) in crossroads:
                     corridors += [corridor]
                     corridor = [(a,b)]
-            # check for spherical map adjacencies
-            elif (y == 0 and b == self.map_.hor_tiles-1 and a == x) \
-                or (b == 0 and y == self.map_.hor_tiles-1 and a == x):
-                adjacencies += [((x,y),(a,b))]
             else:
                 if len(corridor) > 1: # length 1 is a section of a vertical corridor
                     corridors += [corridor]
                 corridor = [(a,b)]
+
+            # check for spherical map adjacencies
+            if b == self.map_.ver_tiles-1:
+                (i,j) = [ (i,j) for (i,j) in pathways_ver if j == 0 and i = a ][0]
+                adjacencies += [((i,j),(a,b))]
+                tunnels_points += [(i,j)]
+                tunnels_points += [(a,b)]
 
             (x,y) = (a,b)
 
         if debug:
             self.print_debug_block('horizontal + vertical corridors', corridors)
 
-        # add last vertical adjacency
+        # add last vertical adjacency and last vertical corridor
         if i == len(pathways_ver) -1:
             adjacencies += [(pathways_ver[len(pathways_ver) -2], pathways_ver[len(pathways_ver) -1])]
         if len(corridor) > 1:
-            corridors += [corridor]
+            corridors += [corridor]        
 
-
-        # connect vertical and horizontal adjacent corridors
-        buffer = corridors
-        corridors = []
-        while buffer != []:
-
-            corr = buffer.pop(len(buffer)-1)
-            found = True
-            while found:
-                found = False
-                end0 = corr[0]
-                end1 = corr[len(corr)-1]
-                for c in buffer[:]: # copy of list to allow removals while iterating
-                    if end0 == c[0] and end0 not in crossroads:
-                        corr = corr[::-1] + c[1:]
-                        buffer.remove(c)
-                        found = True
-                        break
-                    elif end0 == c[len(c)-1] and end0 not in crossroads:
-                        corr = c[1:] + corr
-                        buffer.remove(c)
-                        found = True
-                        break
-                    elif end1 == c[0] and end1 not in crossroads:
-                        corr = corr + c[1:]
-                        buffer.remove(c)
-                        found = True
-                        break
-                    elif end1 == c[len(c)-1] and end1 not in crossroads:
-                        corr = c[1:len(c)-1] + corr[::-1]
-                        buffer.remove(c)
-                        found = True
-                        break
-
-            corridors += [corr]
-
-        corridors = [ Corridor(corr) for corr in corridors ]
+        
 
         if debug:
             self.print_debug_block('adjacencies', adjacencies)
             self.print_debug_block('corridors', corridors)
 
         return adjacencies, corridors
+
+#------------------------------------------------------------------------------#
+
+    def connect_corridors(self, corridors):
+        """connects horizontal and vertical subcorridors that make up the
+        same corridor
+
+        Args:
+        corridors: a list of horizontal and vertical subcorridors
+
+        Returns:
+        a list of complete corridors
+        """
+
+        # TODO turn this into a function to be utilized to sort corridors and to sort tunnels
+        # connect vertical and horizontal adjacent corridors
+        connected = []
+        while corridors != []:
+            self.print_debug_block('corridors', corridors)
+            corr = corridors.pop(len(corridors)-1)
+            
+            found = True
+            while found:
+                found = False
+                self.print_debug_block('corr', corr)
+                end0 = corr[0]
+                end1 = corr[len(corr)-1]
+                for c in corridors[:]: # copy of list to allow removals while iterating
+
+                    #if end0 == (0,_)
+
+                    if end0 == c[0] and end0 not in crossroads:
+                        corr = corr[::-1] + c[1:]
+                        self.print_debug_block('removed c', c)
+                        corridors.remove(c)
+                        found = True
+                        break
+                    elif end0 == c[len(c)-1] and end0 not in crossroads:
+                        corr = c + corr[1:]
+                        self.print_debug_block('removed c', c)
+                        corridors.remove(c)
+                        found = True
+                        break
+                    elif end1 == c[0] and end1 not in crossroads:
+                        corr = corr + c[1:]
+                        self.print_debug_block('removed c', c)
+                        corridors.remove(c)
+                        found = True
+                        break
+                    elif end1 == c[len(c)-1] and end1 not in crossroads:
+                        corr = c[0:len(c)-1] + corr[::-1]
+                        self.print_debug_block('removed c', c)
+                        corridors.remove(c)
+                        found = True
+                        break
+
+            connected += [corr]
+
+
+        # TODO complete this part
+        # connect corridors that form a tunnel (spherical map)
+        tunnels = [ corr for corr in connected \
+                            if corr[0] in tunnel_points \
+                            or corr[1] in tunnel_points ]
+
+
+
+
+
+        return [ Corridor(corr) for corr in connected ]
+
+#------------------------------------------------------------------------------#
+
+    def create_corridor_adjacencies(self, corridors):
+        """Creates pairs of adjacent corridors
+
+        Args:
+        corridors: a list of corridors
+
+        Returns:
+        a list of tuples of adjacente corridors
+        """
+    
 
 
 ################################################################################
@@ -560,7 +616,7 @@ class Corridor():
     Args:
         coordinates: list of coordinates of the Corridor
 
-    Attributes:
+    Attr:
         coordinates: list of coordinates of the Corridor
         length: length of coordinates without crossroad ends
 
