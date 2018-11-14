@@ -447,10 +447,10 @@ class Pacman_agent():
 
             # check for spherical map adjacencies
             if a == self.map_.hor_tiles-1:
-                (i,j) = [ (i,j) for (i,j) in pathways_hor if i == 0 and j = b ][0]
+                (i,j) = [ (i,j) for (i,j) in pathways_hor if i == 0 and j == b ][0]
                 adjacencies += [((i,j),(a,b))]
-                tunnels_points += [(i,j)]
-                tunnels_points += [(a,b)]
+                tunnel_points += [(i,j)]
+                tunnel_points += [(a,b)]
 
             
 
@@ -497,10 +497,10 @@ class Pacman_agent():
 
             # check for spherical map adjacencies
             if b == self.map_.ver_tiles-1:
-                (i,j) = [ (i,j) for (i,j) in pathways_ver if j == 0 and i = a ][0]
+                (i,j) = [ (i,j) for (i,j) in pathways_ver if j == 0 and i == a ][0]
                 adjacencies += [((i,j),(a,b))]
-                tunnels_points += [(i,j)]
-                tunnels_points += [(a,b)]
+                tunnel_points += [(i,j)]
+                tunnel_points += [(a,b)]
 
             (x,y) = (a,b)
 
@@ -513,7 +513,8 @@ class Pacman_agent():
         if len(corridor) > 1:
             corridors += [corridor]        
 
-        
+        # connect corridors
+        corridors = self.connect_corridors(corridors, tunnel_points, crossroads)
 
         if debug:
             self.print_debug_block('adjacencies', adjacencies)
@@ -523,7 +524,7 @@ class Pacman_agent():
 
 #------------------------------------------------------------------------------#
 
-    def connect_corridors(self, corridors):
+    def connect_corridors(self, corridors, tunnel_points, crossroads):
         """connects horizontal and vertical subcorridors that make up the
         same corridor
 
@@ -600,7 +601,7 @@ class Pacman_agent():
         corridors: a list of corridors
 
         Returns:
-        a list of tuples of adjacente corridors
+        a list of sorted tuples of adjacent corridors (with adjacency in the middle)
         """
     
 
