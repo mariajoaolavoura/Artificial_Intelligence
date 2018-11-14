@@ -345,6 +345,25 @@ class Pacman_agent():
 
 #------------------------------------------------------------------------------#
 
+    def get_ghosts_den(self, ghost_spawn):
+        """delimit the coordinates that make up the ghosts den
+
+        Args:
+        ghost_spawn: coordinates where ghosts spawn (usually the center of den)
+
+        Returns:
+        crossroads: list of coordinates tht make up the ghosts den:
+        """
+
+        if is_wall(ghost_spawn):
+            return []
+
+        x,y = ghost_spawn
+        if 
+    
+
+#------------------------------------------------------------------------------#
+
     def create_static_maps(self, pathways, crossroads):
         """Creates a list with all adjacencies of coordinates that are not walls
         Uses two cycles for horizontal and vertical adjacencies for efficiency
