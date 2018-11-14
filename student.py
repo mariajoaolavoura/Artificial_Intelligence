@@ -380,3 +380,8 @@ class Corridor():
         return self.dist_end1(coord)
             if self.dist_end1(coord) <= self.dist_end2(coord)
             else self.dist_end2(coord)
+
+
+    def sub_corridor(self, coord):
+        index = self.coordinates.index(coord)
+        return Corridor(self.coordinates[:index]+[self.coordinates[index]]), Corridor(self.coordinates[index:])

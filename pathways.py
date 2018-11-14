@@ -1,37 +1,34 @@
 from tree_search import SearchDomain
+from student import Corridor
 import math
 
 class Pathways(SearchDomain):
 
     def __init__(self, adjacencies):
         self.adjacencies = adjacencies
-        #print("### " + str(self.adjacencies))
-        for ((x,y),(a,b)) in adjacencies:
-            if (x,y) == (7,15):
-                    print(((x,y),(a,b)))
-            if (a,b) == (7,15):
-                print(((x,y),(a,b)))
 
-    def actions(self,coordinate):
+    def actions(self,corridor):
         actlist = []
-        for ((x,y),(a,b)) in self.adjacencies:
-            if ((x,y) == coordinate):
-                actlist += [((x,y),(a,b))]
-            elif ((a,b) == coordinate):
-                actlist += [((a,b),(x,y))]
+        for (corr1, corr2) in self.adjacencies:
+            if (corr1 == corridor):
+                actlist += [(corr1, corr2)]
+            elif (corr2 == corridor):
+                actlist += [(corr2, corr1)]
         return actlist 
 
-    def result(self,coordinate,action):
-        (x,y),(a,b) = action
-        if (x,y) == coordinate:
-            return (a,b)
+    def result(self,corridor,action):
+        corr1, corr2 = action
+        if corr1 == corridor:
+            return corr2
         
-    def cost(self, cur_pos, action):
-        orig, _ = action
-        if (orig != cur_pos):
+    def cost(self, cur_corr, action):
+        corr1, _ = action
+        if (corr1 != cur_corr):
             return None
-        return 1
+        return corr1.length
 
+
+    # TODO
     def heuristic(self, new_state, goal):
         x, y = new_state
         gx, gy = goal
