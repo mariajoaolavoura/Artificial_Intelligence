@@ -280,6 +280,7 @@ class Pacman_agent():
     
 
 
+<<<<<<< HEAD
 
 ################################################################################
 #####################   STATIC ANALYSIS AUXILIAR METHODS   #####################
@@ -503,7 +504,337 @@ class Pacman_agent():
             adjacencies += [(pathways_ver[len(pathways_ver) -2], pathways_ver[len(pathways_ver) -1])]
         if len(corridor) > 1:
             corridors += [corridor]
+=======
 
+################################################################################
+#####################   STATIC ANALYSIS AUXILIAR METHODS   #####################
+################################################################################
+    
+    """##########   TESTED AND VERIFIED   ##########"""
+    # TODO how to remove ghosts den from the crossroads (is it needed? see method)
+    def create_pathways_list(self):
+        """Create a list with all coordinates that are not walls
+>>>>>>> static_analisys
+
+        Returns:
+        Tuple of lists (for efficiency purposes):
+        pathways_hor: pathways organized by row
+        pathways_ver: pathways organized by column
+        """
+
+        pathways_hor = []
+        for y in range(self.map_.ver_tiles):
+            for x in range(self.map_.hor_tiles):
+                
+                if not self.map_.is_wall((x,y)): 
+                    pathways_hor += [(x,y)]
+            
+        pathways_ver = sorted(pathways_hor, key=lambda y: (x,y))
+
+        if True:
+            self.print_debug_block('pathways_hor', pathways_hor)
+            self.print_debug_block('pathways_ver', pathways_ver)
+
+        return pathways_hor, pathways_ver
+
+#------------------------------------------------------------------------------#
+    
+    def create_crossroads_list(self, pathways):
+        """Create a list with all coordinates that are crossroads
+
+        Args:
+        pathways: tuple with two list with all coordinates that are not walls
+
+        Returns:
+        crossroads: list of all coordinates that are crossroads:
+        """
+
+        pathways_hor, _ = pathways
+        crossroads = []
+        for (x,y) in pathways_hor:
+            adj = 0
+            if x > 0 and not self.map_.is_wall((x-1,y)):
+                adj += 1
+            if x < self.map_.hor_tiles-1 and not self.map_.is_wall((x+1,y)):
+                adj += 1
+            if y > 0 and not self.map_.is_wall((x,y-1)):
+                adj += 1
+            if y < self.map_.ver_tiles-1 and not self.map_.is_wall((x,y+1)):
+                adj += 1
+            if adj > 2:
+                crossroads += [(x,y)]
+
+        if debug:
+            self.print_debug_block('crossroads', crossroads)
+
+        return crossroads
+
+#------------------------------------------------------------------------------#
+
+    def get_ghosts_den(self, map_, den):
+        """delimit the coordinates that make up the ghosts den
+
+        Args:
+        ghost_spawn: coordinates where ghosts spawn (usually the center of den)
+
+        Returns:
+        crossroads: list of coordinates tht make up the ghosts den:
+        """
+
+        # TODO - work in progress. before continuing, verify if it will be needed
+        # TODO   Using searchTree with corridors, there is no risk of entering the
+        # TODO   den during the search.
+
+
+        buffer = den
+        #while 
+        if den == []:
+            return den
+
+        # get neighbors
+        neighbors = []
+        count = 0
+        for (x,y) in den:
+
+            if not map_.is_wall((x-1,y)):
+                neighbors += [(x-1,y)]
+                count += 1
+            if not map_.is_wall((x+1,y)):
+                neighbors += [(x+1,y)]
+                count += 1
+            if not map_.is_wall((x,y-1)):
+                neighbors += [(x,y-1)]
+                count += 1
+            if not map_.is_wall((x,y+1)):
+                neighbors += [(x,y+1)]
+                count += 1
+
+        if count < 2:
+            return [(x,y)]
+        if count == 2:
+            pass
+            #found entrance
+        if count > 2:
+            return [den] + get_ghosts_den(map_, neighbors)
+        
+
+        return [ghost_spawn] + get_ghosts_den(map_, ...)
+    
+
+#------------------------------------------------------------------------------#
+
+    def create_static_maps(self, pathways, crossroads):
+        """Creates a list with all adjacencies of coordinates that are not walls
+        Uses two cycles for horizontal and vertical adjacencies for efficiency
+        purposes
+
+        Args:
+        pathways: a tuple of list of the coordinates that are not walls
+
+        Returns: A tuple with 2 lists
+        adjacencies: list with pairs of adjacent coordinates
+        corridors: list with groups of horizontal and vertical Corridors
+        """
+
+        pathways_hor, pathways_ver = pathways
+        adjacencies = []
+        corridors = []
+        tunnel_points = []
+
+        # horizontal search
+        (x,y) = pathways_hor[0]
+        corridor = [(x,y)]
+        i = 0
+        for i in range(1,len(pathways_hor)):
+            # print()
+            # print('horizontal iteration number: ' +)
+            (a,b) = pathways_hor[i]
+
+            # check for row change (coordinates are not adjacent)
+            if b != y:
+                if len(corridor) > 1: # length 1 is a section of a vertical corridor
+                    corridors += [corridor]
+                corridor = [(a,b)]
+                (x,y) = (a,b)
+                continue
+
+            # if horizontally adjacent, add to adjacencies, add to current
+            # horizontal corridor
+            if a == x+1:
+                adjacencies += [((x,y),(a,b))]
+                corridor += [(a,b)]
+                if (a,b) in crossroads:
+                    corridors += [corridor]
+                    corridor = [(a,b)]
+            else:
+                if len(corridor) > 1: # length 1 is a section of a vertical corridor
+                    corridors += [corridor]
+                corridor = [(a,b)]
+
+            # check for spherical map adjacencies
+            if a == self.map_.hor_tiles-1:
+                (i,j) = [ (i,j) for (i,j) in pathways_hor if i == 0 and j == b ][0]
+                adjacencies += [((i,j),(a,b))]
+                tunnel_points += [(i,j)]
+                tunnel_points += [(a,b)]
+
+            
+
+            (x,y) = (a,b)
+        
+        # add last horizontal adjacency
+        if i == len(pathways_hor) -1:
+            adjacencies += [(pathways_hor[len(pathways_hor) -2], pathways_hor[len(pathways_hor) -1])]
+        if len(corridor) > 1:
+            corridors += [corridor]
+
+        if debug:
+            self.print_debug_block('horizontal corridors', corridors)
+
+
+        # vertical search
+        (x,y) = pathways_ver[0]
+        corridor = [(x,y)]
+        i = 0
+        for i in range(1,len(pathways_ver)):
+
+            (a,b) = pathways_ver[i]
+
+            # check for column change (coordinates are not adjacent)
+            if a != x:
+                if len(corridor) > 1:
+                    corridors += [corridor] # length 1 is a section of a horizontal corridor
+                corridor = [(a,b)]
+                (x,y) = (a,b)
+                continue
+
+            # if vertically adjacent, add to adjacencies, add to current
+            # vertical corridor
+            if b == y+1:
+                adjacencies += [((x,y),(a,b))]
+                corridor += [(a,b)]
+                if (a,b) in crossroads:
+                    corridors += [corridor]
+                    corridor = [(a,b)]
+            else:
+                if len(corridor) > 1: # length 1 is a section of a vertical corridor
+                    corridors += [corridor]
+                corridor = [(a,b)]
+
+            # check for spherical map adjacencies
+            if b == self.map_.ver_tiles-1:
+                (i,j) = [ (i,j) for (i,j) in pathways_ver if j == 0 and i == a ][0]
+                adjacencies += [((i,j),(a,b))]
+                tunnel_points += [(i,j)]
+                tunnel_points += [(a,b)]
+
+            (x,y) = (a,b)
+
+        if debug:
+            self.print_debug_block('horizontal + vertical corridors', corridors)
+
+        # add last vertical adjacency and last vertical corridor
+        if i == len(pathways_ver) -1:
+            adjacencies += [(pathways_ver[len(pathways_ver) -2], pathways_ver[len(pathways_ver) -1])]
+        if len(corridor) > 1:
+            corridors += [corridor]        
+
+        # connect corridors
+        corridors = self.connect_corridors(corridors, tunnel_points, crossroads)
+
+        if debug:
+            self.print_debug_block('adjacencies', adjacencies)
+            self.print_debug_block('corridors', corridors)
+
+        return adjacencies, corridors
+
+#------------------------------------------------------------------------------#
+
+    def connect_corridors(self, corridors, tunnel_points, crossroads):
+        """connects horizontal and vertical subcorridors that make up the
+        same corridor
+
+        Args:
+        corridors: a list of horizontal and vertical subcorridors
+
+        Returns:
+        a list of complete corridors
+        """
+
+        # TODO turn this into a function to be utilized to sort corridors and to sort tunnels
+        # connect vertical and horizontal adjacent corridors
+        connected = []
+        while corridors != []:
+            self.print_debug_block('corridors', corridors)
+            corr = corridors.pop(len(corridors)-1)
+            
+            found = True
+            while found:
+                found = False
+                self.print_debug_block('corr', corr)
+                end0 = corr[0]
+                end1 = corr[len(corr)-1]
+                for c in corridors[:]: # copy of list to allow removals while iterating
+
+                    #if end0 == (0,_)
+
+                    if end0 == c[0] and end0 not in crossroads:
+                        corr = corr[::-1] + c[1:]
+                        self.print_debug_block('removed c', c)
+                        corridors.remove(c)
+                        found = True
+                        break
+                    elif end0 == c[len(c)-1] and end0 not in crossroads:
+                        corr = c + corr[1:]
+                        self.print_debug_block('removed c', c)
+                        corridors.remove(c)
+                        found = True
+                        break
+                    elif end1 == c[0] and end1 not in crossroads:
+                        corr = corr + c[1:]
+                        self.print_debug_block('removed c', c)
+                        corridors.remove(c)
+                        found = True
+                        break
+                    elif end1 == c[len(c)-1] and end1 not in crossroads:
+                        corr = c[0:len(c)-1] + corr[::-1]
+                        self.print_debug_block('removed c', c)
+                        corridors.remove(c)
+                        found = True
+                        break
+
+            connected += [corr]
+
+
+        # TODO complete this part
+        # connect corridors that form a tunnel (spherical map)
+        tunnels = [ corr for corr in connected \
+                            if corr[0] in tunnel_points \
+                            or corr[1] in tunnel_points ]
+
+
+
+
+
+        return [ Corridor(corr) for corr in connected ]
+
+#------------------------------------------------------------------------------#
+
+    def create_corridor_adjacencies(self, corridors):
+        """Creates pairs of adjacent corridors
+
+        Args:
+        corridors: a list of corridors
+
+        Returns:
+        a list of sorted tuples of adjacent corridors (with adjacency in the middle)
+        """
+    
+
+
+################################################################################
+#############################   AUXILIAR CLASSES   #############################
+################################################################################
 
         # connect vertical and horizontal adjacent corridors
         buffer = corridors
@@ -560,7 +891,7 @@ class Corridor():
     Args:
         coordinates: list of coordinates of the Corridor
 
-    Attributes:
+    Attr:
         coordinates: list of coordinates of the Corridor
         length: length of coordinates without crossroad ends
 
