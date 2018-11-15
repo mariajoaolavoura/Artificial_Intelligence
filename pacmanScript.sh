@@ -8,21 +8,16 @@ s()
 		ghosts=0
 	fi
 
-	source venv/bin/activate
 	python server.py --ghosts $ghosts
-	pacman > gnome-terminal
 }
 
 v()
-{
-	source venv/bin/activate	
+{	
 	python viewer.py
-	pacman > gnome-terminal
 }
 
 c()
-{
-	source venv/bin/activate	
+{	
 	python client.py
 }
 
@@ -34,4 +29,25 @@ ks()
 k()
 {
 	pkill -f "python client.py"
+}
+
+
+##################
+
+# chama o server online e joga
+sr()
+{
+	ghosts=$1
+
+	if [ $# -eq 0 ]; then	
+		ghosts=0
+	fi
+
+	PORT=80 SERVER=pacman-aulas.ws.atnog.av.it.pt NAME=SantissimaTrindade python client.py
+}
+
+# viewer para servidor online
+vr()
+{
+	python viewer.py --server pacman-aulas.ws.atnog.av.it.pt --port 80 --scale 2
 }

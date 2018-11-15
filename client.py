@@ -5,7 +5,7 @@ import asyncio
 import websockets
 import os
 from mapa import Map
-from student import *
+from student import Pacman_agent
 
 
 debug = True

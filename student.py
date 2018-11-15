@@ -30,6 +30,7 @@ class Pacman_agent():
         self.pathways = self.create_pathways_list()
         self.crossroads = self.create_crossroads_list(self.pathways)
         self.adjacencies, self.corridors = self.create_static_maps(self.pathways, self.crossroads)
+        self.corr_adjacencies =self.create_corridor_adjacencies(self.corridors, self.crossroads)
 
         if debug:
             print('CREATED PACMAN AGENT')
@@ -280,8 +281,7 @@ class Pacman_agent():
 #####################   STATIC ANALYSIS AUXILIAR METHODS   #####################
 ################################################################################
     
-    """##########   TESTED AND VERIFIED   ##########"""
-    # TODO how to remove ghosts den from the crossroads (is it needed? see method)
+    #* ##########   TESTED AND VERIFIED   ##########"""
     def create_pathways_list(self):
         """Create a list with all coordinates that are not walls
 
@@ -291,16 +291,22 @@ class Pacman_agent():
         pathways_ver: pathways organized by column
         """
 
+        # find ghosts den. This area will not be used in any search or strategy
+        # and should be avoided by PACMAN
+        ghosts_den = self.get_ghosts_den(self.map_, (x,y))
+
         pathways_hor = []
         for y in range(self.map_.ver_tiles):
             for x in range(self.map_.hor_tiles):
                 
                 if not self.map_.is_wall((x,y)): 
                     pathways_hor += [(x,y)]
-            
+
+        pathways_hor = [ p for p in pathways_hor if p not in ghosts_den ]
         pathways_ver = sorted(pathways_hor, key=lambda y: (x,y))
 
         if True:
+            self.print_debug_block('ghosts_den', ghosts_den)
             self.print_debug_block('pathways_hor', pathways_hor)
             self.print_debug_block('pathways_ver', pathways_ver)
 
@@ -415,8 +421,7 @@ class Pacman_agent():
         corridor = [(x,y)]
         i = 0
         for i in range(1,len(pathways_hor)):
-            # print()
-            # print('horizontal iteration number: ' +)
+
             (a,b) = pathways_hor[i]
 
             # check for row change (coordinates are not adjacent)
@@ -447,8 +452,6 @@ class Pacman_agent():
                 tunnel_points += [(i,j)]
                 tunnel_points += [(a,b)]
 
-            
-
             (x,y) = (a,b)
         
         # add last horizontal adjacency
@@ -459,7 +462,6 @@ class Pacman_agent():
 
         if debug:
             self.print_debug_block('horizontal corridors', corridors)
-
 
         # vertical search
         (x,y) = pathways_ver[0]
@@ -535,7 +537,7 @@ class Pacman_agent():
         connected = []
         while corridors != []:
             self.print_debug_block('corridors', corridors)
-            corr = corridors.pop(len(corridors)-1)
+            corr = corridors.pop()
             
             found = True
             while found:
@@ -574,18 +576,57 @@ class Pacman_agent():
 
             connected += [corr]
 
-
         # TODO complete this part
         # connect corridors that form a tunnel (spherical map)
-        tunnels = [ corr for corr in connected \
+        tunnels = self.find_tunnels(corridors, tunnel_points)
+        corridors = [ c for c in corridors if c not in tunnels]
+        tunnels = self.connect_tunnels(tunnels, crossroads)
+        corridors += tunnels
+
+        return [ Corridor(corr) for corr in connected ]
+
+#------------------------------------------------------------------------------#
+
+    def find_tunnels(self, corridors, tunnel_points):
+        return [ corr for corr in corridors \
                             if corr[0] in tunnel_points \
                             or corr[1] in tunnel_points ]
 
+#------------------------------------------------------------------------------#
 
+    def connect_tunnels(self, tunnels, crossroads):
 
+        connected = []
+        while tunnels != []:
 
+            tun = tunnels.pop()
 
-        return [ Corridor(corr) for corr in connected ]
+            found = True
+            while found:
+                found = False
+                #self.print_debug_block('tun', tun)
+                end0 = tun[0]
+                end1 = tun[len(tun)-1]
+                for t in tunnels[:]: # copy of list to allow removals while iterating
+
+                    #if end0 == (0,_)
+
+                    if end0 == t[len(t)-1] and end0 not in crossroads:
+                        tun = t + tun[1:]
+                        self.print_debug_block('removed t', t)
+                        tunnels.remove(t)
+                        found = True
+                        break
+                    elif end1 == t[0] and end1 not in crossroads:
+                        tun = tun + t[1:]
+                        self.print_debug_block('removed t', t)
+                        tunnels.remove(t)
+                        found = True
+                        break
+
+            connected += [tun]
+        
+        return connected
 
 #------------------------------------------------------------------------------#
 
@@ -604,7 +645,7 @@ class Pacman_agent():
         corridors = []
         while buffer != []:
 
-            corr = buffer.pop(len(buffer)-1)
+            corr = buffer.pop()
             found = True
             while found:
                 found = False
