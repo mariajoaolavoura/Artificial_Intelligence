@@ -382,6 +382,6 @@ class Corridor():
             else self.dist_end2(coord)
 
 
-    def sub_corridor(self, coord):
+    def sub_corridors(self, coord):
         index = self.coordinates.index(coord)
-        return Corridor(self.coordinates[:index]+[self.coordinates[index]]), Corridor(self.coordinates[index:])
+        return Corridor(self.coordinates[:index+1]), Corridor(self.coordinates[index:])
