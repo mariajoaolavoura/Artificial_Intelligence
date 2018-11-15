@@ -20,16 +20,26 @@ class Pathways(SearchDomain):
         corr1, corr2 = action
         if corr1 == corridor:
             return corr2
-        
+ 
     def cost(self, cur_corr, action):
-        corr1, _ = action
+        corr1, corr2 = action
         if (corr1 != cur_corr):
             return None
-        return corr1.length
+        return corr2.length
 
 
     # TODO
-    def heuristic(self, new_state, goal):
-        x, y = new_state
-        gx, gy = goal
-        return math.hypot((gx-x), (gy-y))
+    def heuristic(self, curr_state, new_state, goal):
+        c_ends = curr_state.ends
+        n_ends = new_state.ends
+
+        c_end = [ e for e in c_ends if e in n_ends]
+
+        if c_end == n_ends[0]:
+            x, y = n_ends[1]
+            gx, gy = goal.ends[0]
+        else:
+            x, y = n_ends[0]
+            gx, gy = goal.ends[0]
+            
+        return abs(gx-x) + abs(gy-y)

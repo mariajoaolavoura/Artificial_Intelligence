@@ -119,45 +119,45 @@ class SearchTree:
         # so it can be possible to calculate for the 2 ends of initial/goal corridor
 
         initial = Corridor([self.problem.initial_pos])
-        sub_init0, sub_init1 = Corridor.sub_corridor(self.problem.initial_pos)
-        self.update_domain(initial, sub_init0, sub_init1)
+        sub_init0, sub_init1 = Corridor.sub_corridors(self.problem.initial_pos)
+        self.update_domain(self.problem.initial_corr, initial, sub_init0, sub_init1)
+        self.problem.domain = [ initial, sub_init0, sub_init1] + [c for c in self.problem.domain]
 
         goal = Corridor([self.problem.goal_pos])
-        sub_goal0, sub_goal1 = Corridor.sub_corridor(self.problem.goal_pos)
-        self.update_domain(goal, sub_goal0, sub_goal1)
+        sub_goal0, sub_goal1 = Corridor.sub_corridors(self.problem.goal_pos)
+        self.update_domain(self.problem.goal_corr, goal, sub_goal0, sub_goal1)
 
 
         heur = self.problem.domain.heuristic(problem.initial_corr, self.problem.goal_corr)        
         root = SearchNode(initial, parent=None, cost=initial.length, heuristic=heur)
         
-        heur0 = self.problem.domain.heuristic(sub_init0, self.problem.goal_corr)
-        child0 = SearchNode(sub_init0, parent=root, cost=sub_init0.length, heuristic=heur0)
-
-        heur1 = self.problem.domain.heuristic(sub_init1, self.problem.goal_corr)
-        child1 = SearchNode(sub_init1, parent=root, cost=sub_init1.length, heuristic=heur1)
-
-        self.open_nodes = [root, child0, child1]
+        self.open_nodes = [root]
         self.strategy = strategy
         self.lvisited = [root.state]
         self.cost = None
 
-    # TODO put corridor adajcencies in order
-    def update_domain(self, corr, sub_corr0, sub_corr1):
-        initial_corr = self.problem.initial_corr
 
-        for (corr1, corr2) in self.problem.domain:
+    def update_domain(self, corridor, sub_corr, sub_corr0, sub_corr1):
+        
+        self.problem.domain += [(sub_corr, sub_corr0), (sub_corr, sub_corr1)]
 
-            if initial_corr == corr1:
-                self.problem.domain.pop((corr1, corr2))
-                self.problem.domain += [(sub_corr1, corr2)]
-                if initial_corr.ends[1] == corr:
-                    self.problem.domain += [(corr, corr2)]
+        for (corrA, corrB) in self.problem.domain:
 
-            elif initial_corr == corr2:
-                self.problem.domain.pop((corr1, corr2))
-                self.problem.domain += [(corr1, sub_corr0)]
-                if initial_corr.ends[0] == corr:
-                    self.problem.domain += [(corr1, corr)]
+            if corridor == corrA:
+                self.problem.domain.remove((corrA, corrB))
+
+                if any(e in sub_corr0.ends for e in corrB.ends):
+                    self.problem.domain += [(sub_corr0, corrB)]
+                elif any(e in sub_corr1.ends for e in corrB.ends):
+                    self.problem.domain += [(sub_corr1, corrB)]
+                
+            elif corridor == corrB:
+                self.problem.domain.remove((corrA, corrB))
+                
+                if any(e in sub_corr0.ends for e in corrA.ends):
+                    self.problem.domain += [(sub_corr0, corrA)]
+                elif any(e in sub_corr1.ends for e in corrA.ends):
+                    self.problem.domain += [(sub_corr1, corrA)]
 
 
 
@@ -174,78 +174,48 @@ class SearchTree:
     # procurar a solucao
     def search(self):
 
-        #print()
-        #print(self.open_nodes[0])
-
-        #print(self.weight_dict)
-        #count = 100
-        #print(adjacencies)
         while self.open_nodes != []:
                 
             node = self.open_nodes.pop(0)
             self.lvisited.extend(node.state)
 
             if self.problem.goal_test(node.state):
-                #self.cost = node.cost
+                self.cost = node.cost
                 if node.parent != None:
-                    return (node.parent.state, self.cost)
-                else:
-                    return None
+                    if node.parent.ends[0] in node.ends:
+                        return node.parent.coordinates[1], self.cost
+                    elif node.parent.ends[1] in node.ends:
+                        return node.parent.coordinates[node.parent.length], self.cost
+                return None
 
             lnewnodes = []
 
             for action in self.problem.domain.actions(node.state):
-                
-                #print('action: ' + str(action))
-                
+        
                 # calculate next state
-                newstate = self.problem.domain.result(node.state,action)
-               
-                #print('node.state is: ' + str(node.state))
-                #print('newstate is: ' + str(newstate) + str(newstate in self.weight_dict))
-                
-                # if newstate is already in the list, add this weight to it
-                # if newstate in self.lvisited:
-                #     pass
-                # if newstate in self.weight_dict.keys():
-                #     self.weight_dict[newstate] += node.cost
-                # else:
+                newstate = self.problem.domain.result(node.state,action)   
+                if newstate in self.lvisited:
+                    pass
+                else:
+                    # calculate cost of next node
+                    cost = node.cost + 1 + self.problem.domain.cost(node.state, action)
+                    # calculate heuristic of next node
 
-                # calculate cost of next node
-                cost = node.cost + self.problem.domain.cost(node.state, action)
-                # calculate heuristic of next node
-                heuristic = self.problem.domain.heuristic(newstate, self.problem.goal)
-                # create new node
-                newnode = SearchNode(newstate,node,cost,heuristic)
-                
-                # if self.debug and count > 0:
-                #     print("*** *** newnode: " + str(newnode))
-                #     print("LVISITED")
-                #     print(self.lvisited)
-                # add new node to list of new nodes
-                lnewnodes += [newnode]
-                
-            if lnewnodes == []:
-                node.cost = 0
+                    heuristic = self.problem.domain.heuristic(node.state, newstate, self.problem.goal)
+                    # create new node
+                    newnode = SearchNode(newstate,node,cost,heuristic)
+                    
+                    # add new node to list of new nodes
+                    lnewnodes += [newnode]
 
-            #filterednn = [ newNode for newNode in lnewnodes \
-            #                        if newNode.state not in self.lvisited ]
-            # if self.debug and count > 0:
-            #    print("*** *** filtered newnodes: " + str(filterednn))
-
-            #self.add_to_open(filterednn)
-            #self.lvisited.extend([node.state for node in filterednn])
             
+
+            lnewnodes = [ newNode for newNode in lnewnodes \
+                                    if newNode.state not in self.lvisited ]
+
             self.add_to_open(lnewnodes)
+            self.lvisited.extend(node.state for node in lnewnodes)
 
-            # lista = []
-            # for newNode in lnewnodes:
-            #     if not node.inParent(newNode.state):
-            #         lista += [newNode]
-            #         #print(newNode)
-            # self.add_to_open(lista)
-
-            #count -= 1
         return None
 
     # juntar novos nos a lista de nos abertos de acordo com a estrategia
