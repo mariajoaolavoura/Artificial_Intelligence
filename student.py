@@ -720,8 +720,13 @@ class Corridor():
             if self.dist_end0(coord) <= self.dist_end1(coord) \
             else self.dist_end1(coord)
 
+    def sub_corridors(self, coord):
+        index = self.coordinates.index(coord)
+        return Corridor(self.coordinates[:index+1]), Corridor(self.coordinates[index:])
+
     def __str__(self):
         return str(self.coordinates)
 
     def __repr__(self):
         return self.__str__()
+        

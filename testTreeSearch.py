@@ -1,9 +1,69 @@
 from pathways import Pathways
-from tree_search import *
+#from tree_search import *
+from student import Corridor
 import math
 
 
 print("PACMAN TEST TOOL\n")
+
+#TODO not finished
+
+#
+corrA = Corridor([(2,4), (1,4), (1,3), (1,2), (1,1), (2,1), (3,1), (4,1), (5,1), (6,1), (7,1), (8,1)])
+corrB = Corridor([(2,4), (3,4), (4,4), (4,5), (4,6), (4,7)])
+corrC = Corridor([(2,4), (2,5), (2,6), (2,7), (1,7), (1,8), (1,9), (1,10), (2,10), (3,10), (4,10)])
+corrD = Corridor([(4,7), (4,8), (4,9), (4,10)])
+corrE = Corridor([(4,7), (5,7), (6,7)])
+corrF = Corridor([(8,1), (8,2), (8,3), (8,4), (7,4), (6,4), (6,5), (6,6), (6,7)])
+
+initial_corr = corrA
+initial_pos = (1,1)
+
+initial = Corridor([initial_pos])
+sub_corr0, sub_corr1 = Corridor.sub_corridor(initial_pos)
+
+print("initial_corr = " + str(initial_corr))
+print("initial_pos = " + str(initial_pos))
+
+goal_corr = corrC
+goal_pos = (2,10)
+
+domain = [ (corrA, corrB), (corrA, corrC), (corrA, corrF),\
+            (corrB, corrA), (corrB, corrC), (corrB, corrD), (corrB, corrE),\
+            (corrC corrA), (corrC, corrB), (corrC, corrD),\
+            (corrD, corrB), (corrD, corrC), (corrD, corrE),\
+            (corrE, corrB), (corrE, corrD), (corrE, corrF),\
+            (corrF, corrA), (corrF, corrD) ]
+print("domain = " + str(domain))
+
+#def update_domain(self, domain, initial_corr, corr, sub_corr0, sub_corr1):
+
+for (corr1, corr2) in domain:
+
+    if initial_corr == corr1:
+        domain.pop((corr1, corr2))
+        domain += [(sub_corr1, corr2)]
+        if initial_corr.ends[1] == corr:
+            domain += [(corr, corr2)]
+
+    elif initial_corr == corr2:
+        domain.pop((corr1, corr2))
+        domain += [(corr1, sub_corr0)]
+        if initial_corr.ends[0] == corr:
+            domain += [(corr1, corr)]
+
+print("initial = " + str(initial))
+print("sub_corr0 = " + str(sub_corr0))
+print("sub_corr1 = " + str(sub_corr1))
+print("update domain = " + str(domain))
+
+
+
+################################################################################
+################################################################################
+################################################################################
+
+'''
 # map = []
 # length = 10
 # for i in range(length):
@@ -57,7 +117,7 @@ for (x,y) in energy:
     
 print('\t \t VECTOR SUM IS:')
 print('\t \t \t ' + str(vec_x) + ', ' + str(vec_y))
-    #print('path ' + str(path))
+#print('path ' + str(path))
         
     
 # #print(domain)
@@ -90,7 +150,7 @@ print('\t \t \t ' + str(vec_x) + ', ' + str(vec_y))
 #         vectors += [dir]
 #     return vectors
 
-
+'''
 
 
 

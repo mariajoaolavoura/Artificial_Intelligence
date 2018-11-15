@@ -1,21 +1,5 @@
-
-# Modulo: tree_search
-# 
-# Fornece um conjunto de classes para suporte a resolucao de 
-# problemas por pesquisa em arvore:
-#    SearchDomain  - dominios de problemas
-#    SearchProblem - problemas concretos a resolver 
-#    SearchNode    - nos da arvore de pesquisa
-#    SearchTree    - arvore de pesquisa, com metodos para 
-#                    a respectiva construcao
-#
-#  (c) Luis Seabra Lopes, Introducao a Inteligencia Artificial, 2012-2014
-
 from abc import ABC, abstractmethod
-
-
-
-
+from student import Corridor
 # DOMAIN ----------------------------------------------------------------------
 # -----------------------------------------------------------------------------
 
@@ -52,29 +36,54 @@ class SearchDomain(ABC):
 # -----------------------------------------------------------------------------
 # Problemas concretos a resolver dentro de um determinado dominio
 class SearchProblem:
-    
+    """
+        Args:
+        domain: problem's SearchDomain
+        initial: tupple with initial corridor and initial position in the corridor
+        goal: tupple with goal corridor and goal position in the corridor (goal will be where pacman is)
+
+        Attr:
+        domain: problem's SearchDomain
+        initial_corr: initial corridor
+        initial_pos: initial position in the corridor
+        goal_corr: goal corridor
+        goal_pos: goal position in the corridor
+        """
+
+
     def __init__(self, domain, initial, goal):
+        
         self.domain = domain
-        self.initial = initial
-        self.goal = goal
-        # print("\t### SearchProblem was created!")
-        # print("\t### Domain is: ")
-        # print(self.domain)
-        # print("\t### Initial is: " + str(self.initial))
-        # print("\t### Goal is: " + str(self.goal))
+        self.initial_corr, self.initial_pos = initial
+        self.goal_corr, self.goal_pos= goal
     
     def goal_test(self, state):
-        return state == self.goal
+        '''state=corridor
+        '''
+        return state == self.goal_corr
 
 
 # NODE ------------------------------------------------------------------------
 # -----------------------------------------------------------------------------
 # Nos de uma arvore de pesquisa
 class SearchNode:
+    '''
+        Args:
+        state:
+        parent:
+        cost:
+        heuristic:
+
+        Attr:
+        state:
+        parent:
+        cost:
+        heuristic:
+    '''
     
     def __init__(self, state, parent, cost, heuristic): 
-        self.state = state
-        self.parent = parent
+        self.state = state #corridor
+        self.parent = parent #SearchNode
         self.cost = cost
         self.heuristic = heuristic
         
@@ -99,20 +108,58 @@ class SearchNode:
 class SearchTree:
     debug = False
 
-    # construtor
-    def __init__(self,problem, weight_dict, strategy='breadth'): 
+    def __init__(self, problem, strategy='breadth'): 
+        
         self.problem = problem
-        heur = self.problem.domain.heuristic(problem.initial, self.problem.goal)
-        root = SearchNode(problem.initial, parent=None, cost=weight_dict[problem.initial], heuristic=heur)
+
+        # Divide initial/goal corridor in 3 corridors:
+        # root/goal = corridor with just 1 coordinate, the initial/goal position
+        # sub_init0/sub_goal0 = corridor with all coordinates from 0 to the initial/goal position's index (inclusive)
+        # sub_init1/sub_goal1 = corridor with all coordinates from the initial/goal position's index to end (inclusive)
+        # so it can be possible to calculate for the 2 ends of initial/goal corridor
+
+        initial = Corridor([self.problem.initial_pos])
+        sub_init0, sub_init1 = Corridor.sub_corridors(self.problem.initial_pos)
+        self.update_domain(self.problem.initial_corr, initial, sub_init0, sub_init1)
+        self.problem.domain = [ initial, sub_init0, sub_init1] + [c for c in self.problem.domain]
+
+        goal = Corridor([self.problem.goal_pos])
+        sub_goal0, sub_goal1 = Corridor.sub_corridors(self.problem.goal_pos)
+        self.update_domain(self.problem.goal_corr, goal, sub_goal0, sub_goal1)
+
+
+        heur = self.problem.domain.heuristic(problem.initial_corr, self.problem.goal_corr)        
+        root = SearchNode(initial, parent=None, cost=initial.length, heuristic=heur)
+        
         self.open_nodes = [root]
         self.strategy = strategy
         self.lvisited = [root.state]
-        self.weight_dict = weight_dict
         self.cost = None
-        # print("\t### SearchTree was created!")
-        # print("\t### open nodes starts with only root: " + str(self.open_nodes))
-        # print("\t### root heuristic is: " + str(heur))
-        # print("\t### root is: " + str(root))
+
+
+    def update_domain(self, corridor, sub_corr, sub_corr0, sub_corr1):
+        
+        self.problem.domain += [(sub_corr, sub_corr0), (sub_corr, sub_corr1)]
+
+        for (corrA, corrB) in self.problem.domain:
+
+            if corridor == corrA:
+                self.problem.domain.remove((corrA, corrB))
+
+                if any(e in sub_corr0.ends for e in corrB.ends):
+                    self.problem.domain += [(sub_corr0, corrB)]
+                elif any(e in sub_corr1.ends for e in corrB.ends):
+                    self.problem.domain += [(sub_corr1, corrB)]
+                
+            elif corridor == corrB:
+                self.problem.domain.remove((corrA, corrB))
+                
+                if any(e in sub_corr0.ends for e in corrA.ends):
+                    self.problem.domain += [(sub_corr0, corrA)]
+                elif any(e in sub_corr1.ends for e in corrA.ends):
+                    self.problem.domain += [(sub_corr1, corrA)]
+
+
 
     # obter o caminho (sequencia de estados) da raiz ate um no
     def get_path(self,node):
@@ -122,15 +169,11 @@ class SearchTree:
         path += [node.state]
         return(path)
 
+
+    # TODO
     # procurar a solucao
     def search(self):
 
-        #print()
-        #print(self.open_nodes[0])
-
-        #print(self.weight_dict)
-        count = 100
-        #print(adjacencies)
         while self.open_nodes != []:
                 
             node = self.open_nodes.pop(0)
@@ -139,58 +182,40 @@ class SearchTree:
             if self.problem.goal_test(node.state):
                 self.cost = node.cost
                 if node.parent != None:
-                    return (node.parent.state, self.cost)
-                else:
-                    return None
+                    if node.parent.ends[0] in node.ends:
+                        return node.parent.coordinates[1], self.cost
+                    elif node.parent.ends[1] in node.ends:
+                        return node.parent.coordinates[node.parent.length], self.cost
+                return None
 
             lnewnodes = []
 
             for action in self.problem.domain.actions(node.state):
-                
-                #print('action: ' + str(action))
+        
                 # calculate next state
-                newstate = self.problem.domain.result(node.state,action)
-                #print('node.state is: ' + str(node.state))
-                #print('newstate is: ' + str(newstate) + str(newstate in self.weight_dict))
-                # if newstate is already in the list, add this weight to it
+                newstate = self.problem.domain.result(node.state,action)   
                 if newstate in self.lvisited:
                     pass
-                if newstate in self.weight_dict.keys():
-                    self.weight_dict[newstate] += node.cost
                 else:
                     # calculate cost of next node
-                    cost = node.cost + self.problem.domain.cost(node.state, action)
+                    cost = node.cost + 1 + self.problem.domain.cost(node.state, action)
                     # calculate heuristic of next node
-                    heuristic = self.problem.domain.heuristic(newstate, self.problem.goal)
+
+                    heuristic = self.problem.domain.heuristic(node.state, newstate, self.problem.goal)
                     # create new node
                     newnode = SearchNode(newstate,node,cost,heuristic)
                     
-                    # if self.debug and count > 0:
-                    #     print("*** *** newnode: " + str(newnode))
-                    #     print("LVISITED")
-                    #     print(self.lvisited)
                     # add new node to list of new nodes
                     lnewnodes += [newnode]
-                
-            if lnewnodes == []:
-                node.cost = 0
 
-            filterednn = [ newNode for newNode in lnewnodes \
-                                    if newNode.state not in self.lvisited ]
-            if self.debug and count > 0:
-               print("*** *** filtered newnodes: " + str(filterednn))
-
-            self.add_to_open(filterednn)
-            self.lvisited.extend([node.state for node in filterednn])
             
-            # lista = []
-            # for newNode in lnewnodes:
-            #     if not node.inParent(newNode.state):
-            #         lista += [newNode]
-            #         #print(newNode)
-            # self.add_to_open(lista)
 
-            count -= 1
+            lnewnodes = [ newNode for newNode in lnewnodes \
+                                    if newNode.state not in self.lvisited ]
+
+            self.add_to_open(lnewnodes)
+            self.lvisited.extend(node.state for node in lnewnodes)
+
         return None
 
     # juntar novos nos a lista de nos abertos de acordo com a estrategia
@@ -209,5 +234,3 @@ class SearchTree:
             self.open_nodes.extend(lnewnodes)
             self.open_nodes = sorted(self.open_nodes, key=lambda node: node.heuristic + node.cost)
 
-    # fazer execicio 13
-    # fazer exercicio 14
