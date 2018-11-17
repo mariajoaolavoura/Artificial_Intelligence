@@ -1,4 +1,4 @@
-from tree_search import *
+from tree_search import SearchTree
 import random
 import logging
 
@@ -66,6 +66,58 @@ class Pacman_agent():
         """
 
         #logger.debug(nt("\nEnergy size is : " + str(len(state['energy'])) + "\n")
+
+        #! ##########   STRATEGY   ##########
+
+        #? criar modes:
+            #? counter_mode (pesquisar boost para terminar perseguição)
+            #? pursuit_mode (search and destroy dos fantasmas)
+            #? eating_mode  (sem perigo, maior preocupacao, comer bolinhas)
+            #? flight_mode  (pesquisa por corredores seguros, com ou sem bolinhas, se houver boosts usar)
+
+        #? calcular distancia a pontos acessiveis
+        #? calcular distancia aos meus cruzamentos
+        #? calcular distancia a boosts
+        #? calcular distancia a fantasmas
+
+        #? verificar condicoes do meu corredor
+
+        #? corredor SAFE?
+            #? Cruzamentos VERDE?
+                #? EATING_MODE
+                #? ignorar fantasmas...
+                #? ignorar boosts
+                #? pesquisas bolinhas, caminho mais seguro
+            #? cruzamentos VERDE e AMARELO
+                #? EATING_MODE
+                #? OPCAO 1 - aproveitar para limpar lado amarelo enquanto 'e possivel
+                #? OPCAO 2 - continuar a pesquisar caminho mais seguro
+            #? cruzamentos AMARELO
+                #? FLIGHT_MODE
+                #? OPCAO 1 - fugir para um qualquer caminho seguro
+                #? OPCAO 2 - fugir pelo lado que tem mais bolinhas
+                #? OPCAO 3 - fugir pelo caminha mais curto (evitar que mais fantasmas se aproximem no entretanto?)
+                #? OPCAO 4 - sistema de pesos com as anteriores
+            #? cruzamento AMARELO e VERMELHO
+                #? FLIGHT_MODE
+                #? fugir pelo lado possivel para o sitio mais seguro (com ou sem bolinhas)
+            #? cruzamentos VERMELHOS
+                #? FLIGHT_MODE
+                #? fugir pelo menos vermelho
+                #? morrer com dignidade e apanhar o maximo de bolinhas
+
+        #? corredor NOT SAFE
+            #? corredor livre a AMARELO
+                #? FLIGHT_MODE
+            #? corredor livre a VERDE
+                #? há BOOST?
+                    #? pesquisar boost
+                #? não há boost
+                    #? fantasma nao nos afecta, desde que nao se volte atras. pesquisar bolinhas
+
+
+
+        #print("\nEnergy size is : " + str(len(state['energy'])) + "\n")
         # create a vector for every element in the game
         # every element points pacman teh next move to get to it
         vectors = []
