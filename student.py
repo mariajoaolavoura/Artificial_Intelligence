@@ -403,6 +403,7 @@ class Pacman_agent():
             logger.debug("Removed " + str((x, y, dirs)))
             
             count = 0
+            adj_walls = []
 
             for direction in dirs:
                 dir_x, dir_y = direction    
@@ -419,29 +420,31 @@ class Pacman_agent():
                 if (self.map_.is_wall(new_pos)):
                     logger.debug("Detected wall at " + str(new_pos) + " dir " + str(direction))
 
-                    # todo clean up the list based on zones
+                    # clean up the list based on zones
+                    # todo can only cleanup when valid adjacencies are found!
                     if (direction == (1, 0)): #clean up right part
                         logger.debug(to_visit)
                         logger.debug("Clean right part")
-                        to_visit = [visit for visit in to_visit if visit[0] == x or visit[0] < spawn[0]]
+                        #to_visit = [visit for visit in to_visit if visit[0] == x or visit[0] < spawn[0]]
                         logger.debug(to_visit)
                     elif (direction == (-1, 0)): #clean up left part
                         logger.debug(to_visit)
                         logger.debug("Clean left part")
-                        to_visit = [visit for visit in to_visit if visit[0] == x or visit[0] > spawn[0]]
+                        #to_visit = [visit for visit in to_visit if visit[0] == x or visit[0] > spawn[0]]
                         logger.debug(to_visit)
                     elif (direction == (0, 1)): #clean up down part
                         logger.debug(to_visit)
                         logger.debug("Clean down part")
-                        to_visit = [visit for visit in to_visit if visit[1] == y or visit[1] > spawn[1]]
+                        #to_visit = [visit for visit in to_visit if visit[1] == y or visit[1] > spawn[1]]
                         logger.debug(to_visit)
                     elif (direction == (0, -1)): #clean up up part
                         logger.debug(to_visit)
                         logger.debug("Clean up part")
-                        to_visit = [visit for visit in to_visit if visit[1] == y or visit[1] < spawn[1]]
+                        #to_visit = [visit for visit in to_visit if visit[1] == y or visit[1] < spawn[1]]
                         logger.debug(to_visit)
                     
                     count += 1
+                    adj_walls += [new_pos]
                   
 
                 else:
@@ -457,14 +460,43 @@ class Pacman_agent():
                     logger.debug("Result is: " + str(to_visit))
             
             if count == 2: # corner has 2 adjacent walls
+
+                # verify if adjacent walls are valid
+                wall1_x, wall1_y = adj_walls[0]
+                wall2_x, wall2_y = adj_walls[1]
+                print((wall1_x, wall1_y))
+                print((wall2_x, wall2_y))
+                if (abs(wall1_x - wall2_x) == 1 and abs(wall1_y - wall2_y) == 1):
                 # we can have repeteaded corners 
                 # we can reach corners from different paths
-                print(den_corners + [(x, y)])
-                den_corners = list(set( den_corners + [(x, y)] ) )
-                if (len(den_corners) == 4):
-                    print("FOUND ALL 4 CORNERS! ")
-                    print("RETURNING " + str(den_corners))
-                    return den_corners
+                    print("ADDING CORNER")
+                    print(den_corners + [(x, y)])
+                    den_corners = list(set( den_corners + [(x, y)] ) )
+                    # clean up to_visit
+
+                    # identify corner
+                    if (x < spawn[0]):
+                        if (y > spawn[0]): # left up corner
+                            print("Clean left up")
+                            to_visit = [visit for visit in to_visit if visit[0] > spawn[0] or (visit[0] < spawn[0] and visit[1] < spawn[1])]
+                        if (y < spawn[0]): # left down corner
+                            print("Clean left down")
+                            to_visit = [visit for visit in to_visit if visit[0] > spawn[0] or (visit[0] < spawn[0] and visit[1] > spawn[1])]
+                    elif (x > spawn[0]):
+                        if (y > spawn[0]): # right up corner
+                            print("Clean right up")
+                            to_visit = [visit for visit in to_visit if visit[0] < spawn[0] or (visit[0] > spawn[0] and visit[1] < spawn[1])]
+                        if (y < spawn[0]): # right down corner
+                            print("Clean right down")
+                            to_visit = [visit for visit in to_visit if visit[0] < spawn[0] or (visit[0] > spawn[0] and visit[1] > spawn[1])]
+                    
+                    if (len(den_corners) == 4):
+                        print("FOUND ALL 4 CORNERS! ")
+                        print("RETURNING " + str(den_corners))
+                        return den_corners
+                
+          
+                    
 
             #DEBUG
             if (add == 1 and len(to_visit) == 0 ):
