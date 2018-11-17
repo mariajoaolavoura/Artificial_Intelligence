@@ -289,10 +289,10 @@ class Pacman_agent():
         list_   -- a list
         n       -- number of elements per combination
         """
-        logger.debug("#######################################################")
-        logger.debug('\t ' + string + ' is: ')
-        logger.debug("#######################################################")
-        logger.debug(var)
+        #logger.debug("#######################################################")
+        #logger.debug('\t ' + string + ' is: ')
+        #logger.debug("#######################################################")
+        #logger.debug(var)
 
 
 ################################################################################
@@ -376,53 +376,105 @@ class Pacman_agent():
         """
 
         # get ghots spawn point (which is a point part of the den)
+        spawn = self.map_.ghost_spawn
         if pos == (-1,-1):
-            pos = self.map_.ghost_spawn
+            pos = spawn
         
         logger.debug("SPAWN POINT IS: " + str(pos))
         
         possible_dirs =[(-1,0), (1,0), (0, 1), (0, -1)]
         pos_x, pos_y = pos
         den_corners = []
-        to_visit = [(pos_x, pos_y, possible_dirs)]    # queue with positions to visit
+
+        # to_visit is a queue with positions to visit
+        # each position is a tuple (pos_x, pos_y, list of possible directions)
+        to_visit = [(pos_x, pos_y, possible_dirs)]     
         
-        logger.debug("TO VISIT IS " + str(to_visit))
+        #DEBUG
+        add = 0
+        COUNTING = 0
+
         while len(to_visit) > 0:
             # "pop" element from queue to_visit
             x, y, dirs = to_visit[0]
             to_visit = to_visit[1:] 
 
-            logger.debug("TO VISIT IS " + str(to_visit))
+            logger.debug("===============================================================================================")
+            logger.debug("Removed " + str((x, y, dirs)))
+            
             count = 0
+
             for direction in dirs:
                 dir_x, dir_y = direction    
                 remaining_dirs = [dir for dir in dirs if dir != direction]
 
-                logger.debug("Following direction " + str(direction))
-                logger.debug("Remaining dirs" + str(remaining_dirs))
+                logger.debug("==========================")
+                logger.debug("Following direction " + str(direction) + " from " + str((x, y)))
+                logger.debug("Remaining directions: " + str(remaining_dirs))
 
                 #* OK
-                
-                if (self.map_.is_wall( ((x + dir_x), (y + dir_y)) )):
-                    logger.debug("Detected wall at " + str(((x + dir_x), (y + dir_y))))
+                new_pos = x + dir_x, y + dir_y
+                logger.debug("New pos to analyze: " + str(new_pos))
+
+                if (self.map_.is_wall(new_pos)):
+                    logger.debug("Detected wall at " + str(new_pos) + " dir " + str(direction))
+
+                    # todo clean up the list based on zones
+                    if (direction == (1, 0)): #clean up right part
+                        logger.debug(to_visit)
+                        logger.debug("Clean right part")
+                        to_visit = [visit for visit in to_visit if visit[0] == x or visit[0] < spawn[0]]
+                        logger.debug(to_visit)
+                    elif (direction == (-1, 0)): #clean up left part
+                        logger.debug(to_visit)
+                        logger.debug("Clean left part")
+                        to_visit = [visit for visit in to_visit if visit[0] == x or visit[0] > spawn[0]]
+                        logger.debug(to_visit)
+                    elif (direction == (0, 1)): #clean up down part
+                        logger.debug(to_visit)
+                        logger.debug("Clean down part")
+                        to_visit = [visit for visit in to_visit if visit[1] == y or visit[1] > spawn[1]]
+                        logger.debug(to_visit)
+                    elif (direction == (0, -1)): #clean up up part
+                        logger.debug(to_visit)
+                        logger.debug("Clean up part")
+                        to_visit = [visit for visit in to_visit if visit[1] == y or visit[1] < spawn[1]]
+                        logger.debug(to_visit)
+                    
                     count += 1
+                  
 
                 else:
                     # todo improve comments
                     # if it's not a wall, we add the position to the positions to visit. 
                     # from that position we can go to the remaning_dirs + the oposite direction of where it came from
-                    logger.debug("No wall! Adding to to visit")
-                    to_visit += [(x + dir_x, y + dir_y, [(dir_x * -1, dir_y * -1)] + remaining_dirs)]
+                    logger.debug("No Detected wall.\n Adding " +  str (new_pos) + " to visit")
+                    #to_visit += list(set([(x + dir_x, y + dir_y, [(dir_x * -1, dir_y * -1)] + remaining_dirs)]))
+                    #if COUNTING < 8:
+                    possible_dirs = [direction] + [direct for direct in remaining_dirs if direct != (dir_x * -1, dir_y * -1)]
+                    to_visit += [(x + dir_x, y + dir_y, possible_dirs)]
+                        #COUNTING =0
+                    logger.debug("Result is: " + str(to_visit))
             
             if count == 2: # corner has 2 adjacent walls
                 # we can have repeteaded corners 
                 # we can reach corners from different paths
-                den_corners = set(den_corners + (x, y)) 
-                if (len(den_corners)):
-                    logger.debug("FOUND ALL 4 CORNERS")
-                    break
+                print(den_corners + [(x, y)])
+                den_corners = list(set( den_corners + [(x, y)] ) )
+                if (len(den_corners) == 4):
+                    print("FOUND ALL 4 CORNERS! ")
+                    print("RETURNING " + str(den_corners))
+                    return den_corners
 
-        return den_corners
+            #DEBUG
+            if (add == 1 and len(to_visit) == 0 ):
+                to_visit += [(8, 15, possible_dirs)]
+                to_visit += [(10, 15, possible_dirs)]
+                to_visit += [(9, 14, possible_dirs)]
+                to_visit += [(9, 15, possible_dirs)]
+                add = 0
+        
+        return []
         
     
 
