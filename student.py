@@ -8,18 +8,15 @@ import logging
 # for debug purposes
 debug = True
 
-
 # logs are written to file logger.log after the client is closed
 # possible messages: debug, info, warning, error, critical 
 # how to use: logging.typeOfMessage('message')
+logger = logging.getLogger('student_logger')
+logger_format = '[%(lineno)s - %(funcName)20s() - %(levelname)s]\n %(message)s\n'
+#logger_format = '%(levelname)s:\t%(message)' # simpler format
 
-if (debug):
-    logger = logging.getLogger('student_logger')
-    logger_format = '[%(lineno)s - %(funcName)20s() - %(levelname)s]\n %(message)s\n'
-    #logger_format = '%(levelname)s:\t%(message)' # simpler format
-
-    # currently writing over the logger file, change filemode to a to append
-    logging.basicConfig(format=logger_format, filename='logger.log', filemode='w', level=logging.DEBUG)
+# currently writing over the logger file, change filemode to a to append
+logging.basicConfig(format=logger_format, filename='logger.log', filemode='w', level=logging.DEBUG)
 
 class Pacman_agent():
     """Creates the PACMAN agent that analyses the given 'Map' and 'state'
@@ -36,25 +33,18 @@ class Pacman_agent():
     crossroads: list of all coordinates that separate corridors
     """
 
-
     def __init__(self, map_): 
-        if debug:
-            logger.warning('\n\n\n ========================== NEW EXECUTION ==========================\n')
-            logger.debug('CREATING PACMAN AGENT\n')
+        logger.warning('\n\n\n ========================== NEW EXECUTION ==========================\n')
+        logger.debug('CREATING PACMAN AGENT\n')
 
         # static info from mapa.py Map
         self.map_ = map_
-        print(self.map_.ghost_spawn)
         self.pathways = self.create_pathways_list()
         self.crossroads = self.create_crossroads_list(self.pathways)
         self.adjacencies, self.cae0ad115ec86ac73b730a6fa08032ebfe40afa71orridors = self.create_static_maps(self.pathways, self.crossroads)
         self.corr_adjacencies =self.create_corridor_adjacencies(self.corridors, self.crossroads)
 
-        if debug:
-            logger.debug('CREATED PACMAN AGENT')
-
-        
-
+        logger.debug('CREATED PACMAN AGENT')
 
     def get_next_move(self, state):
         """Objective of Pacman_agent - calculates the next position using
@@ -364,148 +354,120 @@ class Pacman_agent():
 
 #------------------------------------------------------------------------------#
 
-    def get_ghosts_den(self, map_, pos=(-1, -1), den=[], ):
+    def get_ghosts_den(self, map_):
         """delimit the coordinates that make up the ghosts den
 
         Args:
-        ghost_spawn: coordinates where ghosts spawn (usually the center of den)
-        dirs       : directions to search into (by default left, right, up, down)
+        map_       : map of the game
 
         Returns:
-        crossroads: list of coordinates that make up the ghosts den:
+        den_corners: list of coordinates that make up the ghosts den corners
         """
 
-        # get ghots spawn point (which is a point part of the den)
-        spawn = self.map_.ghost_spawn
-        if pos == (-1,-1):
-            pos = spawn
+        # get ghots spawn point (which is itself part of the den)
+        spawn = map_.ghost_spawn
+        logger.debug("Spawn point is: " + str(spawn))
         
-        logger.debug("SPAWN POINT IS: " + str(pos))
-        
-        possible_dirs =[(-1,0), (1,0), (0, 1), (0, -1)]
-        pos_x, pos_y = pos
+        # list of the 4 corners of the den (den is a rectangle)
         den_corners = []
 
-        # to_visit is a queue with positions to visit
+        # possible directions to go from a given point in the map
+        # format (dir_x, dir_y)
+        # currently init is equivalent to left, right, up, down
+        possible_dirs =[(-1,0), (1,0), (0, 1), (0, -1)]    
+
+        # initialize to_visit queue
+        # to_visit is a queue with the points to visit
         # each position is a tuple (pos_x, pos_y, list of possible directions)
-        to_visit = [(pos_x, pos_y, possible_dirs)]     
-        
-        #DEBUG
-        add = 0
-        COUNTING = 0
+        to_visit = [(spawn, possible_dirs)]     
 
         while len(to_visit) > 0:
             # "pop" element from queue to_visit
-            x, y, dirs = to_visit[0]
+            current_pos, current_dirs = to_visit[0]
+            current_x, current_y = current_pos
             to_visit = to_visit[1:] 
-
-            logger.debug("===============================================================================================")
-            logger.debug("Removed " + str((x, y, dirs)))
             
-            count = 0
             adj_walls = []
+            
+            logger.debug("Analyzing " + str((current_pos, current_dirs)))
 
-            for direction in dirs:
-                dir_x, dir_y = direction    
-                remaining_dirs = [dir for dir in dirs if dir != direction]
+            for current_dir in current_dirs:
+                current_dir_x, current_dir_y = current_dir    
+                remaining_dirs = [dir_ for dir_ in current_dirs if dir_ != current_dir]
+                
+                # New position is obtained traveling in the current_direction from the (current_x, current_y)
+                new_pos = current_x + current_dir_x, current_y + current_dir_y
 
-                logger.debug("==========================")
-                logger.debug("Following direction " + str(direction) + " from " + str((x, y)))
+                logger.debug("Following direction "   + str(current_dir) + " from " + str((current_x, current_y)))
                 logger.debug("Remaining directions: " + str(remaining_dirs))
+                logger.debug("New pos to analyze: "   + str(new_pos))
 
-                #* OK
-                new_pos = x + dir_x, y + dir_y
-                logger.debug("New pos to analyze: " + str(new_pos))
-
+                # if it's a wall, add the new position to the list of the adjacent walls
                 if (self.map_.is_wall(new_pos)):
-                    logger.debug("Detected wall at " + str(new_pos) + " dir " + str(direction))
-
-                    # clean up the list based on zones
-                    # todo can only cleanup when valid adjacencies are found!
-                    if (direction == (1, 0)): #clean up right part
-                        logger.debug(to_visit)
-                        logger.debug("Clean right part")
-                        #to_visit = [visit for visit in to_visit if visit[0] == x or visit[0] < spawn[0]]
-                        logger.debug(to_visit)
-                    elif (direction == (-1, 0)): #clean up left part
-                        logger.debug(to_visit)
-                        logger.debug("Clean left part")
-                        #to_visit = [visit for visit in to_visit if visit[0] == x or visit[0] > spawn[0]]
-                        logger.debug(to_visit)
-                    elif (direction == (0, 1)): #clean up down part
-                        logger.debug(to_visit)
-                        logger.debug("Clean down part")
-                        #to_visit = [visit for visit in to_visit if visit[1] == y or visit[1] > spawn[1]]
-                        logger.debug(to_visit)
-                    elif (direction == (0, -1)): #clean up up part
-                        logger.debug(to_visit)
-                        logger.debug("Clean up part")
-                        #to_visit = [visit for visit in to_visit if visit[1] == y or visit[1] < spawn[1]]
-                        logger.debug(to_visit)
+                    logger.debug("Detected wall at " + str(new_pos) + " dir " + str(current_dir))
                     
-                    count += 1
                     adj_walls += [new_pos]
                   
-
+                # if it's not a wall, add the new position to the positions to visit. 
                 else:
-                    # todo improve comments
-                    # if it's not a wall, we add the position to the positions to visit. 
-                    # from that position we can go to the remaning_dirs + the oposite direction of where it came from
-                    logger.debug("No Detected wall.\n Adding " +  str (new_pos) + " to visit")
-                    #to_visit += list(set([(x + dir_x, y + dir_y, [(dir_x * -1, dir_y * -1)] + remaining_dirs)]))
-                    #if COUNTING < 8:
-                    possible_dirs = [direction] + [direct for direct in remaining_dirs if direct != (dir_x * -1, dir_y * -1)]
-                    to_visit += [(x + dir_x, y + dir_y, possible_dirs)]
-                        #COUNTING =0
-                    logger.debug("Result is: " + str(to_visit))
+                    logger.debug("No Detected wall.\n Adding " +  str(new_pos) + " to visit")
+
+                    # from the new position we can go to the remaning_dirs + the oposite direction of where it came from 
+                    # (thus avoiding repetead points, ie going back)
+                    possible_dirs = [current_dir] + [dir_ for dir_ in remaining_dirs if dir_ != (current_dir_x * -1, current_dir_y * -1)]
+                    to_visit += [(new_pos, possible_dirs)]
+
+                    logger.debug("New to_visit is: " + str(to_visit))
             
-            if count == 2: # corner has 2 adjacent walls
+            # the current point is a candidate to be a corner (2 adjacent walls)
+            if len(adj_walls) == 2: 
 
                 # verify if adjacent walls are valid
+                # all corners in a rectangle has 2 adjacent walls
+                # but we can have points with 2 adjacent walls 
+                # without being a corner (see point (3, 15) of the original map, for example)
                 wall1_x, wall1_y = adj_walls[0]
                 wall2_x, wall2_y = adj_walls[1]
-                print((wall1_x, wall1_y))
-                print((wall2_x, wall2_y))
+                logger.debug("Analyzing corner with wall " + str((wall1_x, wall1_y)) + " and " + str((wall2_x, wall2_y)))
+                
                 if (abs(wall1_x - wall2_x) == 1 and abs(wall1_y - wall2_y) == 1):
-                # we can have repeteaded corners 
-                # we can reach corners from different paths
-                    print("ADDING CORNER")
-                    print(den_corners + [(x, y)])
-                    den_corners = list(set( den_corners + [(x, y)] ) )
-                    # clean up to_visit
-
-                    # identify corner
-                    if (x < spawn[0]):
-                        if (y > spawn[0]): # left up corner
-                            print("Clean left up")
-                            to_visit = [visit for visit in to_visit if visit[0] > spawn[0] or (visit[0] < spawn[0] and visit[1] < spawn[1])]
-                        if (y < spawn[0]): # left down corner
-                            print("Clean left down")
-                            to_visit = [visit for visit in to_visit if visit[0] > spawn[0] or (visit[0] < spawn[0] and visit[1] > spawn[1])]
-                    elif (x > spawn[0]):
-                        if (y > spawn[0]): # right up corner
-                            print("Clean right up")
-                            to_visit = [visit for visit in to_visit if visit[0] < spawn[0] or (visit[0] > spawn[0] and visit[1] < spawn[1])]
-                        if (y < spawn[0]): # right down corner
-                            print("Clean right down")
-                            to_visit = [visit for visit in to_visit if visit[0] < spawn[0] or (visit[0] > spawn[0] and visit[1] > spawn[1])]
+                    # we can have repeteaded corners 
+                    # we can reach corners from different paths
+                    logger.debug("Adding valid corner")
+                    logger.debug(den_corners + [(current_x, current_y)])
+                    den_corners = list(set(den_corners + [(current_x, current_y)]))
                     
+                    # a rectangular den has 4 corners
                     if (len(den_corners) == 4):
-                        print("FOUND ALL 4 CORNERS! ")
+                        logger.debug("Found all 4 corners")
+                        logger.debug("Returning " + str(den_corners))
                         print("RETURNING " + str(den_corners))
                         return den_corners
-                
-          
-                    
 
-            #DEBUG
-            if (add == 1 and len(to_visit) == 0 ):
-                to_visit += [(8, 15, possible_dirs)]
-                to_visit += [(10, 15, possible_dirs)]
-                to_visit += [(9, 14, possible_dirs)]
-                to_visit += [(9, 15, possible_dirs)]
-                add = 0
-        
+                    # clean up to_visit
+                    # after finding a corner, we no longer have to
+                    # search using the points in that quadrant 
+                    # so we can clean up the list based on zones
+
+                    # Note:
+                    # visit[0] -> pos
+                    # visit[0][0/1] -> pos_x/pos_y
+                    if (current_x < spawn[0]):
+                        if (current_y > spawn[0]): # left up corner
+                            logger.debug("Clean left up area")
+                            to_visit = [visit for visit in to_visit if visit[0][0] > spawn[0] or (visit[0][0]  < spawn[0] and visit[0][1] < spawn[1])]
+                        if (current_y < spawn[0]): # left down corner
+                            logger.debug("Clean left down area")
+                            to_visit = [visit for visit in to_visit if visit[0][0] > spawn[0] or (visit[0][0]  < spawn[0] and visit[0][1] > spawn[1])]
+                    elif (current_x > spawn[0]):
+                        if (current_y > spawn[0]): # right up corner
+                            logger.debug("Clean right up area")
+                            to_visit = [visit for visit in to_visit if visit[0][0] < spawn[0] or (visit[0][0]  > spawn[0] and visit[0][1] < spawn[1])]
+                        if (current_y < spawn[0]): # right down corner
+                            logger.debug("Clean right down area")
+                            to_visit = [visit for visit in to_visit if visit[0][0] < spawn[0] or (visit[0][0]  > spawn[0] and visit[0][1] > spawn[1])]
+                               
+        # Should never reach this      
         return []
         
     
