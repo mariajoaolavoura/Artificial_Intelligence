@@ -1,4 +1,4 @@
-from tree_search import *
+#from tree_search import *
 import random
 import logging
 
@@ -44,9 +44,10 @@ class Pacman_agent():
 
         # static info from mapa.py Map
         self.map_ = map_
+        print(self.map_.ghost_spawn)
         self.pathways = self.create_pathways_list()
         self.crossroads = self.create_crossroads_list(self.pathways)
-        self.adjacencies, self.corridors = self.create_static_maps(self.pathways, self.crossroads)
+        self.adjacencies, self.cae0ad115ec86ac73b730a6fa08032ebfe40afa71orridors = self.create_static_maps(self.pathways, self.crossroads)
         self.corr_adjacencies =self.create_corridor_adjacencies(self.corridors, self.crossroads)
 
         if debug:
@@ -310,7 +311,7 @@ class Pacman_agent():
 
         # find ghosts den. This area will not be used in any search or strategy
         # and should be avoided by PACMAN
-        ghosts_den = self.get_ghosts_den(self.map_, (x,y))
+        ghosts_den = self.get_ghosts_den(self.map_)
 
         pathways_hor = []
         for y in range(self.map_.ver_tiles):
@@ -363,54 +364,66 @@ class Pacman_agent():
 
 #------------------------------------------------------------------------------#
 
-    def get_ghosts_den(self, map_, den):
+    def get_ghosts_den(self, map_, pos=(-1, -1), den=[], ):
         """delimit the coordinates that make up the ghosts den
 
         Args:
         ghost_spawn: coordinates where ghosts spawn (usually the center of den)
+        dirs       : directions to search into (by default left, right, up, down)
 
         Returns:
-        crossroads: list of coordinates tht make up the ghosts den:
+        crossroads: list of coordinates that make up the ghosts den:
         """
 
-        # TODO - work in progress. before continuing, verify if it will be needed
-        # TODO   Using searchTree with corridors, there is no risk of entering the
-        # TODO   den during the search.
-
-
-        buffer = den
-        #while 
-        if den == []:
-            return den
-
-        # get neighbors
-        neighbors = []
-        count = 0
-        for (x,y) in den:
-
-            if not map_.is_wall((x-1,y)):
-                neighbors += [(x-1,y)]
-                count += 1
-            if not map_.is_wall((x+1,y)):
-                neighbors += [(x+1,y)]
-                count += 1
-            if not map_.is_wall((x,y-1)):
-                neighbors += [(x,y-1)]
-                count += 1
-            if not map_.is_wall((x,y+1)):
-                neighbors += [(x,y+1)]
-                count += 1
-
-        if count < 2:
-            return [(x,y)]
-        if count == 2:
-            pass
-            #found entrance
-        if count > 2:
-            return [den] + get_ghosts_den(map_, neighbors)
+        # get ghots spawn point (which is a point part of the den)
+        if pos == (-1,-1):
+            pos = self.map_.ghost_spawn
         
+        logger.debug("SPAWN POINT IS: " + str(pos))
+        
+        possible_dirs =[(-1,0), (1,0), (0, 1), (0, -1)]
+        pos_x, pos_y = pos
+        den_corners = []
+        to_visit = [(pos_x, pos_y, possible_dirs)]    # queue with positions to visit
+        
+        logger.debug("TO VISIT IS " + str(to_visit))
+        while len(to_visit) > 0:
+            # "pop" element from queue to_visit
+            x, y, dirs = to_visit[0]
+            to_visit = to_visit[1:] 
 
-        return [ghost_spawn] + get_ghosts_den(map_, ...)
+            logger.debug("TO VISIT IS " + str(to_visit))
+            count = 0
+            for direction in dirs:
+                dir_x, dir_y = direction    
+                remaining_dirs = [dir for dir in dirs if dir != direction]
+
+                logger.debug("Following direction " + str(direction))
+                logger.debug("Remaining dirs" + str(remaining_dirs))
+
+                #* OK
+                
+                if (self.map_.is_wall( ((x + dir_x), (y + dir_y)) )):
+                    logger.debug("Detected wall at " + str(((x + dir_x), (y + dir_y))))
+                    count += 1
+
+                else:
+                    # todo improve comments
+                    # if it's not a wall, we add the position to the positions to visit. 
+                    # from that position we can go to the remaning_dirs + the oposite direction of where it came from
+                    logger.debug("No wall! Adding to to visit")
+                    to_visit += [(x + dir_x, y + dir_y, [(dir_x * -1, dir_y * -1)] + remaining_dirs)]
+            
+            if count == 2: # corner has 2 adjacent walls
+                # we can have repeteaded corners 
+                # we can reach corners from different paths
+                den_corners = set(den_corners + (x, y)) 
+                if (len(den_corners)):
+                    logger.debug("FOUND ALL 4 CORNERS")
+                    break
+
+        return den_corners
+        
     
 
 #------------------------------------------------------------------------------#
