@@ -68,6 +68,9 @@ class Pacman_agent():
         #logger.debug(nt("\nEnergy size is : " + str(len(state['energy'])) + "\n")
 
         #! ##########   STRATEGY   ##########
+        #?      -> L
+        #*      -> P
+        #TODO   -> MJ
 
         #? criar modes:
             #? counter_mode (pesquisar boost para terminar perseguição)
@@ -75,29 +78,48 @@ class Pacman_agent():
             #? eating_mode  (sem perigo, maior preocupacao, comer bolinhas)
             #? flight_mode  (pesquisa por corredores seguros, com ou sem bolinhas, se houver boosts usar)
 
+        #* modes mais importantes: pursuit e flight mode (eating seria por defeito, o COUNTER é relevante?)
+        #* implementação : Enum e detecção usando ifs
+        #* how to use enums (if I correctly remember)
+        #* from enum import Enum
+        # class Mode(Enum):
+        #   COUNTER = 1
+        #   PURSUIT = 2
+        #   EATING  = 3
+        #   FLIGHT  = 4
+
         #? calcular distancia a pontos acessiveis
         #? calcular distancia aos meus cruzamentos
         #? calcular distancia a boosts
         #? calcular distancia a fantasmas
+        #* basta um método distanceTo(original_pos, dest_pos)
+        #* a diferença estará na forma de obter dest_pos, como é óbvio
 
         #? verificar condicoes do meu corredor
 
+        #* algoritmo
+        #* porque não uma simplificação (só se analisam corredores nos cruzamentos e
+        #* deixamos de analisar os cruzamentos em si)
         #? corredor SAFE?
+            #* continua no corredor até um cruzamento
+
             #? Cruzamentos VERDE?
                 #? EATING_MODE
-                #? ignorar fantasmas...
-                #? ignorar boosts
-                #? pesquisas bolinhas, caminho mais seguro
+                    #? ignorar fantasmas...
+                    #? ignorar boosts
+                    #? pesquisas bolinhas, caminho mais seguro
             #? cruzamentos VERDE e AMARELO
                 #? EATING_MODE
-                #? OPCAO 1 - aproveitar para limpar lado amarelo enquanto 'e possivel
-                #? OPCAO 2 - continuar a pesquisar caminho mais seguro
+                    #? OPCAO 1 - aproveitar para limpar lado amarelo enquanto 'e possivel
+                    #? OPCAO 2 - continuar a pesquisar caminho mais seguro
+                    #* OPCAO 1 é mais arriscada mas mais adequada para obter mais pontos mais depressa (prefiro)
             #? cruzamentos AMARELO
                 #? FLIGHT_MODE
-                #? OPCAO 1 - fugir para um qualquer caminho seguro
-                #? OPCAO 2 - fugir pelo lado que tem mais bolinhas
-                #? OPCAO 3 - fugir pelo caminha mais curto (evitar que mais fantasmas se aproximem no entretanto?)
-                #? OPCAO 4 - sistema de pesos com as anteriores
+                    #? OPCAO 1 - fugir para um qualquer caminho seguro
+                    #? OPCAO 2 - fugir pelo lado que tem mais bolinhas
+                    #? OPCAO 3 - fugir pelo caminha mais curto (evitar que mais fantasmas se aproximem no entretanto?)
+                    #? OPCAO 4 - sistema de pesos com as anteriores
+                #* muito complexo... temos de tentar simplificar
             #? cruzamento AMARELO e VERMELHO
                 #? FLIGHT_MODE
                 #? fugir pelo lado possivel para o sitio mais seguro (com ou sem bolinhas)
@@ -105,8 +127,10 @@ class Pacman_agent():
                 #? FLIGHT_MODE
                 #? fugir pelo menos vermelho
                 #? morrer com dignidade e apanhar o maximo de bolinhas
+                #* simplemesmente evitá-los (voltar para trás)?
 
         #? corredor NOT SAFE
+            #* acho que querias dizer cruzamentos, não corredores :P
             #? corredor livre a AMARELO
                 #? FLIGHT_MODE
             #? corredor livre a VERDE
@@ -115,7 +139,10 @@ class Pacman_agent():
                 #? não há boost
                     #? fantasma nao nos afecta, desde que nao se volte atras. pesquisar bolinhas
 
-
+            #* se o corredor não for safe: a) evitamo-lo ou b) escolhemos o melhor em termos de pontos (BOOST + energias - ghosts)
+            #* ideia: método que, dado um corredor, devolve o seu valor (BOOST + energias - ghosts). 
+            #* é um revisit da ideia dos pesos mas não sofre dos mesmo problemas 
+            #*(um corredor nunca é muito extenso e a análise seria ocasional)
 
         #print("\nEnergy size is : " + str(len(state['energy'])) + "\n")
         # create a vector for every element in the game
