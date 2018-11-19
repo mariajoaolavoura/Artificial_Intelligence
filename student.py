@@ -361,7 +361,7 @@ class Pacman_agent():
         map_       : map of the game
 
         Returns:
-        den_corners: list of coordinates that make up the ghosts den corners
+        den_corners: list of coordinates of the points inside the den (including the walls and entrances)
         """
 
         # get ghots spawn point (which is itself part of the den)
