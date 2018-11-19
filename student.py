@@ -437,12 +437,39 @@ class Pacman_agent():
                     logger.debug(den_corners + [(current_x, current_y)])
                     den_corners = list(set(den_corners + [(current_x, current_y)]))
                     
-                    # a rectangular den has 4 corners
+                    # Found all den corners (a rectangular den has 4 corners)
+                    # Since the den is rectangular so, we can define the bounds of the den 
+                    # and its inside points using the corners
                     if (len(den_corners) == 4):
                         logger.debug("Found all 4 corners")
-                        logger.debug("Returning " + str(den_corners))
-                        print("RETURNING " + str(den_corners))
-                        return den_corners
+                        logger.debug("Den corners " + str(den_corners))
+                        #print("Den corners are " + str(den_corners))
+                        
+                        # previously
+                        #return den_corners
+
+                        # return all positions of the outer square
+                        # 4 corners, two possible values for x and y: the min and max
+                        x_values, y_values = set([x for (x, y) in den_corners]), set([y for (x, y) in den_corners])
+                        big_x, big_y = max(x_values), max(y_values)
+                        small_x, small_y = min(x_values), min(y_values)
+                        
+                        # include the walls
+                        small_x -= 1
+                        small_y -= 1
+                        big_x   += 1
+                        big_y   += 1
+                        den = []
+
+                        for i in range(small_x, big_x + 1, 1):
+                            for j in range(small_y, big_y + 1, 1):
+                                logger.debug("Den point is " + str((i, j)))
+                                den += [(i, j)]
+
+                        logger.debug("Returning " + str(den) + " (length " + str(len(den)) + ")")
+                        print("Den is (includes walls & entrances) " + str(den) + " (length " + str(len(den)) + ")")
+
+                        return den
 
                     # clean up to_visit
                     # after finding a corner, we no longer have to
