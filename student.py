@@ -1,4 +1,4 @@
-#from tree_search import *
+from tree_search import SearchTree
 import random
 import logging
 
