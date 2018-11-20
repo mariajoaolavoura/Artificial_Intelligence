@@ -64,11 +64,35 @@ class Pacman_agent():
         #*      -> P
         #TODO   -> MJ
 
-        #? criar modes:
-            #? counter_mode (pesquisar boost para terminar perseguição)
-            #? pursuit_mode (search and destroy dos fantasmas)
-            #? eating_mode  (sem perigo, maior preocupacao, comer bolinhas)
-            #? flight_mode  (pesquisa por corredores seguros, com ou sem bolinhas, se houver boosts usar)
+        #! corredor SAFE - UNSAFE
+            #? SAFE - Não tem fantasmas
+            #? UNSAFE - Tem fantasmas
+
+        #! cruzamentos VERDES - AMARELO - VERMELHO
+            #* refere-se aos cruzamentos diretamente acessiveis ao Pac-Man
+            #? VERDE - Não há fantasmas nas proximidades
+            #? AMARELO - Há fantasmas a uma distância perigosa (3 posições?), 
+            #?           no entanto se o Pac-Man se dirigir imediatamente para lá
+            #?           consegue escapar por eles antes de ser encurralado
+            #? VERMELHO - Fantasma a uma distancia que nao permite ao Pac-Man
+            #?            escapar antes de ser apanhado (considerando que o fantasma
+            #?            está em perseguição, se estiver aleatório, pode haver
+            #?            uma possibiliade de fuga)
+
+
+        #! Modos de jogo para o Pac-Man
+            #? EATING_MODE - Modo base. Pac-Man está num corredor SAFE e pelo menos
+            #?                   um cruzamento próximo está VERDE
+            #? COUNTER_MODE - Pac-Man está a ser perseguido apenas por um lado,
+            #?                sem perigo eminente de ser encurralado. Prioridade
+            #?                passa a ser encontrar um BOOST para contra-atacar,
+            #?                uma vez que tem um fantasma próximo. Na ausencia de
+            #?                BOOST, passa a EATING_MODE
+            #? PUSUIT_MODE - Pac-Man comeu um BOOST. Prioridade é fazer perseguição
+            #?               aos fantasmas, independentemente das energias. 
+            #? FLIGHT_MODE - Pac-Man está em perigo eminente de ser encurralado.
+            #?               A prioridade passa a ser encontrar corredores seguros,
+            #?               e são ignoradas as energias.
 
         #* modes mais importantes: pursuit e flight mode (eating seria por defeito, o COUNTER é relevante?)
         #* implementação : Enum e detecção usando ifs
@@ -80,14 +104,82 @@ class Pacman_agent():
         #   EATING  = 3
         #   FLIGHT  = 4
 
-        #? calcular distancia a pontos acessiveis
-        #? calcular distancia aos meus cruzamentos
-        #? calcular distancia a boosts
-        #? calcular distancia a fantasmas
-        #* basta um método distanceTo(original_pos, dest_pos)
-        #* a diferença estará na forma de obter dest_pos, como é óbvio
+        #! Análise Estática fornece
+            #? pathways
+            #? corridors
+            #? crossroads
+            #? coordinates_adjacencies
+            #? corridor_adjacencies
+        
+        #! Análise Base (posição atual do Pac-Man), comum e necessária a todos os MODES
+            #? 1.1 - Analisar corredores SAFE - UNSAFE (alterar na lista de adjacencias de corredores)
+            #? 1.2 - Determinar meu corredor SAFE - UNSAFE
+            #? 2.1 - Calcular distancia aos meus cruzamentos
+            #? 2.2 - Calcular distancia dos fantasmas aos meus cruzamentos
+            #? 2.3 - Determinar meus cruzamentos VERDE - AMARELO - VERMELHO
+            #? 3.1 - Determinar se há fantasmas em modo zombie + tempo para perseguição
 
-        #? verificar condicoes do meu corredor
+        #! chamar MODE correspondente (corredor - cruzamento1 - cruzamento2)
+            #* SAFE     - VERDE     - VERDE
+                #? EATING_MODE
+                    #? dependencias:
+                        #? lista de adjacencias de corredores SAFE/UNSAFE
+                        #? posição do Pac-Man (coordenada + corredor)
+                        #? lista de energias
+                        #? lista de boosts (para ser tratado como energias)
+                    #? retorna
+                        #? próxima posição para energia mais próxima
+                    #? considerações
+                        #? verifica se o primeiro corredor no caminho para a
+                        #? energia é SAFE/UNSAFE. Se for UNSAFE, retorna caminho
+                        #? para a segunda energia mais próxima.
+                        #? Em caso de ambiguidade, opta por opção mais segura.
+            #* SAFE     - VERDE     - AMARELO
+                #? EATING_MODE
+                    #? idem
+                    #? pode considerar sair por caminho VERDE caso distancias sejam muito semelhantes?
+            #* SAFE     - VERDE     - VERMELHO
+                #? EATING_MODE
+                    #? idem
+                    #? tem de sair pelo lado VERDE
+                    #? verificar o quanto pode arriscar a limpar lado VERMELHO
+            #* SAFE     - AMARELO   - AMARELO
+                #? COUNTER_MODE
+                    #? -- Só funciona se existirem BOOST, caso contrário retorna None
+                    #? dependencias
+                        #? lista de adjacencias de corredores SAFE/UNSAFE
+                        #? posição do Pac-Man (coordenada + corredor)
+                        #? lista de energias
+                        #? lista de boosts
+                
+                #? EATING_MODE
+                
+                #? FLIGHT_MODE
+            #* SAFE     - AMARELO   - VERMELHO
+                #? FLIGHT_MODE
+            #* SAFE     - VERMELHO  - VERMELHO
+                #? FLIGHT_MODE
+
+            #* UNSAFE   - VERDE     - VERMELHO
+                #? COUNTER_MODE
+                #? FLIGHT_MODE
+            #* UNSAFE   - AMARELO   - VERMELHO
+                #? COUNTER_MODE
+                #? FLIGHT_MODE
+            #* UNSAFE   - VERMELHO  - VERMELHO
+                #? FLIGHT_MODE
+
+
+            #? corr SAFE - corredores amarelos
+                #? COUNTER_MODE
+             
+            #? calcular distancia a pontos acessiveis
+            #? calcular distancia a boosts
+            #? calcular distancia a fantasmas
+            #* basta um método distanceTo(original_pos, dest_pos)
+            #* a diferença estará na forma de obter dest_pos, como é óbvio
+
+            #? verificar condicoes do meu corredor
 
         #* algoritmo
         #* porque não uma simplificação (só se analisam corredores nos cruzamentos e
@@ -117,15 +209,13 @@ class Pacman_agent():
                 #? fugir pelo lado possivel para o sitio mais seguro (com ou sem bolinhas)
             #? cruzamentos VERMELHOS
                 #? FLIGHT_MODE
-                #? fugir pelo menos vermelho
                 #? morrer com dignidade e apanhar o maximo de bolinhas
                 #* simplemesmente evitá-los (voltar para trás)?
 
         #? corredor NOT SAFE
-            #* acho que querias dizer cruzamentos, não corredores :P
-            #? corredor livre a AMARELO
+            #? cruzamento livre a AMARELO
                 #? FLIGHT_MODE
-            #? corredor livre a VERDE
+            #? cruzamento livre a VERDE
                 #? há BOOST?
                     #? pesquisar boost
                 #? não há boost
