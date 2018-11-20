@@ -290,6 +290,27 @@ class Pacman_agent():
         return key
 
 
+
+    def compute_strategy(self):
+
+        set_corridors_safety()
+
+    def set_corridors_safety(self):
+
+
+
+        for (cA, cB) in self.static_analysis.corr_adjacencies:
+            pass 
+
+
+    def get_crossroads_semaphores(self):
+        pass
+
+
+    def boosts_analyser(self):
+        pass
+
+
     def get_vector(self, nodes_to_search, pac_pos):
         """Calculates the vector given by an element
 
