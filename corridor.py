@@ -14,6 +14,7 @@ class Corridor():
         self.coordinates = coordinates
         self.length = len(coordinates) - 2 if len(coordinates)>1 else 0
         self.ends = (coordinates[0], coordinates[len(coordinates)-1])
+        self.safe = True
         
     def dist_end0(self, coord):
         return len(self.coordinates[0:coord])

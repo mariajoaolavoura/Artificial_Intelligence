@@ -176,9 +176,9 @@ class SearchTree:
                     #print("node.state = " + str(node.state))
                     #print("node.parent.state = " + str(node.parent.state))
                     if node.parent.state.ends[0] in node.state.ends:
-                        return node.parent.state.coordinates[1], self.cost#, self.get_path(node)
+                        return node.parent.state.coordinates[1], self.cost, self.get_path(node)
                     elif node.parent.state.ends[1] in node.state.ends:
-                        return node.parent.state.coordinates[node.parent.state.length], self.cost#, self.get_path(node)
+                        return node.parent.state.coordinates[node.parent.state.length], self.cost, self.get_path(node)
                 return None
 
             lnewnodes = []
