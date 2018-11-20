@@ -1,6 +1,7 @@
-from tree_search import SearchTree
+from tree_search import SearchTree, SearchProblem
 from corridor import Corridor
 from static_analysis import Static_Analysis
+from pathways import Pathways
 import random
 import logging
 
@@ -19,6 +20,8 @@ logger_format = '[%(lineno)s - %(funcName)20s() - %(levelname)s]\n %(message)s\n
 
 # currently writing over the logger file, change filemode to a to append
 logging.basicConfig(format=logger_format, filename='logger.log', filemode='w', level=logging.DEBUG)
+
+SAFE_DIST_TO_CROSSROAD = 1
 
 class Pacman_agent():
     """Creates the PACMAN agent that analyses the given 'Map' and 'state'
@@ -300,21 +303,15 @@ class Pacman_agent():
         # Pac-Man position
         pacman = state['pacman']
         # Pac-Man corridor or list of corridors if Pac-Man is in crossroad
-        pac_corridor = [ corr for corr in corridors if pacman in corr ]
+        pac_corridor = [ corr for corr in corridors if pacman in corr ][0]
 
-        # RESOLVER CASO DE SER UMA LISTA
+        #TODO RESOLVER CASO DE SER UMA LISTA
 
-        # get ends of Pac-Man corridor
-        pac_crossroads = pac_corridor.ends
+        
 
-        #
+        # 
 
-        # verify crossroads semaphores
-        domain = Pathways(self.static_analysis.corr_adjacencies)
-        for corr in unsafe_corridors:
-            my_prob = SearchProblem(domain, corr[1], corr[0], pacman_corridor, pacman)
-            my_tree = SearchTree(my_prob, "a*")
-            # calcular distancia de cada fantasma aos cruzamentos
+        
 
 
 
@@ -339,13 +336,51 @@ class Pacman_agent():
             
 
 
-    def get_crossroads_semaphores(self, crossroads, ghosts):
+    def get_crossroads_semaphores(self, haunted_corridors, pac_corridor, pacman):
 
-        semaphores = []
-        for cross in crossroads:
-            # pesquisar distancia dos ghosts a esse corredor
-            # comparar com distancia do pacman a esse corredor
-            # atribuir cor de semáforo
+        # get ends of Pac-Man corridor
+        pac_crossroads = pac_corridor.ends
+        pac_dist_end0 = pac_corridor.dist_end0(pacman)
+        pac_dist_end1 = pac_corridor.dist_end1(pacman)
+
+        semaphores = {}
+        # verify crossroads semaphores - calculate trajectory of every ghost towards Pac-Man
+        domain = Pathways(self.static_analysis.corr_adjacencies)
+        for (ghost, corr) in haunted_corridors:
+            my_prob = SearchProblem(domain, corr, ghost, pac_corridor, pacman)
+            my_tree = SearchTree(my_prob, "a*")
+            _, cost, path = my_tree.search()
+            # the crossroad that the ghost will use to get to Pac-Man
+            crossroad = path[-2].ends[0] if path[-2].ends[0] != pacman else path[-2].ends[1]
+            # calculate distance of every ghost to Pac-Man crossroads
+            ghost_dist = cost - pac_corridor.dist_end(pacman, crossroad)
+
+            if crossroad in semaphores:
+                (ghost, dists) = semaphores[crossroad]
+                dists += ghost_dist
+                #semaphores[crossroad] = (ghost, dists) # descomentar se der asneira
+            else:
+                semaphores[crossroad] = [(ghost, [ghost_dist])]
+            
+            # select most dangerous ghost distancies
+            semaphores = { crossroad : (ghost, min(dist)) for crossroad : (ghost, dist) }
+
+            # compare distance of Pac-Man and ghosts to crossroads and
+            # attribute a semaphore color
+            for key in semaphores:
+
+                if key == pac_corridor.ends[0]:
+                    end = pac_dist_end0
+                else:
+                    end = pac_dist_end1
+                    
+                if semaphores[key][1] - end > SAFE_DIST_TO_CROSSROAD:
+                    semaphores[key] = (ghost, GREEN)
+                elif semaphores[key][1] - end == SAFE_DIST_TO_CROSSROAD:
+                    semaphores[key] = (ghost, YELLOW)
+                else:
+                    semaphores[key] = (ghost, RED)
+    
         
         return semaphores
 
