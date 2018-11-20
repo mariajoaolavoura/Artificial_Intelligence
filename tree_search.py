@@ -98,8 +98,7 @@ class SearchProblem:
         self.domain.adjacencies = [(A,B) for (A, B) in self.domain.adjacencies if (corridor != A and corridor != B) ]
     
     def goal_test(self, state):
-        '''state=corridor
-        '''
+        #state=corridor
         return state == self.goal
 
 
@@ -107,20 +106,7 @@ class SearchProblem:
 # -----------------------------------------------------------------------------
 # Nos de uma arvore de pesquisa
 class SearchNode:
-    '''
-        Args:
-        state:
-        parent:
-        cost:
-        heuristic:
-
-        Attr:
-        state:
-        parent:
-        cost:
-        heuristic:
-    '''
-    
+   
     def __init__(self, state, parent, cost, heuristic): 
         self.state = state #corridor
         self.parent = parent #SearchNode
@@ -176,13 +162,12 @@ class SearchTree:
 
         while self.open_nodes != []:
             
-
-            print("\n\n###############################################################\n")
+            #print("\n\n###############################################################\n")
             
-            node = self.open_nodes.pop(0)
+            node = self.open_nodes.pop()
             self.lvisited += [node.state]
-            print("node.state = " + str(node.state))
-            print("self.open_nodes = " + str(self.open_nodes))
+            #print("node.state = " + str(node.state))
+            #print("self.open_nodes = " + str(self.open_nodes))
             #print("self.lvisited = " + str(self.lvisited))
 
             if self.problem.goal_test(node.state):
@@ -202,7 +187,7 @@ class SearchTree:
 
             for action in self.problem.domain.actions(node.state):
         
-                print("action = " + str(action))
+                #print("action = " + str(action))
 
                 # calculate next state
                 new_state = self.problem.domain.result(node.state, action) 
@@ -213,10 +198,10 @@ class SearchTree:
                 else:
                     # calculate cost of next node
                     cost = node.cost + 1 + self.problem.domain.cost(node.state, action)
-                    print("cost = " + str(cost))
+                    #print("cost = " + str(cost))
                     # calculate heuristic of next node
                     heuristic = self.problem.domain.heuristic(node.state, new_state, self.problem.goal)
-                    print("heuristic = " + str(heuristic))
+                    #print("heuristic = " + str(heuristic))
                     # create new node
                     new_node = SearchNode(state=new_state, parent=node, cost=cost, heuristic=heuristic)
                     
@@ -230,7 +215,7 @@ class SearchTree:
 
             #print("lnewnodes = " + str(lnewnodes))
 
-            print("\n#############################################################\n\n")
+            #print("\n#############################################################\n\n")
 
             self.add_to_open(lnewnodes)
             self.lvisited.extend(node.state for node in lnewnodes)
@@ -251,5 +236,5 @@ class SearchTree:
             self.open_nodes = sorted(self.open_nodes, key=lambda node: node.heuristic)
         elif self.strategy == 'a*':
             self.open_nodes.extend(lnewnodes)
-            self.open_nodes = sorted(self.open_nodes, key=lambda node: node.heuristic + node.cost)
+            self.open_nodes = sorted(self.open_nodes, key=lambda node: node.heuristic + node.cost, reverse=True)
 
