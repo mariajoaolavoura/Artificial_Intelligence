@@ -1,5 +1,5 @@
 from tree_search import SearchDomain
-from student import Corridor
+from corridor import Corridor
 import math
 
 class Pathways(SearchDomain):
@@ -28,12 +28,13 @@ class Pathways(SearchDomain):
         return corr2.length
 
 
-    # TODO
     def heuristic(self, curr_state, new_state, goal):
         c_ends = curr_state.ends
         n_ends = new_state.ends
 
-        c_end = [ e for e in c_ends if e in n_ends]
+        c_end = [ e for e in c_ends if e in n_ends][0]
+
+        print("c_end = " + str(c_end))
 
         if c_end == n_ends[0]:
             x, y = n_ends[1]
@@ -42,4 +43,8 @@ class Pathways(SearchDomain):
             x, y = n_ends[0]
             gx, gy = goal.ends[0]
             
+        print("(x,y) = " + str((x,y)))
         return abs(gx-x) + abs(gy-y)
+
+    def copy(self):
+        return Pathways(self.adjacencies.copy())
