@@ -162,11 +162,11 @@ class SearchTree:
 
         while self.open_nodes != []:
             
-            #print("\n\n###############################################################\n")
+            print("\n\n###############################################################\n")
             
             node = self.open_nodes.pop()
             self.lvisited += [node.state]
-            #print("node.state = " + str(node.state))
+            print("node.state = " + str(node.state))
             #print("self.open_nodes = " + str(self.open_nodes))
             #print("self.lvisited = " + str(self.lvisited))
 
@@ -187,7 +187,7 @@ class SearchTree:
 
             for action in self.problem.domain.actions(node.state):
         
-                #print("action = " + str(action))
+                print("action = " + str(action))
 
                 # calculate next state
                 new_state = self.problem.domain.result(node.state, action) 
@@ -215,7 +215,7 @@ class SearchTree:
 
             #print("lnewnodes = " + str(lnewnodes))
 
-            #print("\n#############################################################\n\n")
+            print("\n#############################################################\n\n")
 
             self.add_to_open(lnewnodes)
             self.lvisited.extend(node.state for node in lnewnodes)
