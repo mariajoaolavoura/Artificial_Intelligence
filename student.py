@@ -22,46 +22,8 @@ logger_format = '[%(lineno)s - %(funcName)20s() - %(levelname)s]\n %(message)s\n
 # currently writing over the logger file, change filemode to a to append
 logging.basicConfig(format=logger_format, filename='logger.log', filemode='w', level=logging.DEBUG)
 
-SAFE_DIST_TO_CROSSROAD = 1
 
-class Pacman_agent():
-    """Creates the PACMAN agent that analyses the given 'Map' and 'state'
-    to decide which direction to take and win the game 
-
-    Args:
-    map_: instance of Map for the current level
-
-    Attr:
-    map_: instance of Map for the current level
-    static_analysis: instance of Static_Analysis containing:
-                - pathways: list of all coordinates that are not walls
-                - adjacencies: list of pairs of adjacent pathways
-                - corridors: list of coordinates that create a corridor
-                - crossroads: list of all coordinates that separate corridors
-    """
-
-    def __init__(self, map_): 
-        logger.warning('\n\n\n ========================== NEW EXECUTION ==========================\n')
-        logger.debug('CREATING PACMAN AGENT\n')
-
-        self.map_ = Static_Analysis(map_)
-
-        logger.debug('CREATED PACMAN AGENT')
-
-
-    def get_next_move(self, state):
-        """Objective of Pacman_agent - calculates the next position using
-        multiple auxiliar methods
-
-        Args:
-        state: a list of lists with the state of every element in the game
-
-        Returns: the key corresponding to the next move of PACMAN
-        """
-
-        #logger.debug(nt("\nEnergy size is : " + str(len(state['energy'])) + "\n")
-
-        #! ##########   STRATEGY   ##########
+ #! ##########   STRATEGY   ##########
         #?      -> L
         #*      -> P
         #TODO   -> MJ
@@ -227,6 +189,45 @@ class Pacman_agent():
             #* ideia: método que, dado um corredor, devolve o seu valor (BOOST + energias - ghosts). 
             #* é um revisit da ideia dos pesos mas não sofre dos mesmo problemas 
             #*(um corredor nunca é muito extenso e a análise seria ocasional)
+
+class Pacman_agent():
+    """Creates the PACMAN agent that analyses the given 'Map' and 'state'
+    to decide which direction to take and win the game 
+
+    Args:
+    map_: instance of Map for the current level
+
+    Attr:
+    map_: instance of Map for the current level
+    static_analysis: instance of Static_Analysis containing:
+                - pathways: list of all coordinates that are not walls
+                - adjacencies: list of pairs of adjacent pathways
+                - corridors: list of coordinates that create a corridor
+                - crossroads: list of all coordinates that separate corridors
+    """
+
+    def __init__(self, map_): 
+        logger.warning('\n\n\n ========================== NEW EXECUTION ==========================\n')
+        logger.debug('CREATING PACMAN AGENT\n')
+
+        self.map_ = Static_Analysis(map_)
+
+        logger.debug('CREATED PACMAN AGENT')
+
+
+    def get_next_move(self, state):
+        """Objective of Pacman_agent - calculates the next position using
+        multiple auxiliar methods
+
+        Args:
+        state: a list of lists with the state of every element in the game
+
+        Returns: the key corresponding to the next move of PACMAN
+        """
+
+        #logger.debug(nt("\nEnergy size is : " + str(len(state['energy'])) + "\n")
+
+       
 
 
         advisor = Strategy_Advisor(map_)
