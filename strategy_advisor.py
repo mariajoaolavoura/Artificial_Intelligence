@@ -9,6 +9,22 @@ SAFE_DIST_TO_CROSSROAD = 1
 # distance at which ghost probably isn't in pursuit of pacman
 SAFE_DIST_TO_GHOST = 7
 
+# Usage MODE.EATING
+class MODE(Enum):
+    EATING  = 1
+    FLIGHT  = 2
+    PURSUIT = 3
+    COUNTER = 4
+
+class CORRIDOR_SAFETY(Enum):
+    SAFE   = 1
+    UNSAFE = 2
+
+class CROSSROAD_SAFETY(Enum):
+    GREEN  = 1
+    YELLOW = 2
+    RED    = 3
+
 class Strategy_Advisor():
     """Analyses corridors safety (if contains ghost or not) and crossroads
     semaphores. Advises on a strategy for the given conditions
@@ -26,6 +42,7 @@ class Strategy_Advisor():
 
     def __init__():
         self.map_ = map_
+        
         self.state = state
     
 
@@ -109,13 +126,16 @@ class Strategy_Advisor():
                 if zombie == False: # ghost is not zombie
                     if ghost in cA.coordinates: # pode dar erro: pesquisar [x,y] em (x,y)
                         cA.safe = False
+                        #TODO consider changing to cA.safe = CORRIDOR_SAFETY.UNSAFE
                         unsafe_corridors += [(cA, ghost[0]]
                     elif ghost in cB.coordinates:
                         cB.safe = False
+                        #TODO consider changing to cb.safe = CORRIDOR_SAFETY.UNSAFE
                         unsafe_corridors += [(cB, ghost[0])]
                     else:
                         cA.safe = True
                         cB.safe = True
+                        #TODO consider changing to ca.safe = CORRIDOR_SAFETY.SAFE and cb.safe = CORRIDOR_SAFETY.UNSAFE
         
         return unsafe_corridors
             
@@ -175,11 +195,11 @@ class Strategy_Advisor():
                 end = pac_dist_end1
                 
             if semaphores[cross][1] > end + 1:
-                semaphores[cross] = (semaphores[cross][0], GREEN)
+                semaphores[cross] = (semaphores[cross][0], CROSSROAD_SAFETY.GREEN)
             elif semaphores[cross][1] == end + 1:
-                semaphores[cross] = (semaphores[cross][0], YELLOW)
+                semaphores[cross] = (semaphores[cross][0], CROSSROAD_SAFETY.YELLOW)
             else:
-                semaphores[cross] = (semaphores[cross][0], RED)
+                semaphores[cross] = (semaphores[cross][0], CROSSROAD_SAFETY.RED)
 
         return semaphores
 
