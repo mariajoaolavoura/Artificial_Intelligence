@@ -2,6 +2,7 @@ from tree_search import SearchTree, SearchProblem
 from corridor import Corridor
 from static_analysis import Static_Analysis
 from pathways import Pathways
+from strategy_advisor import Strategy_Advisor
 import random
 import logging
 
@@ -43,9 +44,7 @@ class Pacman_agent():
         logger.warning('\n\n\n ========================== NEW EXECUTION ==========================\n')
         logger.debug('CREATING PACMAN AGENT\n')
 
-        # static info from mapa.py Map
-        self.map_ = map_
-        self.static_analysis = Static_Analysis(map_)
+        self.map_ = Static_Analysis(map_)
 
         logger.debug('CREATED PACMAN AGENT')
 
@@ -230,152 +229,14 @@ class Pacman_agent():
             #*(um corredor nunca é muito extenso e a análise seria ocasional)
 
 
-        self.compute_strategy(state)
-
-
-
-
-
-
-
-      
-
-
-
-
-    def compute_strategy(self, state):
-        """Objective of Pacman_agent - calculates the next position using
-        multiple auxiliar methods
-
-        Args:
-        state: a list of lists with the state of every element in the game
-
-        Returns: the key corresponding to the next move of PACMAN
-        """
-
-        # verify corridors safety
-        ghosts = state['ghosts']
-        unsafe_corridors = self.set_corridors_safety(ghosts)
-
-        # Pac-Man position
-        pacman = state['pacman']
-        # Pac-Man corridor or list of corridors if Pac-Man is in crossroad
-        pac_corridor = [ corr for corr in self.static_analysis.corridors if pacman in corr ][0]
-
-        #TODO RESOLVER CASO DE SER UMA LISTA
-
-        logger.debug()
-
-    
-
-        
-
-
-
-
-    def set_corridors_safety(self, ghosts):
-        """Verifies if a corridor is safe and sets a flag
-
-        Args:
-        state: a list of lists with the state of every element in the game
-
-        Returns:
-        A list of tuples of ghost and the corridor the ghost is in
-        """
-
-        unsafe_corridors = []
-        for ghost in ghosts:
-            for (cA, cB) in self.static_analysis.corr_adjacencies:
-                if ghost[1] == False: # ghost is not zombie
-                    if ghost[0] in cA.coordinates: # pode dar erro: pesquisar [x,y] em (x,y)
-                        cA.safe = False
-                        unsafe_corridors += [(ghost[0], cA)]
-                    elif ghost[0] in cB.coordinates:
-                        cB.safe = False
-                        unsafe_corridors += [(ghost[0], cB)]
-                    else:
-                        cA.safe = True
-                        cB.safe = True
-        
-        return unsafe_corridors
-            
-
-
-    def get_crossroads_semaphores(self, haunted_corridors, pac_corridor, pacman):
-        """Objective of Pacman_agent - calculates the next position using
-        multiple auxiliar methods
-
-        Args:
-        state: a list of lists with the state of every element in the game
-
-        Returns: the key corresponding to the next move of PACMAN
-        """
-
-        # get ends of Pac-Man corridor
-        pac_crossroads = pac_corridor.ends
-        pac_dist_end0 = pac_corridor.dist_end0(pacman)
-        pac_dist_end1 = pac_corridor.dist_end1(pacman)
-
-        semaphores = {}
-        # verify crossroads semaphores - calculate trajectory of every ghost towards Pac-Man
-        domain = Pathways(self.static_analysis.corr_adjacencies)
-        for (ghost, corr) in haunted_corridors:
-            my_prob = SearchProblem(domain, corr, ghost, pac_corridor, pacman)
-            my_tree = SearchTree(my_prob, "a*")
-            _, cost, path = my_tree.search()
-            # the crossroad that the ghost will use to get to Pac-Man
-            crossroad = path[-2].ends[0] if path[-2].ends[0] != pacman else path[-2].ends[1]
-            # calculate distance of every ghost to Pac-Man crossroads
-            ghost_dist = cost - pac_corridor.dist_end(pacman, crossroad)
-
-            if crossroad in semaphores:
-                (ghost, dists) = semaphores[crossroad]
-                dists += ghost_dist
-                #semaphores[crossroad] = (ghost, dists) # descomentar se der asneira
-            else:
-                semaphores[crossroad] = [(ghost, [ghost_dist])]
-            
-            # select most dangerous ghost distancies
-            semaphores = { crossroad : (ghost, min(dist)) for crossroad in semaphores }
-
-            # compare distance of Pac-Man and ghosts to crossroads and
-            # attribute a semaphore color
-            for key in semaphores:
-
-                if key == pac_corridor.ends[0]:
-                    end = pac_dist_end0
-                else:
-                    end = pac_dist_end1
-                    
-                if semaphores[key][1] - end > SAFE_DIST_TO_CROSSROAD:
-                    semaphores[key] = (ghost, GREEN)
-                elif semaphores[key][1] - end == SAFE_DIST_TO_CROSSROAD:
-                    semaphores[key] = (ghost, YELLOW)
-                else:
-                    semaphores[key] = (ghost, RED)
-    
-        
-        return semaphores
-
-        
-
-
-    def boosts_analyser(self):
-        """Objective of Pacman_agent - calculates the next position using
-        multiple auxiliar methods
-
-        Args:
-        state: a list of lists with the state of every element in the game
-
-        Returns: the key corresponding to the next move of PACMAN
-        """
-        pass
-
-
-   
-
-
-
+        advisor = Strategy_Advisor(map_)
+        mode_handler = advisor.advise()
+        next_move = mode(mode_handler)
+        if (next_move == False):
+            adjuster = Strategy_Adjuster()
+            mode_handler = adjuster.adjustStrategy()
+        else:
+        key = calculateKey()
 
 
     def calculate_key(self, vector):
