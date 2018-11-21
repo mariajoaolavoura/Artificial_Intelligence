@@ -31,7 +31,7 @@ class Static_Analysis():
         self.map_ = map_
         self.pathways = self.create_pathways_list()
         self.crossroads = self.create_crossroads_list(self.pathways)
-        self.coord_adjacencies, self.corridors = self.create_static_maps(self.pathways, self.crossroads)
+        self.corridors = self.create_corridors(self.pathways, self.crossroads)
         self.corr_adjacencies =self.create_corridor_adjacencies(self.corridors, self.crossroads)
 
         self.corridors = [ Corridor(corr) for corr in self.corridors ]
@@ -249,7 +249,7 @@ class Static_Analysis():
 
 #------------------------------------------------------------------------------#
 
-    def create_static_maps(self, pathways, crossroads):
+    def create_corridors(self, pathways, crossroads):
         """Creates a list with all adjacencies of coordinates that are not walls
         Uses two cycles for horizontal and vertical adjacencies for efficiency
         purposes
