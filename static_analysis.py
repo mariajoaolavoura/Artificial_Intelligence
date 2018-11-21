@@ -483,6 +483,7 @@ class Static_Analysis():
         """
 
         # connect vertical and horizontal adjacent corridors
+        corridors = corridors.copy()        # TODO more efficient solution
         buffer = corridors
         corridors = []
         while buffer != []:

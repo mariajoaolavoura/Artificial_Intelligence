@@ -69,7 +69,7 @@ class Strategy_Advisor():
 
         # Pac-Man position and corridor or list of corridors if Pac-Man is in crossroad
         pacman = (self.state['pacman'][0],self.state['pacman'][1])
-        pac_corridor = [ corr for corr in self.map_.corridors if pacman in corr.coordinates ][0]
+        pac_corridor = [ corr for corr in self.map_.corridors if pacman in corr.coordinates ][0]        #TODO verify [0]
 
         #Pac-Man might be at a crossroad. Choose most dangerous corridor.
         for corr in self.map_.corridors:
@@ -99,7 +99,9 @@ class Strategy_Advisor():
         """
 
         unsafe_corridors = []
-        for [ghost, zombie] in ghosts:
+        for [ghost, zombie, timeout] in ghosts:
+            #TODO we could use the timeout to assess the safeness of a corredor
+            #TODO when we have ghosts there (useful on the pursuit mode)
             for (cA, cB) in self.map_.corr_adjacencies:
                 if zombie == False: # ghost is not zombie
                     if ghost in cA.coordinates: # pode dar erro: pesquisar [x,y] em (x,y)
