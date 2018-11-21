@@ -99,8 +99,10 @@ class SearchProblem:
     
     def goal_test(self, state):
         #state=corridor
-        return state == self.goal
-
+        print("state = " + str(state))
+        print("self.goal = " + str(self.goal))
+        return state.coordinates == self.goal.coordinates
+        
 
 # NODE ------------------------------------------------------------------------
 # -----------------------------------------------------------------------------
@@ -169,7 +171,7 @@ class SearchTree:
             print("node.state = " + str(node.state))
             #print("self.open_nodes = " + str(self.open_nodes))
             #print("self.lvisited = " + str(self.lvisited))
-
+            print("self.problem.goal_test(node.state) = " + str(self.problem.goal_test(node.state)))
             if self.problem.goal_test(node.state):
                 self.cost = node.cost
                 if node.parent != None:

@@ -20,6 +20,14 @@ corrD = Corridor([(4,7), (4,8), (4,9), (4,10)])
 corrE = Corridor([(4,7), (5,7), (6,7)])
 corrF = Corridor([(8,1), (8,2), (8,3), (8,4), (7,4), (6,4), (6,5), (6,6), (6,7)])
 
+list_corr = [corrA, corrB, corrC]#, corrD, corrE, corrF]
+
+adjacencies = [ (corrA, corrB), (corrA, corrC), (corrA, corrF),\
+                (corrB, corrC), (corrB, corrD), (corrB, corrE),\
+                (corrC, corrD),\
+                (corrD, corrE),\
+                (corrE, corrF) ]
+
 
 all_corr_full_energ = [(1, 1), (1, 2), (1, 3), (1, 4), (1, 7), (1, 8), (1, 9), (1, 10), (1, 20), (1, 21), (1, 23), (1, 26), (1, 27), (1, 28), (1, 29),\
                         (2, 1), (2, 4), (2, 5), (2,6), (2, 7), (2, 10), (2, 20), (2, 23), (2, 24), (2, 25), (2, 26), (2, 29),\
@@ -48,51 +56,38 @@ next_corr_has_energ = [(1, 1), (1, 2),\
                         (8, 2),\
                         (9, 1), (9, 7), (9, 23), (9, 29)]
 
-initial_corr = corrA
-initial_pos = (1,1)
-print("initial_corr = " + str(initial_corr))
-print("initial_pos = " + str(initial_pos))
 
-print("#######################################################################")
+for corr in list_corr:
+    print("\n\n#######################################################################")
+    print("#######################################################################")
+    print("#######################################################################\n\n")
+    for (x,y) in corr.coordinates:
+        if (x,y) in all_corr_full_energ:
+            initial_corr = corr
+            initial_pos = (x,y)
+            print("initial_corr = " + str(initial_corr))
+            print("initial_pos = " + str(initial_pos))
 
-goal_corr = corrC
-goal_pos = (2,10)
-print("goal_corr = " + str(goal_corr))
-print("goal_pos = " + str(goal_pos))
+            print("#######################################################################")
 
-print("\n#######################################################################")
-print("#######################################################################")
-print("#######################################################################\n")
+            goal_corr = corrC
+            goal_pos = (2,10)
+            print("goal_corr = " + str(goal_corr))
+            print("goal_pos = " + str(goal_pos))
 
-adjacencies = [ (corrA, corrB), (corrA, corrC), (corrA, corrF),\
-                (corrB, corrC), (corrB, corrD), (corrB, corrE),\
-                (corrC, corrD),\
-                (corrD, corrE),\
-                (corrE, corrF) ]
-#print("adjacencies = " + str(adjacencies))
+            print("\n#######################################################################")
+            print("#######################################################################\n")
 
-#print("\n\n#######################################################################")
-#print("#######################################################################")
-#print("#######################################################################\n\n")
 
-domain = Pathways(adjacencies, all_corr_full_energ)
-my_prob = SearchProblem(domain, initial_corr, initial_pos, goal_corr, goal_pos)
+            domain = Pathways(adjacencies, all_corr_full_energ)
+            my_prob = SearchProblem(domain, initial_corr, initial_pos, goal_corr, goal_pos)
 
-#print("\n#######################################################################")
-#print("#######################################################################")
-#print("#######################################################################\n")
 
-#print(str(corrA) + "is in adjacencies : " + str(any((corrA == A or corrA == B) for (A, B) in my_prob.domain.adjacencies )))
-#print(str(corrA) + "is in adjacencies : " + str([(cA, cB) for (cA, cB) in my_prob.domain.adjacencies if (corrA==cA or corrA==cB)]))
+            my_tree = SearchTree(my_prob, "a*")
+            next_result = my_tree.search()
+            print("next_result = " + str(next_result))
 
-#print("\n#######################################################################")
-#print("#######################################################################")
-#print("#######################################################################\n")
-my_tree = SearchTree(my_prob, "a*")
-next_result = my_tree.search()
-print("next_result = " + str(next_result))
-
-print("\n")
+            print("\n")
 
 
 
@@ -167,7 +162,7 @@ def testUpdateDomain(self):
     print("#######################################################################")
     print("#######################################################################\n\n")
 
-def update_domain(self, corridor, sub_corr, sub_corr0, sub_corr1):
+#def update_domain(self, corridor, sub_corr, sub_corr0, sub_corr1):
     corridor = initial_corr
     sub_corr0 = sub_icorr0
     sub_corr1 = sub_icorr1
@@ -193,7 +188,7 @@ def update_domain(self, corridor, sub_corr, sub_corr0, sub_corr1):
                 print([(sub_corr1, corrA)])
         print("\n")
 
-def update_domain(self, corridor, sub_corr, sub_corr0, sub_corr1):
+#def update_domain(self, corridor, sub_corr, sub_corr0, sub_corr1):
     corridor = goal_corr
     sub_corr0 = sub_gcorr0
     sub_corr1 = sub_gcorr1
