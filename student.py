@@ -230,7 +230,7 @@ class Pacman_agent():
             #*(um corredor nunca é muito extenso e a análise seria ocasional)
 
 
-        compute_strategy(state)
+        self.compute_strategy(state)
 
 
 
@@ -238,63 +238,20 @@ class Pacman_agent():
 
 
 
-        #print("\nEnergy size is : " + str(len(state['energy'])) + "\n")
-        # create a vector for every element in the game
-        # every element points pacman teh next move to get to it
-        # vectors = []
-        # #logger.debug(nt(state['energy'])
-        
-        # pac_pos = (state['pacman'][0], state['pacman'][1])
-        # # if debug:
-        # #     logger.debug("\t pacman is in position " + str(pac_pos))
+      
 
-        # ex, ey = self.get_vector(nodes_to_search=state['energy'], pac_pos=pac_pos)
-        # #(gx, gy) = self.get_vector(state['ghosts'], pac_pos)
-
-        # #sum the vectors
-        # vec_x = ex #+ (-10*gx)
-        # vec_y = ey #+ (-10*gy)
-
-        # # calculate the key to send
-        # if abs(vec_x) > abs(vec_y):
-        #     if vec_x > 0:
-        #         key = 'd'
-        #     else:
-        #         key = 'a'
-        # elif abs(vec_x) < abs(vec_y):
-        #     if vec_y > 0:
-        #         key = 's'
-        #     else:
-        #         key = 'w'
-        # elif abs(vec_x) == abs(vec_y):
-        #     if vec_x > 0 and vec_y > 0:
-        #         key = random.choice('sd')
-        #     elif vec_x > 0 and vec_y < 0:
-        #         key = random.choice('dw')
-        #     elif vec_x < 0 and vec_y < 0:
-        #         key = random.choice('aw')
-        #     elif vec_x < 0 and vec_y > 0:
-        #         key = random.choice('as')
-        #     elif vec_x == 0:
-        #         logger.warning("There is a problem not solved yet in this line of code!")
-        
-        # if debug:
-        #     logger.debug('The key is: ' + str(key))
-
-
-        # x, y = state['pacman']
-        # if x == cur_x and y == cur_y:
-        #     if key in "ad":
-        #         key = random.choice("ws")
-        #     elif key in "ws":
-        #         key = random.choice("ad")
-        # cur_x, cur_y = x, y
-
-        #return key
 
 
 
     def compute_strategy(self, state):
+        """Objective of Pacman_agent - calculates the next position using
+        multiple auxiliar methods
+
+        Args:
+        state: a list of lists with the state of every element in the game
+
+        Returns: the key corresponding to the next move of PACMAN
+        """
 
         # verify corridors safety
         ghosts = state['ghosts']
@@ -303,13 +260,13 @@ class Pacman_agent():
         # Pac-Man position
         pacman = state['pacman']
         # Pac-Man corridor or list of corridors if Pac-Man is in crossroad
-        pac_corridor = [ corr for corr in corridors if pacman in corr ][0]
+        pac_corridor = [ corr for corr in self.static_analysis.corridors if pacman in corr ][0]
 
         #TODO RESOLVER CASO DE SER UMA LISTA
 
-        
+        logger.debug()
 
-        # 
+    
 
         
 
@@ -317,6 +274,14 @@ class Pacman_agent():
 
 
     def set_corridors_safety(self, ghosts):
+        """Verifies if a corridor is safe and sets a flag
+
+        Args:
+        state: a list of lists with the state of every element in the game
+
+        Returns:
+        A list of tuples of ghost and the corridor the ghost is in
+        """
 
         unsafe_corridors = []
         for ghost in ghosts:
@@ -337,6 +302,14 @@ class Pacman_agent():
 
 
     def get_crossroads_semaphores(self, haunted_corridors, pac_corridor, pacman):
+        """Objective of Pacman_agent - calculates the next position using
+        multiple auxiliar methods
+
+        Args:
+        state: a list of lists with the state of every element in the game
+
+        Returns: the key corresponding to the next move of PACMAN
+        """
 
         # get ends of Pac-Man corridor
         pac_crossroads = pac_corridor.ends
@@ -363,7 +336,7 @@ class Pacman_agent():
                 semaphores[crossroad] = [(ghost, [ghost_dist])]
             
             # select most dangerous ghost distancies
-            semaphores = { crossroad : (ghost, min(dist)) for crossroad : (ghost, dist) }
+            semaphores = { crossroad : (ghost, min(dist)) for crossroad in semaphores }
 
             # compare distance of Pac-Man and ghosts to crossroads and
             # attribute a semaphore color
@@ -388,122 +361,18 @@ class Pacman_agent():
 
 
     def boosts_analyser(self):
+        """Objective of Pacman_agent - calculates the next position using
+        multiple auxiliar methods
+
+        Args:
+        state: a list of lists with the state of every element in the game
+
+        Returns: the key corresponding to the next move of PACMAN
+        """
         pass
 
 
-    # def get_vector(self, nodes_to_search, pac_pos):
-    #     """Calculates the vector given by an element
-
-    #     Args:
-    #     nodes_to_search -- 
-    #     pac_pos         -- coordinates of PACMAN position
-
-    #     Returns:
-
-    #     """
-    #     i = 0
-    #     next_pos = []
-    #     vectors = []
-    #     # if debug:
-    #     #     logger.debug("***********************************************************")
-    #     #     logger.debug('\t get vector was called! ')
-    #     #     logger.debug("***********************************************************")
-
-    #     # convert list to dictionary with zero weight for each element
-    #     weight_dict = { (x,y):1 for [x,y] in nodes_to_search }
-
-    #     for (x,y) in nodes_to_search:
-
-    #         # if debug:
-    #             # logger.debug("#######################################################")
-    #             # logger.debug('\t calculating vector for pos: ' + str((x,y)))
-    #             # logger.debug("#######################################################")
-        
-    #         # if debug:
-    #         #     logger.debug("\t cycle  for position " + str((x,y)))
-
-    #         # search the path
-    #         # if debug:
-    #         #     logger.debug("SearchDomain being called to create")
-    #         domain = Pathways(self.adjacencies)
-
-    #         # if debug:
-    #         #     logger.debug("SearchProblem " + str(i) + " being called to create")
-    #         my_prob = SearchProblem(domain,(x,y),pac_pos)
-            
-    #         # if debug:
-    #         #     logger.debug("SearchTree " + str(i) + " being called to create")
-    #         my_tree = SearchTree(my_prob, weight_dict, self.strategy)
-            
-    #         next_result = my_tree.search()
-
-    #         if next_result != None:
-    #             next_res, next_cost = next_result
-    #             next_pos += [((x,y) , next_res, next_cost)]
-    #         else:
-    #             next_pos += [((x,y), pac_pos, 0)]
-
-    #         #logger.debug((x,y))
-    #         #logger.debug(next_result)
-            
-    #         #logger.debug("\t search " + str(i) + " was completed!")
-
-    #         # if debug:
-    #         #     logger.debug('\t Calculating next move for position: ' + str((x,y)))
-
-    #     #logger.debug(next_pos)
-
-    #     for i in range(len(next_pos)):
-    #         if next_pos[i][1] != pac_pos:
-    #             pac_x, pac_y = pac_pos
-    #             next_x, next_y = (next_pos[i])[1]
-    #             x = pac_x - next_x
-    #             y = pac_y - next_y
-    #             if (x == 1):
-    #                 dir = ( ( -(1/next_pos[i][2])) , 0 )
-    #             elif (x == -1):
-    #                 dir = ( ( (1/next_pos[i][2])) , 0 )
-    #             elif (y == 1):
-    #                 dir = ( 0 , (-(1/next_pos[i][2])) )
-    #             elif (y == -1):
-    #                 dir = ( 0 , ((1/next_pos[i][2])) )
-    #             elif (x > 1):
-    #                 dir = ( ((1/next_pos[i][2])) , 0 )
-    #             elif (x < 1):
-    #                 dir = ( (-(1/next_pos[i][2])) , 0 )
-    #             elif (y > 1):
-    #                 dir = ( 0 , ((1/next_pos[i][2])) )
-    #             elif (y < 1):
-    #                 dir = ( 0 , (-(1/next_pos[i][2])) )
-    #             vectors += [dir]
-
-    #             logger.debug(str(next_pos[i][0]) + " : vector is: " + str(dir))
-            
-    #         # if debug:
-    #         #     logger.debug("#######################################################")
-    #         #     logger.debug('\t Vector is ' + str(dir))
-    #         #     logger.debug("#######################################################")
-
-    #     #logger.debug(weight_dict)
-
-
-
-    #     # sum all the vectors
-    #     vec_x = 0
-    #     vec_y = 0
-    #     for (x,y) in vectors:
-    #         vec_x += x
-    #         vec_y += y
-        
-    #     #logger.debug("\npacman is in position " + str(pac_pos[0], pac_pos[1]))
-    #     #logger.debug('Sum of all vectors is: ' + str(vec_x) + ', ' + str(vec_y) + "\n")
-
-    #     if debug:
-    #         logger.debug("#######################################################")
-    #         logger.debug('\t Vector is ' + str((vec_x, vec_y)))
-    #         logger.debug("#######################################################")
-
-    #     return [vec_x, vec_y]
+   
 
 
 
@@ -515,6 +384,28 @@ class Pacman_agent():
         Keyword arguments:
         vector -- the vector that represents next PACMAN move
         """
+        # # calculate the key to send
+        # if abs(vec_x) > abs(vec_y):
+        #     if vec_x > 0:
+        #         key = 'd'
+        #     else:
+        #         key = 'a'
+        # elif abs(vec_x) < abs(vec_y):
+        #     if vec_y > 0:
+        #         key = 's'
+        #     else:
+        #         key = 'w'
+        # elif abs(vec_x) == abs(vec_y):
+        #     if vec_x > 0 and vec_y > 0:
+        #         key = random.choice('sd')
+        #     elif vec_x > 0 and vec_y < 0:
+        #         key = random.choice('dw')
+        #     elif vec_x < 0 and vec_y < 0:
+        #         key = random.choice('aw')
+        #     elif vec_x < 0 and vec_y > 0:
+        #         key = random.choice('as')
+        #     elif vec_x == 0:
+        #         logger.warning("There is a problem not solved yet in this line of code!")
 
 
 
@@ -537,18 +428,14 @@ class Pacman_agent():
 
 
 
-    def combinations(self, list_, n):
-        """Generates all combinations of the elements in a list
 
-        Keyword arguments:
-        list_   -- a list
-        n       -- number of elements per combination
-        """
-        if n==0: yield []
-        else:
-            for i in range(len(list_)):
-                for elem in self.combinations(list_[i+1:],n-1):
-                    yield [list_[i]] + elem
+
+
+
+
+
+
+
 
     
 
