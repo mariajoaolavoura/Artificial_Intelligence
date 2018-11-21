@@ -28,18 +28,6 @@ from mapa import Map
 
 logger = logging.getLogger('Ghost')
 logger.setLevel(logging.INFO)
-<<<<<<< HEAD
-
-class Ghost:
-    def __init__(self, mapa, buff_size=9, wait_max=10):
-        self.map = mapa
-        self.respawn()
-        self.direction = ""
-        self.buff_size = buff_size
-        self.buff_pos = []
-        self.wait = random.randint(0, wait_max)
-        self.zombie_timeout = 0
-=======
 
 
 def combine_scores(l, *args):
@@ -124,7 +112,6 @@ class Ghost:
 
         logger.info("Ghost Level = %s ", self.level)
         logger.info("Ghost Visibility = %s", self.visibility)
->>>>>>> upstream/master
 
     def respawn(self):
         x, y = self.map._ghost_spawn
