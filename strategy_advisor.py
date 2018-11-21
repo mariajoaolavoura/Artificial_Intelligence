@@ -69,11 +69,11 @@ class Strategy_Advisor():
 
         # Pac-Man position and corridor or list of corridors if Pac-Man is in crossroad
         pacman = (self.state['pacman'][0],self.state['pacman'][1])
-        pac_corridor = [ corr for corr in self.map_.corridors if pacman in corr.coordinates ][0]        #TODO verify [0]
+        pac_corridor = [ corr for corr in self.map_.corridors if pacman in corr.coordinates ]        #TODO verify [0]
 
         #Pac-Man might be at a crossroad. Choose most dangerous corridor.
         for corr in self.map_.corridors:
-            if corr.safe == False:
+            if corr.safe == CORRIDOR_SAFETY.UNSAFE:
                 pac_corridor = [corr]
                 break
         pac_corridor = pac_corridor[0]
@@ -98,22 +98,40 @@ class Strategy_Advisor():
         corridor is returned multiple times tupled with each ghost 
         """
 
+        return [] #! DEBUG ONLY to detected bugs in other methods 
         unsafe_corridors = []
+
+        #TODO we should switch the order of the cycles 
+        #TODO (for each adjacents_corridors, verify if the ghosts are there
+        #TODO for efficiency reasons)
         for [ghost, zombie, timeout] in ghosts:
-            #TODO we could use the timeout to assess the safeness of a corredor
-            #TODO when we have ghosts there (useful on the pursuit mode)
-            for (cA, cB) in self.map_.corr_adjacencies:
-                if zombie == False: # ghost is not zombie
-                    if ghost in cA.coordinates: # pode dar erro: pesquisar [x,y] em (x,y)
-                        cA.safe = CORRIDOR_SAFETY.UNSAFE
-                        unsafe_corridors += [(cA, ghost[0])]
-                    elif ghost in cB.coordinates:
-                        cB.safe = CORRIDOR_SAFETY.UNSAFE
-                        unsafe_corridors += [(cB, ghost[0])]
-                    else:
-                        cA.safe = CORRIDOR_SAFETY.SAFE
-                        cA.safe = CORRIDOR_SAFETY.SAFE
-        
+            #! the format is pos_CA, adjacency point, pos cB
+            #! it should be corridor a, adjacency point, corridor b
+            print("\n\n\n\n\nCORR_ADJACENCIES" + str(self.map_.corr_adjacencies) + "\n\n\n\n\n")
+
+            #for each cA, adjacent point, cB, in the list of adjancies of the corridors
+            for adjacents_corridors in self.map_.corr_adjacencies: 
+                print("THE PROBLEM IS HERE " + str(adjacents_corridors) + "\n")
+                for (cA, _, cB) in adjacents_corridors:   
+                    if zombie == False:                 # ghost is not zombie
+                        if ghost in cA.coordinates:     # pode dar erro: pesquisar [x,y] em (x,y)
+                            cA.safe = CORRIDOR_SAFETY.UNSAFE
+                            unsafe_corridors += [(cA, ghost[0])]
+                        elif ghost in cB.coordinates:
+                            cB.safe = CORRIDOR_SAFETY.UNSAFE
+                            unsafe_corridors += [(cB, ghost[0])]
+                        else:
+                            cA.safe = CORRIDOR_SAFETY.SAFE
+                            cA.safe = CORRIDOR_SAFETY.SAFE
+                    
+                    #TODO we could use the timeout to assess the safeness of a corredor
+                    #TODO when we have ghosts there (useful on the pursuit mode)
+                    #else:
+                        #if timeout < X:
+                            # consider safe?
+                        #else:
+                            # consider unsafe
+            
         return unsafe_corridors
             
 
@@ -141,7 +159,7 @@ class Strategy_Advisor():
 
         # verify crossroads semaphores
         semaphores = {}
-        domain = Pathways(self.map_.corr_adjacencies, self.state['energies'])
+        domain = Pathways(self.map_.corr_adjacencies, self.state['energy'])
         for (ghost, corr) in unsafe_corridors:
 
             # calculate trajectory of every ghost towards Pac-Man
