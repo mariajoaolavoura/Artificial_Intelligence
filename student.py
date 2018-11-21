@@ -1,9 +1,9 @@
-from tree_search import SearchTree, SearchProblem
-from corridor import Corridor
+from game_consts import *
 from static_analysis import Static_Analysis
 from pathways import Pathways
+from tree_search import SearchTree, SearchProblem
+from corridor import Corridor
 from strategy_advisor import Strategy_Advisor
-import random
 import logging
 
 #$ PORT=80 SERVER=pacman-aulas.ws.atnog.av.it.pt python client.py
@@ -23,172 +23,69 @@ logger_format = '[%(lineno)s - %(funcName)20s() - %(levelname)s]\n %(message)s\n
 logging.basicConfig(format=logger_format, filename='logger.log', filemode='w', level=logging.DEBUG)
 
 
- #! ##########   STRATEGY   ##########
-        #?      -> L
-        #*      -> P
-        #TODO   -> MJ
+ #! ##########   PAC-MAN AGENT GLOBAL STRATEGY   ##########
 
-        #! corredor SAFE - UNSAFE
-            #? SAFE - Não tem fantasmas
-            #? UNSAFE - Tem fantasmas
+    #! ###    CONCEPTS    ###
 
-        #! cruzamentos VERDES - AMARELO - VERMELHO
-            #* refere-se aos cruzamentos diretamente acessiveis ao Pac-Man
-            #? VERDE - Não há fantasmas nas proximidades
-            #? AMARELO - Há fantasmas a uma distância perigosa (3 posições?), 
-            #?           no entanto se o Pac-Man se dirigir imediatamente para lá
-            #?           consegue escapar por eles antes de ser encurralado
-            #? VERMELHO - Fantasma a uma distancia que nao permite ao Pac-Man
-            #?            escapar antes de ser apanhado (considerando que o fantasma
-            #?            está em perseguição, se estiver aleatório, pode haver
-            #?            uma possibiliade de fuga)
+    #! Corridor
+        #* A list of path coordinates with only two adjacent coordinates
+        #* and two crossroads as ends
 
+    #! Crossroad
+        #* A coordinate that joins corridors. The crossroad belong to all
+        #* corridors it joins
 
-        #! Modos de jogo para o Pac-Man
-            #? EATING_MODE - Modo base. Pac-Man está num corredor SAFE e pelo menos
-            #?                   um cruzamento próximo está VERDE
-            #? COUNTER_MODE - Pac-Man está a ser perseguido apenas por um lado,
-            #?                sem perigo eminente de ser encurralado. Prioridade
-            #?                passa a ser encontrar um BOOST para contra-atacar,
-            #?                uma vez que tem um fantasma próximo. Na ausencia de
-            #?                BOOST, passa a EATING_MODE
-            #? PUSUIT_MODE - Pac-Man comeu um BOOST. Prioridade é fazer perseguição
-            #?               aos fantasmas, independentemente das energias. 
-            #? FLIGHT_MODE - Pac-Man está em perigo eminente de ser encurralado.
-            #?               A prioridade passa a ser encontrar corredores seguros,
-            #?               e são ignoradas as energias.
+    #! Corridor SAFE vs UNSAFE
+        #* SAFE - Has no ghosts
+        #* UNSAFE - Has one or more ghosts
 
-        #* modes mais importantes: pursuit e flight mode (eating seria por defeito, o COUNTER é relevante?)
-        #* implementação : Enum e detecção usando ifs
-        #* how to use enums (if I correctly remember)
-        #* from enum import Enum
-        # class Mode(Enum):
-        #   COUNTER = 1
-        #   PURSUIT = 2
-        #   EATING  = 3
-        #   FLIGHT  = 4
-
-        #! Análise Estática fornece
-            #? pathways
-            #? corridors
-            #? crossroads
-            #? coordinates_adjacencies
-            #? corridor_adjacencies
-        
-        #! Análise Base (posição atual do Pac-Man), comum e necessária a todos os MODES
-            #? 1.1 - Analisar corredores SAFE - UNSAFE (alterar na lista de adjacencias de corredores)
-            #? 1.2 - Determinar meu corredor SAFE - UNSAFE
-            #? 2.1 - Calcular distancia aos meus cruzamentos
-            #? 2.2 - Calcular distancia dos fantasmas aos meus cruzamentos
-            #? 2.3 - Determinar meus cruzamentos VERDE - AMARELO - VERMELHO
-            #? 3.1 - Determinar se há fantasmas em modo zombie + tempo para perseguição
-
-        #! chamar MODE correspondente (corredor - cruzamento1 - cruzamento2)
-            #* SAFE     - VERDE     - VERDE
-                #? EATING_MODE
-                    #? dependencias:
-                        #? lista de adjacencias de corredores SAFE/UNSAFE
-                        #? posição do Pac-Man (coordenada + corredor)
-                        #? lista de energias
-                        #? lista de boosts (para ser tratado como energias)
-                    #? retorna
-                        #? próxima posição para energia mais próxima
-                    #? considerações
-                        #? verifica se o primeiro corredor no caminho para a
-                        #? energia é SAFE/UNSAFE. Se for UNSAFE, retorna caminho
-                        #? para a segunda energia mais próxima.
-                        #? Em caso de ambiguidade, opta por opção mais segura.
-            #* SAFE     - VERDE     - AMARELO
-                #? EATING_MODE
-                    #? idem
-                    #? pode considerar sair por caminho VERDE caso distancias sejam muito semelhantes?
-            #* SAFE     - VERDE     - VERMELHO
-                #? EATING_MODE
-                    #? idem
-                    #? tem de sair pelo lado VERDE
-                    #? verificar o quanto pode arriscar a limpar lado VERMELHO
-            #* SAFE     - AMARELO   - AMARELO
-                #? COUNTER_MODE
-                    #? -- Só funciona se existirem BOOST, caso contrário retorna None
-                    #? dependencias
-                        #? lista de adjacencias de corredores SAFE/UNSAFE
-                        #? posição do Pac-Man (coordenada + corredor)
-                        #? lista de energias
-                        #? lista de boosts
-                
-                #? EATING_MODE
-                
-                #? FLIGHT_MODE
-            #* SAFE     - AMARELO   - VERMELHO
-                #? FLIGHT_MODE
-            #* SAFE     - VERMELHO  - VERMELHO
-                #? FLIGHT_MODE
-
-            #* UNSAFE   - VERDE     - VERMELHO
-                #? COUNTER_MODE
-                #? FLIGHT_MODE
-            #* UNSAFE   - AMARELO   - VERMELHO
-                #? COUNTER_MODE
-                #? FLIGHT_MODE
-            #* UNSAFE   - VERMELHO  - VERMELHO
-                #? FLIGHT_MODE
+    #! Crossroad GREEN - YELLOW - RED
+        #* Refers to the crossroads directly accessible to Pac-Man (the
+        #* ends of it's corridor)
+        #* GREEN - No ghosts in proximity
+        #* YELLOW - There are ghosts at a dangerous distance of the crossroad
+        #*          (default = 1). Pac-Man can escape if he goes directly through
+        #*          that end
+        #* RED - Considering that the ghosts is in pursuit of Pac-Man, it is
+        #*       impossible for Pac-Man to escape from that end before the ghost
+        #*       gets to it (or the ghost is already inside Pac-Man's Corridor)
 
 
-            #? corr SAFE - corredores amarelos
-                #? COUNTER_MODE
-             
-            #? calcular distancia a pontos acessiveis
-            #? calcular distancia a boosts
-            #? calcular distancia a fantasmas
-            #* basta um método distanceTo(original_pos, dest_pos)
-            #* a diferença estará na forma de obter dest_pos, como é óbvio
+    #! Strategy Game Modes
+        #* EATING_MODE - Pac-Man is safe. Focus on eating energies. Tries to
+        #*               find closest energies through safest paths
+        #* COUNTER_MODE - Pac-Man is almost surrounded. Focus on eating boosts.
+        #* PURSUIT_MODE - Pac-Man is safe and there are zombie ghosts.
+        #*               Focus on eating ghosts.
+        #* FLIGHT_MODE - Pac-Man is almost surrounded. There are no boosts
+        #*               available. Focus on finding the closest safest Corridor.
 
-            #? verificar condicoes do meu corredor
+    #! Static Analysis of Map provides
+        #* pathways
+        #* corridors
+        #* crossroads
+        #* corridor_adjacencies
+    
+    #! Strategy Guidelines
+        #* Pac-Man Agent calls Strategy Advisor
+        #*      Strategy Advisor analyses:
+        #*          Corridor Safety
+        #*          Crossroads Semaphores
+        #*          Distance to ghosts
+        #*      Strategy Advisor advises a Game Mode
+        #* Pac-Man calls Game Mode Agent to get next move
+        #*      Game Mode tries to find a next move
+        #* Pac-Man analyses next move
+        #*      Is it specific (only one solution)
+        #*          Pac-Man accepts next move
+        #*      It's not specific (strategy was not correct)
+        #*          Pac-Man calls Strategy Adjuster
+        #*              Strategy Adjuster evaluates new info and advises a new Game Mode
+        #*          Pac-Man call Game Mode Agent to get next move
+        #*              Game Mode tries to find a solution
+        #*          Pac-Man accepts best solution found (if more than one)
 
-        #* algoritmo
-        #* porque não uma simplificação (só se analisam corredores nos cruzamentos e
-        #* deixamos de analisar os cruzamentos em si)
-        #? corredor SAFE?
-            #* continua no corredor até um cruzamento
 
-            #? Cruzamentos VERDE?
-                #? EATING_MODE
-                    #? ignorar fantasmas...
-                    #? ignorar boosts
-                    #? pesquisas bolinhas, caminho mais seguro
-            #? cruzamentos VERDE e AMARELO
-                #? EATING_MODE
-                    #? OPCAO 1 - aproveitar para limpar lado amarelo enquanto 'e possivel
-                    #? OPCAO 2 - continuar a pesquisar caminho mais seguro
-                    #* OPCAO 1 é mais arriscada mas mais adequada para obter mais pontos mais depressa (prefiro)
-            #? cruzamentos AMARELO
-                #? FLIGHT_MODE
-                    #? OPCAO 1 - fugir para um qualquer caminho seguro
-                    #? OPCAO 2 - fugir pelo lado que tem mais bolinhas
-                    #? OPCAO 3 - fugir pelo caminha mais curto (evitar que mais fantasmas se aproximem no entretanto?)
-                    #? OPCAO 4 - sistema de pesos com as anteriores
-                #* muito complexo... temos de tentar simplificar
-            #? cruzamento AMARELO e VERMELHO
-                #? FLIGHT_MODE
-                #? fugir pelo lado possivel para o sitio mais seguro (com ou sem bolinhas)
-            #? cruzamentos VERMELHOS
-                #? FLIGHT_MODE
-                #? morrer com dignidade e apanhar o maximo de bolinhas
-                #* simplemesmente evitá-los (voltar para trás)?
-
-        #? corredor NOT SAFE
-            #? cruzamento livre a AMARELO
-                #? FLIGHT_MODE
-            #? cruzamento livre a VERDE
-                #? há BOOST?
-                    #? pesquisar boost
-                #? não há boost
-                    #? fantasma nao nos afecta, desde que nao se volte atras. pesquisar bolinhas
-
-            #* se o corredor não for safe: a) evitamo-lo ou b) escolhemos o melhor em termos de pontos (BOOST + energias - ghosts)
-            #* ideia: método que, dado um corredor, devolve o seu valor (BOOST + energias - ghosts). 
-            #* é um revisit da ideia dos pesos mas não sofre dos mesmo problemas 
-            #*(um corredor nunca é muito extenso e a análise seria ocasional)
 
 class Pacman_agent():
     """Creates the PACMAN agent that analyses the given 'Map' and 'state'
@@ -206,7 +103,7 @@ class Pacman_agent():
                 - crossroads: list of all coordinates that separate corridors
     """
 
-    def __init__(self, map_): 
+    def __init__(self, map_,): 
         logger.warning('\n\n\n ========================== NEW EXECUTION ==========================\n')
         logger.debug('CREATING PACMAN AGENT\n')
 
@@ -227,79 +124,58 @@ class Pacman_agent():
 
         #logger.debug(nt("\nEnergy size is : " + str(len(state['energy'])) + "\n")
 
-       
+        # get advice on the next move
+        strategy_advisor = Strategy_Advisor(self.map_, state)
+        mode_handler = strategy_advisor.advise()
+        next_move = self.mode(mode_handler)
+
+        # if advice is not specific, adjustments to the strategy may be needed
+        if (next_move == False): #correct when methods are implementd
+            strategy_adjuster = Strategy_Adjuster()
+            mode_handler = strategy_adjuster.adjustStrategy()
+            next_move = self.mode(mode_handler)
+        
+        # calculate and return the key
+        return self.calculate_key(state['pacman'], next_move)
 
 
-        advisor = Strategy_Advisor(map_)
-        mode_handler = advisor.advise()
-        next_move = mode(mode_handler)
-        if (next_move == False):
-            adjuster = Strategy_Adjuster()
-            mode_handler = adjuster.adjustStrategy()
-        else:
-        key = calculateKey()
+
+    def mode(self, mode_handler):
+        if mode_handler == MODE.EATING:
+            next_move = mode_eating()
+        elif mode_handler == MODE.FLIGHT:
+            next_move = mode_flight()
+        elif mode_handler == MODE.PURSUIT:
+            next_move = mode_pursuit()
+        else: # next_move == MODE.COUNTER
+            next_move = mode_counter()
+        return next_move
 
 
-    def calculate_key(self, vector):
+
+    def calculate_key(self, pacman, next_move):
         """Calculates the 'wasd' key that corresponds to the next move
 
-        Keyword arguments:
-        vector -- the vector that represents next PACMAN move
-        """
-        # # calculate the key to send
-        # if abs(vec_x) > abs(vec_y):
-        #     if vec_x > 0:
-        #         key = 'd'
-        #     else:
-        #         key = 'a'
-        # elif abs(vec_x) < abs(vec_y):
-        #     if vec_y > 0:
-        #         key = 's'
-        #     else:
-        #         key = 'w'
-        # elif abs(vec_x) == abs(vec_y):
-        #     if vec_x > 0 and vec_y > 0:
-        #         key = random.choice('sd')
-        #     elif vec_x > 0 and vec_y < 0:
-        #         key = random.choice('dw')
-        #     elif vec_x < 0 and vec_y < 0:
-        #         key = random.choice('aw')
-        #     elif vec_x < 0 and vec_y > 0:
-        #         key = random.choice('as')
-        #     elif vec_x == 0:
-        #         logger.warning("There is a problem not solved yet in this line of code!")
+        Args:
+        pacman: the coordinates of Pac-Man position
+        next_move: the coordinates of the position to go to
 
-
-
-    def calculate_next_move_direction(self, pac_pos, next_pos):
-        """Calculates direction of next PACMAN move
-
-        Keyword arguments:
-        pac_pos     -- coordinates of PACMAN position
-        next_pos    -- coordinates of next PACMAN move
+        Returns:
+        The 'wasd' key for moving from pacman to next_move
         """
 
+        px, py = pacman
+        nx, ny = next_move
+        if nx > px:
+            key = 'd'
+        elif nx < px:
+            key = 'a'
+        elif ny > py:
+            key = 's'
+        else: # ny < py
+            key = 'w'
 
 
-    def sum_vectors(self, vectors):
-        """Sums all vectors
-
-        Keyword arguments:
-        vectors -- a list of vectors
-        """
-
-
-
-
-
-
-
-
-
-
-
-
-    
 
     def print_debug_block(self, string, var):
         """Prints a debug bar
@@ -312,14 +188,3 @@ class Pacman_agent():
         #logger.debug('\t ' + string + ' is: ')
         #logger.debug("#######################################################")
         #logger.debug(var)
-
-
-################################################################################
-#####################   STATIC ANALYSIS AUXILIAR METHODS   #####################
-################################################################################
-    
-    
-
-################################################################################
-#############################   AUXILIAR CLASSES   #############################
-################################################################################
