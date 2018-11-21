@@ -33,8 +33,8 @@ class Static_Analysis():
         self.crossroads = self.create_crossroads_list(self.pathways)
         self.corridors = self.create_corridors(self.pathways, self.crossroads)
         self.corr_adjacencies =self.create_corridor_adjacencies(self.corridors, self.crossroads)
-
         self.corridors = [ Corridor(corr) for corr in self.corridors ]
+        
 
 
     #* ##########   TESTED AND VERIFIED   ##########"""
@@ -357,6 +357,9 @@ class Static_Analysis():
 
         if debug:
             self.print_debug_block('corridors', corridors)
+
+        # print("CORRIDORS:\n")
+        # print(self.corridors)
 
         return corridors
 

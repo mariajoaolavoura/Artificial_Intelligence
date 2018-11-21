@@ -68,8 +68,9 @@ class Strategy_Advisor():
         unsafe_corridors = self.set_corridors_safety(ghosts)
 
         # Pac-Man position and corridor or list of corridors if Pac-Man is in crossroad
-        pacman = self.state['pacman']
-        pac_corridor = [ corr for corr in self.map_.corridors if pacman in corr ][0]
+        pacman = (self.state['pacman'][0],self.state['pacman'][1])
+        print(self.map_.corridors)
+        pac_corridor = [ corr for corr in self.map_.corridors if pacman in corr.coordinates ][0]
 
         #Pac-Man might be at a crossroad. Choose most dangerous corridor.
         for corr in self.map_.corridors:

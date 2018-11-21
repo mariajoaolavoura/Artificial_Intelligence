@@ -1,4 +1,4 @@
-from game_consts import SEMAPHORE
+from game_consts import CORRIDOR_SAFETY
 
 class Corridor():
     """Represents an uninterrupted path of adjacente coordinates with a
@@ -16,7 +16,7 @@ class Corridor():
         self.coordinates = coordinates
         self.length = len(coordinates) - 2 if len(coordinates)>1 else 0
         self.ends = (coordinates[0], coordinates[len(coordinates)-1])
-        self.safe = SEMAPHORE.SAFE
+        self.safe = CORRIDOR_SAFETY.SAFE
         
     def dist_end0(self, coord):
         return len(self.coordinates[0:coord])
