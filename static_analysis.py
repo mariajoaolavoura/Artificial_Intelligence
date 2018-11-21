@@ -356,7 +356,6 @@ class Static_Analysis():
         corridors = self.connect_corridors(corridors, tunnel_points, crossroads)
 
         if debug:
-            self.print_debug_block('coord_adjacencies', coord_adjacencies)
             self.print_debug_block('corridors', corridors)
 
         return corridors
