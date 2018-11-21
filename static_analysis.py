@@ -358,9 +358,6 @@ class Static_Analysis():
         if debug:
             self.print_debug_block('corridors', corridors)
 
-        # print("CORRIDORS:\n")
-        # print(self.corridors)
-
         return corridors
 
 #------------------------------------------------------------------------------#

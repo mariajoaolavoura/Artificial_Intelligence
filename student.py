@@ -124,6 +124,8 @@ class Pacman_agent():
 
         #logger.debug(nt("\nEnergy size is : " + str(len(state['energy'])) + "\n")
 
+        
+
         # get advice on the next move
         strategy_advisor = Strategy_Advisor(self.map_, state)
         mode_handler = strategy_advisor.advise()
