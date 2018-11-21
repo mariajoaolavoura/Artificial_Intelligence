@@ -263,7 +263,6 @@ class Static_Analysis():
         """
 
         pathways_hor, pathways_ver = pathways
-        coord_adjacencies = []
         corridors = []
         tunnel_points = []
 
@@ -286,7 +285,6 @@ class Static_Analysis():
             # if horizontally adjacent, add to adjacencies, add to current
             # horizontal corridor
             if a == x+1:
-                coord_adjacencies += [((x,y),(a,b))]
                 corridor += [(a,b)]
                 if (a,b) in crossroads:
                     corridors += [corridor]
@@ -299,15 +297,12 @@ class Static_Analysis():
             # check for spherical map adjacencies
             if a == self.map_.hor_tiles-1:
                 (i,j) = [ (i,j) for (i,j) in pathways_hor if i == 0 and j == b ][0]
-                coord_adjacencies += [((i,j),(a,b))]
                 tunnel_points += [(i,j)]
                 tunnel_points += [(a,b)]
 
             (x,y) = (a,b)
         
-        # add last horizontal adjacency
-        if i == len(pathways_hor) -1:
-            coord_adjacencies += [(pathways_hor[len(pathways_hor) -2], pathways_hor[len(pathways_hor) -1])]
+        # add last horizontal corridor
         if len(corridor) > 1:
             corridors += [corridor]
 
@@ -333,7 +328,6 @@ class Static_Analysis():
             # if vertically adjacent, add to adjacencies, add to current
             # vertical corridor
             if b == y+1:
-                coord_adjacencies += [((x,y),(a,b))]
                 corridor += [(a,b)]
                 if (a,b) in crossroads:
                     corridors += [corridor]
@@ -346,7 +340,6 @@ class Static_Analysis():
             # check for spherical map adjacencies
             if b == self.map_.ver_tiles-1:
                 (i,j) = [ (i,j) for (i,j) in pathways_ver if j == 0 and i == a ][0]
-                coord_adjacencies += [((i,j),(a,b))]
                 tunnel_points += [(i,j)]
                 tunnel_points += [(a,b)]
 
@@ -355,9 +348,7 @@ class Static_Analysis():
         if debug:
             self.print_debug_block('horizontal + vertical corridors', corridors)
 
-        # add last vertical adjacency and last vertical corridor
-        if i == len(pathways_ver) -1:
-            coord_adjacencies += [(pathways_ver[len(pathways_ver) -2], pathways_ver[len(pathways_ver) -1])]
+        # add last vertical corridor
         if len(corridor) > 1:
             corridors += [corridor]        
 
@@ -368,7 +359,7 @@ class Static_Analysis():
             self.print_debug_block('coord_adjacencies', coord_adjacencies)
             self.print_debug_block('corridors', corridors)
 
-        return coord_adjacencies, corridors
+        return corridors
 
 #------------------------------------------------------------------------------#
 
