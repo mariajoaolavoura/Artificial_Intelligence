@@ -179,10 +179,6 @@ class Pacman_agent():
         pass
     
 
-<<<<<<< HEAD
-    def flight_agent(self, state):
-        corridors_ adj = [ corr for corr in map_.corridor_adjacencies if ]
-=======
     def flight_agent(self, advisor):
         
         pac_crossroads = advisor.pac_corridor.ends
@@ -190,7 +186,6 @@ class Pacman_agent():
         adj_corridors = [ corr for corr in self.map_.corr_adjacencies \
                                 if pac_crossroads[0] in corr \
                                 or pac_crossroads[1] in corr ]
->>>>>>> improved startegy_advisor, created classes: ghots_info and pacman_info
 
 
     def pursuit_agent(self, state):

@@ -2,12 +2,9 @@ from game_consts import *
 from tree_search import SearchProblem, SearchTree
 from pathways import Pathways
 from corridor import Corridor
-<<<<<<< HEAD
-=======
 from ghost_info import Ghost_Info
 from pacman_info import Pacman_Info
 import logging
->>>>>>> improved startegy_advisor, created classes: ghots_info and pacman_info
 
 # logs are written to file advisor.log after the client is closed
 # possible messages: debug, info, warning, error, critical 
