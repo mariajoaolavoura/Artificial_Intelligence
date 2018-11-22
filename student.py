@@ -143,7 +143,6 @@ class Pacman_agent():
 
 
     def mode(self, mode_handler):
-        # ! last error i verified. the error is expected , the methods are not defined
         if mode_handler == MODE.EATING:
             next_move = eating_agent()
         elif mode_handler == MODE.FLIGHT:

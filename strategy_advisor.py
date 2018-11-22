@@ -21,6 +21,7 @@ class Strategy_Advisor():
         self.map_ = map_
         self.state = state
         self.ghosts = {}
+        self.pac_corridor = []
     
 
     def advise(self):
@@ -29,7 +30,7 @@ class Strategy_Advisor():
         Returns: the advised MODE of play
         """
         
-        pac_corridor, semaphores = self.compute_situation()
+        semaphores = self.compute_situation()
 
         # There is at least on crossroad with a ghost at a safe distance
         ghosts_dists = [semaphores[cross][0] for cross in semaphores]
@@ -67,19 +68,19 @@ class Strategy_Advisor():
 
         # Pac-Man position and corridor or list of corridors if Pac-Man is in crossroad
         pacman = (self.state['pacman'][0],self.state['pacman'][1])
-        pac_corridor = [ corr for corr in self.map_.corridors if pacman in corr.coordinates ]        #TODO verify [0]
+        self.pac_corridor = [ corr for corr in self.map_.corridors if pacman in corr.coordinates ]
 
         #Pac-Man might be at a crossroad. Choose most dangerous corridor.
-        for corr in self.map_.corridors:
+        for corr in self.pac_corridor:
             if corr.safe == CORRIDOR_SAFETY.UNSAFE:
-                pac_corridor = [corr]
+                self.pac_corridor = [corr]
                 break
-        pac_corridor = pac_corridor[0]
+        self.pac_corridor = self.pac_corridor[0]
 
         # Evaluate Pac-Man escape crossroads as GREEN, YELLOW OR RED
-        semaphores = self.calculate_crossroads_semaphores(unsafe_corridors, pac_corridor, pacman)
+        semaphores = self.calculate_crossroads_semaphores(unsafe_corridors, self.pac_corridor, pacman)
 
-        return pac_corridor, semaphores    
+        return semaphores    
 
         
 
@@ -172,7 +173,6 @@ class Strategy_Advisor():
             else:
                 semaphores[crossroad] = [(cost, ghost_dist)]
         
-
         # select most dangerous ghost distancies
         if len(semaphores) > 0:
             semaphores = { crossroad : (min(costs),min(dists)) for crossroad in semaphores }
