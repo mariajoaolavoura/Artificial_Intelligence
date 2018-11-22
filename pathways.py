@@ -4,9 +4,9 @@ import math
 
 class Pathways(SearchDomain):
 
-    def __init__(self, adjacencies, energies):
+    def __init__(self, adjacencies, targets):
         self.adjacencies = adjacencies
-        self.energies = energies
+        self.targets = targets
 
     def actions(self,corridor):
         actlist = []
@@ -14,7 +14,7 @@ class Pathways(SearchDomain):
             
             if (corr1 == corridor):
                 #verify if there is an energy in the next corridor
-                if any(coord not in self.energies for coord in corr2.coordinates):
+                if any(coord not in self.targets for coord in corr2.coordinates):
                     actlist += [(corr1, corr2)]
 
                 '''
@@ -34,13 +34,13 @@ class Pathways(SearchDomain):
                         pos = -2
                         
                 #verify if there is an energy in the first position of the next corridor
-                if corr2.coordinates[pos] not in self.energies:
+                if corr2.coordinates[pos] not in self.targets:
                     actlist += [(corr1, corr2)]
                 '''
 
             elif (corr2 == corridor):
                 #verify if there is an energy in the next corridor
-                if any(coord not in self.energies for coord in corr1.coordinates):
+                if any(coord not in self.targets for coord in corr1.coordinates):
                     actlist += [(corr2, corr1)]
 
                 '''
@@ -60,7 +60,7 @@ class Pathways(SearchDomain):
                         pos = -2
 
                 #verify if there is an energy in the first position of the next corridor
-                if corr1.coordinates[pos] not in self.energies:
+                if corr1.coordinates[pos] not in self.targets:
                     actlist += [(corr2, corr1)]
                 '''
         return actlist 
@@ -93,4 +93,4 @@ class Pathways(SearchDomain):
         return abs(gx-x) + abs(gy-y)
 
     def copy(self):
-        return Pathways(self.adjacencies.copy(), self.energies.copy())
+        return Pathways(self.adjacencies.copy(), self.targets.copy())

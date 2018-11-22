@@ -19,7 +19,7 @@ logger = setup_logger('student', 'student.log')
 debug = True
 
 
- #! ##########   PAC-MAN AGENT GLOBAL STRATEGY   ##########
+#! ##########   PAC-MAN AGENT GLOBAL STRATEGY   ##########
 
     #! ###    CONCEPTS    ###
 
@@ -125,7 +125,7 @@ class Pacman_agent():
         # get advice on the next move
         strategy_advisor = Strategy_Advisor(self.map_, state)
         mode_handler = strategy_advisor.advise()
-        next_move = self.mode(mode_handler)
+        next_move = self.mode(mode_handler, strategy_advisor)
 
         # if advice is not specific, adjustments to the strategy may be needed
         if (next_move == False): # correct when methods are implemented
@@ -138,9 +138,9 @@ class Pacman_agent():
 
 
 
-    def mode(self, mode_handler):
+    def mode(self, mode_handler, advisor):
         if mode_handler == MODE.EATING:
-            next_move = eating_agent()
+            next_move = eating_agent(strategy_advisor)
         elif mode_handler == MODE.FLIGHT:
             next_move = flight_agent()
         elif mode_handler == MODE.PURSUIT:
@@ -179,8 +179,18 @@ class Pacman_agent():
         pass
     
 
+<<<<<<< HEAD
     def flight_agent(self, state):
         corridors_ adj = [ corr for corr in map_.corridor_adjacencies if ]
+=======
+    def flight_agent(self, advisor):
+        
+        pac_crossroads = advisor.pac_corridor.ends
+
+        adj_corridors = [ corr for corr in self.map_.corr_adjacencies \
+                                if pac_crossroads[0] in corr \
+                                or pac_crossroads[1] in corr ]
+>>>>>>> improved startegy_advisor, created classes: ghots_info and pacman_info
 
 
     def pursuit_agent(self, state):
