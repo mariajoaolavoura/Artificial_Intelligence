@@ -74,7 +74,7 @@ logging.basicConfig(format=logger_format, filename='logger.log', filemode='w', l
         #*          Distance to ghosts
         #*      Strategy Advisor advises a Game Mode
         #* Pac-Man calls Game Mode Agent to get next move
-        #*      Game Mode tries to find a next move
+        #*      Game Mode tries to find the next move
         #* Pac-Man analyses next move
         #*      Is it specific (only one solution)
         #*          Pac-Man accepts next move
@@ -132,7 +132,7 @@ class Pacman_agent():
         next_move = self.mode(mode_handler)
 
         # if advice is not specific, adjustments to the strategy may be needed
-        if (next_move == False): #correct when methods are implementd
+        if (next_move == False): # correct when methods are implemented
             strategy_adjuster = Strategy_Adjuster()
             mode_handler = strategy_adjuster.adjustStrategy()
             next_move = self.mode(mode_handler)
@@ -145,13 +145,13 @@ class Pacman_agent():
     def mode(self, mode_handler):
         # ! last error i verified. the error is expected , the methods are not defined
         if mode_handler == MODE.EATING:
-            next_move = mode_eating()
+            next_move = eating_agent()
         elif mode_handler == MODE.FLIGHT:
-            next_move = mode_flight()
+            next_move = flight_agent()
         elif mode_handler == MODE.PURSUIT:
-            next_move = mode_pursuit()
+            next_move = pursuit_agent()
         else: # next_move == MODE.COUNTER
-            next_move = mode_counter()
+            next_move = counter_agent()
         return next_move
 
 
@@ -180,14 +180,17 @@ class Pacman_agent():
 
 
 
-    def print_debug_block(self, string, var):
-        """Prints a debug bar
+    def eating_agent(self, state):
+        pass
+    
 
-        Keyword arguments:
-        list_   -- a list
-        n       -- number of elements per combination
-        """
-        #logger.debug("#######################################################")
-        #logger.debug('\t ' + string + ' is: ')
-        #logger.debug("#######################################################")
-        #logger.debug(var)
+    def flight_agent(self, state):
+        pass
+
+
+    def pursuit_agent(self, state):
+        pass
+
+
+    def counter_agent(self, state):
+        pass

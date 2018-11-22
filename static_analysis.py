@@ -32,12 +32,13 @@ class Static_Analysis():
         self.pathways = self.create_pathways_list()
         self.crossroads = self.create_crossroads_list(self.pathways)
         self.corridors = self.create_corridors(self.pathways, self.crossroads)
-        self.corr_adjacencies =self.create_corridor_adjacencies(self.corridors, self.crossroads)
         self.corridors = [ Corridor(corr) for corr in self.corridors ]
+        self.corr_adjacencies =self.create_corridor_adjacencies(self.corridors)
+        self.ghosts_den = []
         
 
 
-    #* ##########   TESTED AND VERIFIED   ##########"""
+    #* ##########   TESTED AND VERIFIED   ##########
     def create_pathways_list(self):
         """Create a list with all coordinates that are not walls
 
@@ -49,7 +50,7 @@ class Static_Analysis():
 
         # find ghosts den. This area will not be used in any search or strategy
         # and should be avoided by PACMAN
-        ghosts_den = self.get_ghosts_den(self.map_)
+        self.ghosts_den = self.get_ghosts_den(self.map_)
 
         pathways_hor = []
         for y in range(self.map_.ver_tiles):
@@ -58,18 +59,18 @@ class Static_Analysis():
                 if not self.map_.is_wall((x,y)): 
                     pathways_hor += [(x,y)]
 
-        pathways_hor = [ p for p in pathways_hor if p not in ghosts_den ]
+        pathways_hor = [ p for p in pathways_hor if p not in self.ghosts_den ]
         pathways_ver = sorted(pathways_hor, key=lambda y: (x,y))
 
-        if True:
-            self.print_debug_block('ghosts_den', ghosts_den)
-            self.print_debug_block('pathways_hor', pathways_hor)
-            self.print_debug_block('pathways_ver', pathways_ver)
+        logger.debug("GHOST_DEN:\n" + str(self.ghosts_den) + "\n")
+        logger.debug("PATHWAYS_HOR:\n" + str(pathways_hor) + "\n")
+        logger.debug("PATHWAYS_VER:\n" + str(pathways_ver) + "\n")
 
         return pathways_hor, pathways_ver
 
 #------------------------------------------------------------------------------#
     
+    #* ##########   TESTED AND VERIFIED   ##########
     def create_crossroads_list(self, pathways):
         """Create a list with all coordinates that are crossroads
 
@@ -95,13 +96,13 @@ class Static_Analysis():
             if adj > 2:
                 crossroads += [(x,y)]
 
-        if debug:
-            self.print_debug_block('crossroads', crossroads)
+        logger.debug("CROSSROADS:\n" + str(crossroads) + "\n")
 
         return crossroads
 
 #------------------------------------------------------------------------------#
 
+    #* ##########   TESTED AND VERIFIED   ##########
     def get_ghosts_den(self, map_):
         """delimit the coordinates that make up the ghosts den
 
@@ -191,7 +192,6 @@ class Static_Analysis():
                     if (len(den_corners) == 4):
                         logger.debug("Found all 4 corners")
                         logger.debug("Den corners " + str(den_corners))
-                        #print("Den corners are " + str(den_corners))
                         
                         # previously
                         #return den_corners
@@ -215,7 +215,6 @@ class Static_Analysis():
                                 den += [(i, j)]
 
                         logger.debug("Returning " + str(den) + " (length " + str(len(den)) + ")")
-                        print("Den is (includes walls & entrances) " + str(den) + " (length " + str(len(den)) + ")")
 
                         return den
 
@@ -249,6 +248,7 @@ class Static_Analysis():
 
 #------------------------------------------------------------------------------#
 
+    #* ##########   TESTED AND VERIFIED   ##########
     def create_corridors(self, pathways, crossroads):
         """Creates a list with all adjacencies of coordinates that are not walls
         Uses two cycles for horizontal and vertical adjacencies for efficiency
@@ -306,9 +306,6 @@ class Static_Analysis():
         if len(corridor) > 1:
             corridors += [corridor]
 
-        if debug:
-            self.print_debug_block('horizontal corridors', corridors)
-
         # vertical search
         (x,y) = pathways_ver[0]
         corridor = [(x,y)]
@@ -345,9 +342,6 @@ class Static_Analysis():
 
             (x,y) = (a,b)
 
-        if debug:
-            self.print_debug_block('horizontal + vertical corridors', corridors)
-
         # add last vertical corridor
         if len(corridor) > 1:
             corridors += [corridor]        
@@ -355,13 +349,13 @@ class Static_Analysis():
         # connect corridors
         corridors = self.connect_corridors(corridors, tunnel_points, crossroads)
 
-        if debug:
-            self.print_debug_block('corridors', corridors)
+        logger.debug("CORRIDORS:\n" + str(corridors) + "\n")
 
         return corridors
 
 #------------------------------------------------------------------------------#
 
+    #* ##########   TESTED AND VERIFIED   ##########
     def connect_corridors(self, corridors, tunnel_points, crossroads):
         """connects horizontal and vertical subcorridors that make up the
         same corridor
@@ -377,13 +371,12 @@ class Static_Analysis():
         # connect vertical and horizontal adjacent corridors
         connected = []
         while corridors != []:
-            self.print_debug_block('corridors', corridors)
+
             corr = corridors.pop()
             
             found = True
             while found:
                 found = False
-                self.print_debug_block('corr', corr)
                 end0 = corr[0]
                 end1 = corr[len(corr)-1]
                 for c in corridors[:]: # copy of list to allow removals while iterating
@@ -392,25 +385,21 @@ class Static_Analysis():
 
                     if end0 == c[0] and end0 not in crossroads:
                         corr = corr[::-1] + c[1:]
-                        self.print_debug_block('removed c', c)
                         corridors.remove(c)
                         found = True
                         break
                     elif end0 == c[len(c)-1] and end0 not in crossroads:
                         corr = c + corr[1:]
-                        self.print_debug_block('removed c', c)
                         corridors.remove(c)
                         found = True
                         break
                     elif end1 == c[0] and end1 not in crossroads:
                         corr = corr + c[1:]
-                        self.print_debug_block('removed c', c)
                         corridors.remove(c)
                         found = True
                         break
                     elif end1 == c[len(c)-1] and end1 not in crossroads:
                         corr = c[0:len(c)-1] + corr[::-1]
-                        self.print_debug_block('removed c', c)
                         corridors.remove(c)
                         found = True
                         break
@@ -429,6 +418,7 @@ class Static_Analysis():
 
 #------------------------------------------------------------------------------#
 
+    #* ##########   TESTED AND VERIFIED   ##########
     def find_tunnels(self, corridors, tunnel_points):
         return [ corr for corr in corridors \
                             if corr[0] in tunnel_points \
@@ -436,6 +426,7 @@ class Static_Analysis():
 
 #------------------------------------------------------------------------------#
 
+    #* ##########   TESTED AND VERIFIED   ##########
     def connect_tunnels(self, tunnels, crossroads):
 
         connected = []
@@ -446,7 +437,6 @@ class Static_Analysis():
             found = True
             while found:
                 found = False
-                #self.print_debug_block('tun', tun)
                 end0 = tun[0]
                 end1 = tun[len(tun)-1]
                 for t in tunnels[:]: # copy of list to allow removals while iterating
@@ -455,13 +445,11 @@ class Static_Analysis():
 
                     if end0 == t[len(t)-1] and end0 not in crossroads:
                         tun = t + tun[1:]
-                        self.print_debug_block('removed t', t)
                         tunnels.remove(t)
                         found = True
                         break
                     elif end1 == t[0] and end1 not in crossroads:
                         tun = tun + t[1:]
-                        self.print_debug_block('removed t', t)
                         tunnels.remove(t)
                         found = True
                         break
@@ -472,68 +460,24 @@ class Static_Analysis():
 
 #------------------------------------------------------------------------------#
 
-    def create_corridor_adjacencies(self, corridors, crossroads):
+    #* ##########   TESTED AND VERIFIED   ##########
+    def create_corridor_adjacencies(self, corridors):
         """Creates pairs of adjacent corridors
 
         Args:
         corridors: a list of corridors
 
         Returns:
-        a list of sorted tuples of adjacent corridors (with adjacency in the middle)
+        a list of sorted tuples of adjacent corridors
         """
 
-        # connect vertical and horizontal adjacent corridors
-        corridors = corridors.copy()        # TODO more efficient solution
-        buffer = corridors
-        corridors = []
-        while buffer != []:
+        corridor_adjacencies = [ (corrA, corrB) for corrA in corridors for corrB in corridors \
+                                if corrA != corrB
+                                and (corrA.ends[0] == corrB.ends[0] \
+                                or corrA.ends[0] == corrB.ends[1] \
+                                or corrA.ends[1] == corrB.ends[0] \
+                                or corrA.ends[1] == corrB.ends[1]) ]
 
-            corr = buffer.pop()
-            found = True
-            while found:
-                found = False
-                end0 = corr[0]
-                end1 = corr[len(corr)-1]
-                for c in buffer[:]: # copy of list to allow removals while iterating
-                    if end0 == c[0] and end0 not in crossroads:
-                        corr = corr[::-1] + c[1:]
-                        buffer.remove(c)
-                        found = True
-                        break
-                    elif end0 == c[len(c)-1] and end0 not in crossroads:
-                        corr = c[1:] + corr
-                        buffer.remove(c)
-                        found = True
-                        break
-                    elif end1 == c[0] and end1 not in crossroads:
-                        corr = corr + c[1:]
-                        buffer.remove(c)
-                        found = True
-                        break
-                    elif end1 == c[len(c)-1] and end1 not in crossroads:
-                        corr = c[1:len(c)-1] + corr[::-1]
-                        buffer.remove(c)
-                        found = True
-                        break
+        logger.debug("CORRIDOR_ADJACENCIES:\n" + str(corridor_adjacencies) + "\n")
 
-            corridors += [corr]
-
-        corridors = [ Corridor(corr) for corr in corridors ]
-
-        if debug:
-            self.print_debug_block('corridors', corridors)
-
-        return corridors
-
-
-    def print_debug_block(self, string, var):
-        """Prints a debug bar
-
-        Keyword arguments:
-        list_   -- a list
-        n       -- number of elements per combination
-        """
-        #logger.debug("#######################################################")
-        #logger.debug('\t ' + string + ' is: ')
-        #logger.debug("#######################################################")
-        #logger.debug(var)
+        return corridor_adjacencies
