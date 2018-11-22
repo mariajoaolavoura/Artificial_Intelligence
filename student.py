@@ -184,7 +184,8 @@ class Pacman_agent():
     
 
     def flight_agent(self, state):
-        pass
+        
+        corridors_ adj = [ corr for corr in map_.corridor_adjacencies if ]
 
 
     def pursuit_agent(self, state):
