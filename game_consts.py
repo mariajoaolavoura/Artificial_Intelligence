@@ -1,4 +1,5 @@
 from enum import Enum
+import logging
 
 #------------------------------------------------------------------------------#
 # ENUMERATES
@@ -28,3 +29,25 @@ class SEMAPHORE(Enum):
 SAFE_DIST_TO_CROSSROAD = 1
 # distance at which ghost probably isn't in pursuit of pacman
 SAFE_DIST_TO_GHOST = 7
+
+#------------------------------------------------------------------------------#
+# LOGGER 
+# After many solutions, I found an elegant one (kudos to 
+# https://stackoverflow.com/questions/11232230/logging-to-two-files-with-different-settings)
+
+
+def setup_logger(name, log_file, level=logging.DEBUG):
+    """Function setup as many loggers as you want"""
+
+    # currently writing over the logger file, change filemode to a to append
+    handler = logging.FileHandler(log_file, mode='w')        
+    
+    # '%(levelname)s:\t%(message)' # simpler format
+    format = logging.Formatter('[%(lineno)s - %(funcName)20s() - %(levelname)s]\n %(message)s\n')
+    handler.setFormatter(format)
+
+    logger = logging.getLogger(name)
+    logger.setLevel(level)
+    logger.addHandler(handler)
+
+    return logger

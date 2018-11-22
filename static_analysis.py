@@ -1,17 +1,14 @@
 from corridor import Corridor
-import logging
+from game_consts import *
 
 debug = True
 
-# logs are written to file logger.log after the client is closed
+# logger
+# logs are written to file static_analysis.log after the client is closed
 # possible messages: debug, info, warning, error, critical 
-# how to use: logging.typeOfMessage('message')
-logger = logging.getLogger('static_analysis_logger')
-logger_format = '[%(lineno)s - %(funcName)20s() - %(levelname)s]\n %(message)s\n'
-#logger_format = '%(levelname)s:\t%(message)' # simpler format
+# how to use: logger.typeOfMessage('message')
+logger = setup_logger('static_analysis', 'static_analysis.log')
 
-# currently writing over the logger file, change filemode to a to append
-logging.basicConfig(format=logger_format, filename='loggerStaticAnalysis.log', filemode='w', level=logging.DEBUG)
 
 class Static_Analysis():
     """Makes the static analysis of the Map instance for the game. 

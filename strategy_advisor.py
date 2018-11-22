@@ -2,8 +2,13 @@ from game_consts import *
 from tree_search import SearchProblem, SearchTree
 from pathways import Pathways
 from corridor import Corridor
-import logging
 
+
+# logger
+# logs are written to file strategy_advisor.log after the client is closed
+# possible messages: debug, info, warning, error, critical 
+# how to use: logger.typeOfMessage('message')
+logger = setup_logger('strategy_advisor', 'strategy_advisor.log')
 
 class Strategy_Advisor():
     """Analyses corridors safety (if contains ghost or not) and crossroads

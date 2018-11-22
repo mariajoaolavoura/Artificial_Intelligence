@@ -9,18 +9,14 @@ import logging
 #$ PORT=80 SERVER=pacman-aulas.ws.atnog.av.it.pt python client.py
 # to kill server: fuser 8000/tcp
 
+# logger
+# logs are written to file student.log after the client is closed
+# possible messages: debug, info, warning, error, critical 
+# how to use: logger.typeOfMessage('message')
+logger = setup_logger('student', 'student.log')
+
 # for debug purposes
 debug = True
-
-# logs are written to file logger.log after the client is closed
-# possible messages: debug, info, warning, error, critical 
-# how to use: logging.typeOfMessage('message')
-logger = logging.getLogger('student_logger')
-logger_format = '[%(lineno)s - %(funcName)20s() - %(levelname)s]\n %(message)s\n'
-#logger_format = '%(levelname)s:\t%(message)' # simpler format
-
-# currently writing over the logger file, change filemode to a to append
-logging.basicConfig(format=logger_format, filename='logger.log', filemode='w', level=logging.DEBUG)
 
 
  #! ##########   PAC-MAN AGENT GLOBAL STRATEGY   ##########
@@ -184,7 +180,6 @@ class Pacman_agent():
     
 
     def flight_agent(self, state):
-        
         corridors_ adj = [ corr for corr in map_.corridor_adjacencies if ]
 
 
