@@ -142,11 +142,11 @@ class Pacman_agent():
         if mode_handler == MODE.EATING:
             next_move = eating_agent(strategy_advisor)
         elif mode_handler == MODE.FLIGHT:
-            next_move = flight_agent()
+            next_move = self.flight_agent()
         elif mode_handler == MODE.PURSUIT:
-            next_move = pursuit_agent()
+            next_move = self.pursuit_agent()
         else: # next_move == MODE.COUNTER
-            next_move = counter_agent()
+            next_move = self.counter_agent()
         return next_move
 
 
@@ -180,14 +180,55 @@ class Pacman_agent():
     
 
     def flight_agent(self, advisor):
+        '''
+        args:
+        advisor: instance of Strategy_Advisor
+        '''
         
         pac_crossroads = advisor.pac_corridor.ends
 
         adj_corridors = [ corr for corr in self.map_.corr_adjacencies \
-                                if pac_crossroads[0] in corr \
-                                or pac_crossroads[1] in corr ]
+                                if pac_crossroads[0] in corr.coordinates \
+                                or pac_crossroads[1] in corr.coordinates ]
 
+        #crossroads YY, YR, RR -> semaphore.Y or semaphore.R for end[0] and end[1]
+        #ghost.distPac
+        #corr adj SAFE, UNSAFE 
 
+        #pac corr UNSAFE? (ghost no mesmo corr do pac)
+            #crossroad[0].RED and crossroad[1].RED?
+                #morrer com dignidade
+            #crossroad[0].YELLOW and crossroad[1].YELLOW?
+                #pesquisar todos os corredores
+                #SAFE?
+                    #escolhe saida
+                #UNSAFE? 
+                    #escolher o do crossroad mais perto
+
+            #crossroad[0].YELLOW?
+                #próximo corr SAFE?
+                    #escolhe saída
+                #proximo corr UNSAFE?
+                    #crossroad[1].RED?
+                        #ghost do prox corr (crossroad[0]) pode nao estar em perseguiçao, so...
+                        #distGhostPac < SAFE_DIST_TO_GHOST?
+                            #morrer com dignidade
+                        #distGhostPac >= SAFE_DIST_TO_GHOST?
+                            #escolhe saida
+
+                    #crossroad[1].YELLOW?
+                        #próximo corr SAFE?
+                            #escolhe saída
+                        #próximo corr UNSAFE?
+                            #ghost do prox corr (crossroad[1]) pode nao estar em perseguiçao, so...
+                            #distGhostPac < SAFE_DIST_TO_GHOST?
+                                #morrer com dignidade
+                            #distGhostPac >= SAFE_DIST_TO_GHOST?
+                                #escolhe saida
+
+        #
+
+    
     def pursuit_agent(self, state):
         pass
 
