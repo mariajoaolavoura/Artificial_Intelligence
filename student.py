@@ -125,22 +125,22 @@ class Pacman_agent():
         # get advice on the next move
         strategy_advisor = Strategy_Advisor(self.map_, state)
         mode_handler = strategy_advisor.advise()
-        next_move = self.mode(mode_handler, strategy_advisor)
+        next_move = self.mode(mode_handler, strategy_advisor, state)
 
         # if advice is not specific, adjustments to the strategy may be needed
         if (next_move == False): # correct when methods are implemented
             strategy_adjuster = Strategy_Adjuster()
             mode_handler = strategy_adjuster.adjustStrategy()
-            next_move = self.mode(mode_handler)
+            next_move = self.mode(mode_handler, state)
         
         # calculate and return the key
         return self.calculate_key(state['pacman'], next_move)
 
 
 
-    def mode(self, mode_handler, advisor):
+    def mode(self, mode_handler, advisor, state):
         if mode_handler == MODE.EATING:
-            next_move = eating_agent(strategy_advisor)
+            next_move = self.eating_agent(advisor, state)
         elif mode_handler == MODE.FLIGHT:
             next_move = self.flight_agent()
         elif mode_handler == MODE.PURSUIT:
@@ -175,8 +175,40 @@ class Pacman_agent():
 
 
 
-    def eating_agent(self, state):
-        pass
+    def eating_agent(self, advisor, state):
+
+        domain = Pathways(self.map_.corr_adjacencies, state['energy'] + state['boost'])
+
+        acessible_energies = []
+        for energy in state['energy']:
+
+            energy = (energy[0], energy[1])
+            # print("Energy #######################################")
+            # print(energy)
+            # print("#######################################")
+
+            corridor = None
+            for corr in self.map_.corridors:
+                if energy in corr.coordinates:
+                    corridor = corr
+
+            # print("Corridor #######################################")
+            # print(corridor)
+            # print("#######################################")
+            
+            my_prob = SearchProblem(domain, corridor, energy, advisor.pacman_info.corridor, advisor.pacman_info.position)
+            my_tree = SearchTree(my_prob, "a*")
+            tree = my_tree.search()
+            
+
+            if tree != None:
+                acessible_energies += [energy]
+
+        print("Acessible_Energies #######################################")
+        print(acessible_energies)
+        print("#######################################")
+
+        return 1
     
 
     def flight_agent(self, advisor):

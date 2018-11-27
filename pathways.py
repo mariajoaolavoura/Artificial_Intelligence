@@ -14,7 +14,7 @@ class Pathways(SearchDomain):
             
             if (corr1 == corridor):
                 #verify if there is an energy in the next corridor
-                if any(coord not in self.targets for coord in corr2.coordinates):
+                if any(coord in self.targets for coord in corr2.coordinates):
                     actlist += [(corr1, corr2)]
 
                 '''
@@ -40,7 +40,7 @@ class Pathways(SearchDomain):
 
             elif (corr2 == corridor):
                 #verify if there is an energy in the next corridor
-                if any(coord not in self.targets for coord in corr1.coordinates):
+                if any(coord in self.targets for coord in corr1.coordinates):
                     actlist += [(corr2, corr1)]
 
                 '''
