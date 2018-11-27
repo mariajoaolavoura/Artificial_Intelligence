@@ -182,7 +182,8 @@ class Pacman_agent():
         domain = Pathways(self.map_.corr_adjacencies, state['energy'] + state['boost'])
 
         acessible_energies = []
-        for energy in state['energy']:
+        points = state['energy'] + state['boost']
+        for energy in points:
 
             
             # print("Energy #######################################")
