@@ -54,7 +54,7 @@ class Static_Analysis():
             for x in range(self.map_.hor_tiles):
                 
                 if not self.map_.is_wall((x,y)): 
-                    pathways_hor += [(x,y)]
+                    pathways_hor += [[x,y]]
 
         pathways_hor = [ p for p in pathways_hor if p not in self.ghosts_den ]
         pathways_ver = sorted(pathways_hor, key=lambda y: (x,y))
@@ -80,7 +80,7 @@ class Static_Analysis():
 
         pathways_hor, _ = pathways
         crossroads = []
-        for (x,y) in pathways_hor:
+        for [x,y] in pathways_hor:
             adj = 0
             if x > 0 and not self.map_.is_wall((x-1,y)):
                 adj += 1
@@ -91,7 +91,7 @@ class Static_Analysis():
             if y < self.map_.ver_tiles-1 and not self.map_.is_wall((x,y+1)):
                 adj += 1
             if adj > 2:
-                crossroads += [(x,y)]
+                crossroads += [[x,y]]
 
         logger.debug("CROSSROADS:\n" + str(crossroads) + "\n")
 
@@ -209,7 +209,7 @@ class Static_Analysis():
                         for i in range(small_x, big_x + 1, 1):
                             for j in range(small_y, big_y + 1, 1):
                                 logger.debug("Den point is " + str((i, j)))
-                                den += [(i, j)]
+                                den += [[i, j]]
 
                         logger.debug("Returning " + str(den) + " (length " + str(len(den)) + ")")
 
@@ -264,80 +264,80 @@ class Static_Analysis():
         tunnel_points = []
 
         # horizontal search
-        (x,y) = pathways_hor[0]
-        corridor = [(x,y)]
+        [x,y] = pathways_hor[0]
+        corridor = [[x,y]]
         i = 0
         for i in range(1,len(pathways_hor)):
 
-            (a,b) = pathways_hor[i]
+            [a,b] = pathways_hor[i]
 
             # check for row change (coordinates are not adjacent)
             if b != y:
                 if len(corridor) > 1: # length 1 is a section of a vertical corridor
                     corridors += [corridor]
-                corridor = [(a,b)]
-                (x,y) = (a,b)
+                corridor = [[a,b]]
+                [x,y] = [a,b]
                 continue
 
             # if horizontally adjacent, add to adjacencies, add to current
             # horizontal corridor
             if a == x+1:
-                corridor += [(a,b)]
-                if (a,b) in crossroads:
+                corridor += [[a,b]]
+                if [a,b] in crossroads:
                     corridors += [corridor]
-                    corridor = [(a,b)]
+                    corridor = [[a,b]]
             else:
                 if len(corridor) > 1: # length 1 is a section of a vertical corridor
                     corridors += [corridor]
-                corridor = [(a,b)]
+                corridor = [[a,b]]
 
             # check for spherical map adjacencies
             if a == self.map_.hor_tiles-1:
-                (i,j) = [ (i,j) for (i,j) in pathways_hor if i == 0 and j == b ][0]
-                tunnel_points += [(i,j)]
-                tunnel_points += [(a,b)]
+                [i,j] = [ [i,j] for [i,j] in pathways_hor if i == 0 and j == b ][0]
+                tunnel_points += [[i,j]]
+                tunnel_points += [[a,b]]
 
-            (x,y) = (a,b)
+            [x,y] = [a,b]
         
         # add last horizontal corridor
         if len(corridor) > 1:
             corridors += [corridor]
 
         # vertical search
-        (x,y) = pathways_ver[0]
-        corridor = [(x,y)]
+        [x,y] = pathways_ver[0]
+        corridor = [[x,y]]
         i = 0
         for i in range(1,len(pathways_ver)):
 
-            (a,b) = pathways_ver[i]
+            [a,b] = pathways_ver[i]
 
             # check for column change (coordinates are not adjacent)
             if a != x:
                 if len(corridor) > 1:
                     corridors += [corridor] # length 1 is a section of a horizontal corridor
-                corridor = [(a,b)]
-                (x,y) = (a,b)
+                corridor = [[a,b]]
+                [x,y] = [a,b]
                 continue
 
             # if vertically adjacent, add to adjacencies, add to current
             # vertical corridor
             if b == y+1:
-                corridor += [(a,b)]
-                if (a,b) in crossroads:
+                corridor += [[a,b]]
+                if [a,b] in crossroads:
                     corridors += [corridor]
-                    corridor = [(a,b)]
+                    corridor = [[a,b]]
             else:
                 if len(corridor) > 1: # length 1 is a section of a vertical corridor
                     corridors += [corridor]
-                corridor = [(a,b)]
+                corridor = [[a,b]]
 
             # check for spherical map adjacencies
             if b == self.map_.ver_tiles-1:
-                (i,j) = [ (i,j) for (i,j) in pathways_ver if j == 0 and i == a ][0]
-                tunnel_points += [(i,j)]
-                tunnel_points += [(a,b)]
+                [i,j] = [ [i,j] for [i,j] in pathways_ver if j == 0 and i == a ][0]
+                tunnel_points += [[i,j]]
+                tunnel_points += [[a,b]]
 
-            (x,y) = (a,b)
+            [x,y] = [a,b]
 
         # add last vertical corridor
         if len(corridor) > 1:
@@ -346,7 +346,9 @@ class Static_Analysis():
         # connect corridors
         corridors = self.connect_corridors(corridors, tunnel_points, crossroads)
 
-        logger.debug("CORRIDORS:\n" + str(corridors) + "\n")
+        for c in corridors:
+            logger.debug("CORRIDORS:\n" + str(c) + "\n")
+        logger.debug("TUNNEL POINTS:\n" + str(tunnel_points) + "\n")
 
         return corridors
 
@@ -403,13 +405,12 @@ class Static_Analysis():
 
             connected += [corr]
 
-        # TODO complete this part
         # connect corridors that form a tunnel (spherical map)
-        tunnels = self.find_tunnels(corridors, tunnel_points)
-        corridors = [ c for c in corridors if c not in tunnels]
+        tunnels = self.find_tunnels(connected, tunnel_points)
+        corridors = [ c for c in connected if c not in tunnels]
         tunnels = self.connect_tunnels(tunnels, crossroads)
         corridors += tunnels
-        corridors += connected
+        #corridors += connected
 
         return corridors
 
@@ -417,9 +418,12 @@ class Static_Analysis():
 
     #* ##########   TESTED AND VERIFIED   ##########
     def find_tunnels(self, corridors, tunnel_points):
-        return [ corr for corr in corridors \
+        tunnels = [ corr for corr in corridors \
                             if corr[0] in tunnel_points \
-                            or corr[1] in tunnel_points ]
+                            or corr[len(corr)-1] in tunnel_points ]
+        logger.debug("CORRIDORS TO BE TUNNELED:\n" + str(corridors) + "\n")
+        logger.debug("TUNNELS separated:\n" + str(tunnels) + "\n")
+        return tunnels
 
 #------------------------------------------------------------------------------#
 
@@ -430,30 +434,30 @@ class Static_Analysis():
         while tunnels != []:
 
             tun = tunnels.pop()
+            
+            if tun[0][0] == 0: # end 0, x coordinate
+                o_tun = [tun for tun in tunnels if tun[len(tun)-1][0] == self.map_.hor_tiles-1]
+                connected += o_tun[0] + tun
+                tunnels.remove(o_tun[0])
 
-            found = True
-            while found:
-                found = False
-                end0 = tun[0]
-                end1 = tun[len(tun)-1]
-                for t in tunnels[:]: # copy of list to allow removals while iterating
+            elif tun[len(tun)-1][0] == self.map_.hor_tiles -1: # end 0, x coordinate
+                o_tun = [tun for tun in tunnels if tun[0][0] == 0]
+                connected += tun + o_tun[0]
+                tunnels.remove(o_tun[0])
 
-                    #if end0 == (0,_)
+            elif tun[0][1] == 0: # end 0, x coordinate
+                o_tun = [tun for tun in tunnels if tun[len(tun)-1][1] == self.map_.ver_tiles-1]
+                connected += o_tun[0] + tun
+                tunnels.remove(o_tun[0])
 
-                    if end0 == t[len(t)-1] and end0 not in crossroads:
-                        tun = t + tun[1:]
-                        tunnels.remove(t)
-                        found = True
-                        break
-                    elif end1 == t[0] and end1 not in crossroads:
-                        tun = tun + t[1:]
-                        tunnels.remove(t)
-                        found = True
-                        break
+            elif tun[len(tun)-1][1] == self.map_.ver_tiles -1: # end 0, x coordinate
+                o_tun = [tun for tun in tunnels if tun[0][1] == 0]
+                connected += tun + o_tun[0]
+                tunnels.remove(o_tun[0])
 
-            connected += [tun]
+        logger.debug("TUNNELS:\n" + str(connected) + "\n")
         
-        return connected
+        return [connected]
 
 #------------------------------------------------------------------------------#
 
@@ -467,14 +471,16 @@ class Static_Analysis():
         Returns:
         a list of sorted tuples of adjacent corridors
         """
+        corridor_adjacencies = []
+        for i in range(len(corridors)):
+            for j in range(i+1,len(corridors)):
+                if (corridors[i].ends[0] == corridors[j].ends[0] \
+                or corridors[i].ends[0] == corridors[j].ends[1] \
+                or corridors[i].ends[1] == corridors[j].ends[0] \
+                or corridors[i].ends[1] == corridors[j].ends[1]):
+                    corridor_adjacencies += [ [corridors[i], corridors[j]] ]
 
-        corridor_adjacencies = [ (corrA, corrB) for corrA in corridors for corrB in corridors \
-                                if corrA != corrB
-                                and (corrA.ends[0] == corrB.ends[0] \
-                                or corrA.ends[0] == corrB.ends[1] \
-                                or corrA.ends[1] == corrB.ends[0] \
-                                or corrA.ends[1] == corrB.ends[1]) ]
-
-        logger.debug("CORRIDOR_ADJACENCIES:\n" + str(corridor_adjacencies) + "\n")
+        for a in corridor_adjacencies:
+            logger.debug("CORRIDOR_ADJACENCIES:\n" + str(a) + "\n")
 
         return corridor_adjacencies

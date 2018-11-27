@@ -4,7 +4,7 @@ from game_consts import *
 class Pacman_Info():
 
     def __init__(self, pacman):
-        self.position = (pacman[0], pacman[1])
+        self.position = pacman
         self.corridor = None
         self.crossroads = None
         self.crossroad0 = None

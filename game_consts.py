@@ -43,7 +43,7 @@ def setup_logger(name, log_file, level=logging.DEBUG):
     handler = logging.FileHandler(log_file, mode='w')        
     
     # '%(levelname)s:\t%(message)' # simpler format
-    format = logging.Formatter('[%(lineno)s - %(funcName)20s() - %(levelname)s]\n %(message)s\n')
+    format = logging.Formatter('[%(lineno)s - %(funcName)20s() - %(levelname)s] %(message)s\n')
     handler.setFormatter(format)
 
     logger = logging.getLogger(name)

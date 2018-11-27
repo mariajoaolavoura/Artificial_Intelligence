@@ -98,7 +98,7 @@ class Strategy_Advisor():
 
         unsafe_corridors = []
         for ghost in [ghost for ghost in self.state['ghosts'] if ghost[1] == False]: # non zombie ghosts
-            for (cA, cB) in self.map_.corr_adjacencies:
+            for [cA, cB] in self.map_.corr_adjacencies:
                 if ghost[0] in cA.coordinates:     # pode dar erro: pesquisar [x,y] em (x,y)
                     cA.safe = CORRIDOR_SAFETY.UNSAFE
                     unsafe_corridors += [cA]
@@ -156,7 +156,7 @@ class Strategy_Advisor():
     def calculate_pacman_corridor(self):
 
         # Pac-Man position and his corridor (or list of corridors if Pac-Man is in crossroad)
-        pacman = (self.state['pacman'][0],self.state['pacman'][1])
+        pacman = (self.state['pacman'])
         pac_corridor = [ corr for corr in self.map_.corridors if pacman in corr.coordinates ]
         logger.debug("PACMAN POSITION:\n" + str(pacman))
         logger.debug("PACMAN CORRIDORS:\n" + str(pac_corridor))
@@ -199,7 +199,7 @@ class Strategy_Advisor():
             if ghost.crossroad_to_pacman not in semaphores:
                 semaphores[ghost.crossroad_to_pacman] = [ghost]
             else: # gdt(p/c) -> ghost.dist_to_(pacman/crossroad)
-                semaphores[ghost.crossroad_to_pacman] += ghost
+                semaphores[ghost.crossroad_to_pacman] += [ghost]
                 
         # select most dangerous ghost distancies
         if len(semaphores) > 0: # there are no ghosts, or all are zombie

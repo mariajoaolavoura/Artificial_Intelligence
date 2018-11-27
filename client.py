@@ -35,7 +35,7 @@ async def agent_loop(server_address = "localhost:8000", agent_name="student"):
             #------------------------------------------------------------------#
 
             
-            print(state)
+            #print(state)
             # get next move from pacman agent
             key = pacman.get_next_move(state)
             

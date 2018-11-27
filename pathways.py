@@ -14,55 +14,15 @@ class Pathways(SearchDomain):
             
             if (corr1 == corridor):
                 #verify if there is an energy in the next corridor
-                if any(coord in self.targets for coord in corr2.coordinates):
+                if all(coord not in self.targets for coord in [c for c in corr2.coordinates if c not in corr1.coordinates]):
                     actlist += [(corr1, corr2)]
 
-                '''
-                verify if there is an energy in the FIRST POSITION of the next corridor
-                #get the same crossroad
-                curr_ends = corr1.ends
-                next_ends = corr2.ends
-
-                curr_end = [ e for e in curr_ends if e in next_ends][0]
-
-                if corr2.length == 0:
-                    pos = 0
-                else:
-                    if curr_end == next_ends[0]:
-                        pos = 1                    
-                    else:
-                        pos = -2
-                        
-                #verify if there is an energy in the first position of the next corridor
-                if corr2.coordinates[pos] not in self.targets:
-                    actlist += [(corr1, corr2)]
-                '''
 
             elif (corr2 == corridor):
                 #verify if there is an energy in the next corridor
-                if any(coord in self.targets for coord in corr1.coordinates):
+                if all(coord not in self.targets for coord in [c for c in corr1.coordinates if c not in corr2.coordinates]):
                     actlist += [(corr2, corr1)]
 
-                '''
-                verify if there is an energy in the FIRST POSITION of the next corridor
-                #get the same crossroad
-                curr_ends = corr2.ends
-                next_ends = corr1.ends
-
-                curr_end = [ e for e in curr_ends if e in next_ends][0]
-
-                if corr1.length == 0:
-                    pos = 0
-                else:
-                    if curr_end == next_ends[0]:
-                        pos = 1                    
-                    else:
-                        pos = -2
-
-                #verify if there is an energy in the first position of the next corridor
-                if corr1.coordinates[pos] not in self.targets:
-                    actlist += [(corr2, corr1)]
-                '''
         return actlist 
 
     def result(self,corridor,action):

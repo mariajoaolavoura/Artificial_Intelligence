@@ -161,7 +161,7 @@ class Pacman_agent():
         Returns:
         The 'wasd' key for moving from pacman to next_move
         """
-
+        print("NEXT MOVE: " + str(pacman) + ", " + str(next_move))
         px, py = pacman
         nx, ny = next_move
         if nx > px:
@@ -172,6 +172,8 @@ class Pacman_agent():
             key = 's'
         else: # ny < py
             key = 'w'
+        
+        return key
 
 
 
@@ -182,7 +184,7 @@ class Pacman_agent():
         acessible_energies = []
         for energy in state['energy']:
 
-            energy = (energy[0], energy[1])
+            
             # print("Energy #######################################")
             # print(energy)
             # print("#######################################")
@@ -198,17 +200,17 @@ class Pacman_agent():
             
             my_prob = SearchProblem(domain, corridor, energy, advisor.pacman_info.corridor, advisor.pacman_info.position)
             my_tree = SearchTree(my_prob, "a*")
-            tree = my_tree.search()
+            search_results = my_tree.search()
             
 
-            if tree != None:
-                acessible_energies += [energy]
+            if search_results != None:
+                acessible_energies += [search_results[0]]
 
-        print("Acessible_Energies #######################################")
-        print(acessible_energies)
-        print("#######################################")
+        # print("Acessible_Energies #######################################")
+        # print(acessible_energies)
+        # print("#######################################")
 
-        return 1
+        return acessible_energies[0]
     
 
     def flight_agent(self, advisor):

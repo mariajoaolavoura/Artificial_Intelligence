@@ -50,7 +50,7 @@ class SearchProblem:
         goal_pos: goal position in the corridor
         """
 
-
+    
     def __init__(self, domain, initial_corr, initial_pos, goal_corr, goal_pos):
         
         self.domain = domain.copy() #so we can change the domain as we wish
@@ -58,12 +58,22 @@ class SearchProblem:
         self.initial_pos = initial_pos
         self.goal_corr = goal_corr
         self.goal_pos = goal_pos
+        self.debug = False
+        if (initial_pos == [4,10] or initial_pos == [4,11] or initial_pos == [4,12] \
+        or initial_pos == [4,13] or initial_pos == [4,14] or initial_pos == [4,15] \
+        or initial_pos == [4,16] or initial_pos == [4,17] or initial_pos == [4,18] \
+        or initial_pos == [4,19] or initial_pos == [4,20] ):
+            self.debug = True
+        #self.debug = False
 
         # Divide initial/goal corridor in 3 corridors:
         # root/goal = corridor with just 1 coordinate, the initial/goal position
         # sub_init0/sub_goal0 = corridor with all coordinates from 0 to the initial/goal position's index (inclusive)
         # sub_init1/sub_goal1 = corridor with all coordinates from the initial/goal position's index to end (inclusive)
         # so it can be possible to calculate the path for the 2 ends of initial/goal corridor
+
+        
+
 
         self.initial = Corridor([self.initial_pos])
         
@@ -72,31 +82,45 @@ class SearchProblem:
 
 
         self.goal = Corridor([self.goal_pos])
+
+        if goal_pos in sub_init0.coordinates:
+            self.goal_corr = sub_init0
+        if goal_pos in sub_init1.coordinates:
+            self.goal_corr = sub_init1
         
         sub_goal0, sub_goal1 = self.goal_corr.sub_corridors(self.goal_pos)
         self.update_domain(self.goal_corr, self.goal, sub_goal0, sub_goal1)
 
+        if(self.debug and initial_pos == [4,11]):
+            print("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$")
+            for batatas in self.domain.adjacencies:
+                print(batatas)
+            print("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$")
+
 
     def update_domain(self, corridor, sub_corr, sub_corr0, sub_corr1):
-        
-        self.domain.adjacencies += [(sub_corr, sub_corr0)]
-        self.domain.adjacencies += [(sub_corr, sub_corr1)]
 
-        for (corrA, corrB) in self.domain.adjacencies:
+        for [corrA, corrB] in self.domain.adjacencies:
 
             if corridor == corrA:
                 if any(e in sub_corr0.ends for e in corrB.ends):
-                    self.domain.adjacencies += [(sub_corr0, corrB)]
+                    self.domain.adjacencies += [[sub_corr0, corrB]]
                 elif any(e in sub_corr1.ends for e in corrB.ends):
-                    self.domain.adjacencies += [(sub_corr1, corrB)]
+                    self.domain.adjacencies += [[sub_corr1, corrB]]
                 
             elif corridor == corrB:                
                 if any(e in sub_corr0.ends for e in corrA.ends):
-                    self.domain.adjacencies += [(sub_corr0, corrA)]
+                    self.domain.adjacencies += [[sub_corr0, corrA]]
                 elif any(e in sub_corr1.ends for e in corrA.ends):
-                    self.domain.adjacencies += [(sub_corr1, corrA)]
+                    self.domain.adjacencies += [[sub_corr1, corrA]]
         
-        self.domain.adjacencies = [(A,B) for (A, B) in self.domain.adjacencies if (corridor != A and corridor != B) ]
+        self.domain.adjacencies = [[A,B] for [A, B] in self.domain.adjacencies if (corridor != A and corridor != B) ]
+
+        #if sub_corr != sub_corr0:
+        self.domain.adjacencies += [[sub_corr, sub_corr0]]
+        #if sub_corr != sub_corr1:
+        self.domain.adjacencies += [[sub_corr, sub_corr1]]
+
     
     def goal_test(self, state):
         #state=corridor
@@ -146,7 +170,7 @@ class SearchTree:
         
         self.open_nodes = [root]
         self.strategy = strategy
-        self.lvisited = [root.state]
+        self.lvisited = []
         self.cost = None
 
 
@@ -165,14 +189,16 @@ class SearchTree:
 
         while self.open_nodes != []:
             
-            #print("\n\n###############################################################\n")
+            if (self.problem.debug):
+                print("\n\n###############################################################\n")
             
             node = self.open_nodes.pop()
             self.lvisited += [node.state]
-            #print("node.state = " + str(node.state))
-            #print("self.open_nodes = " + str(self.open_nodes))
-            #print("self.lvisited = " + str(self.lvisited))
-            #print("self.problem.goal_test(node.state) = " + str(self.problem.goal_test(node.state)))
+            if (self.problem.debug):
+                print("node.state = " + str(node.state))
+                print("self.open_nodes = " + str(self.open_nodes))
+                print("self.lvisited = " + str(self.lvisited))
+                print("self.problem.goal_test(node.state) = " + str(self.problem.goal_test(node.state)))
             if self.problem.goal_test(node.state):
                 self.cost = node.cost
                 if node.parent != None:
@@ -186,25 +212,30 @@ class SearchTree:
 
             lnewnodes = []
 
-            #print("node.state = " + str(node.state))
+            if (self.problem.debug):
+                print("node.state = " + str(node.state))
 
             for action in self.problem.domain.actions(node.state):
-        
-                #print("action = " + str(action))
+                
+                if (self.problem.debug):
+                    print("action = " + str(action))
 
                 # calculate next state
-                new_state = self.problem.domain.result(node.state, action) 
-                #print("new_state = " + str(new_state))
+                new_state = self.problem.domain.result(node.state, action)
+                if (self.problem.debug): 
+                    print("new_state = " + str(new_state))
 
                 if new_state in self.lvisited:
                     pass
                 else:
                     # calculate cost of next node
                     cost = node.cost + 1 + self.problem.domain.cost(node.state, action)
-                    #print("cost = " + str(cost))
+                    if (self.problem.debug): 
+                        print("cost = " + str(cost))
                     # calculate heuristic of next node
                     heuristic = self.problem.domain.heuristic(node.state, new_state, self.problem.goal)
-                    #print("heuristic = " + str(heuristic))
+                    if (self.problem.debug): 
+                        print("heuristic = " + str(heuristic))
                     # create new node
                     new_node = SearchNode(state=new_state, parent=node, cost=cost, heuristic=heuristic)
                     
@@ -216,9 +247,10 @@ class SearchTree:
             lnewnodes = [ newNode for newNode in lnewnodes \
                                     if newNode.state not in self.lvisited ]
 
-            #print("lnewnodes = " + str(lnewnodes))
+            if (self.problem.debug):
+                print("lnewnodes = " + str(lnewnodes))
 
-            #print("\n#############################################################\n\n")
+                print("\n#############################################################\n\n")
 
             self.add_to_open(lnewnodes)
             self.lvisited.extend(node.state for node in lnewnodes)
