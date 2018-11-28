@@ -135,7 +135,7 @@ class Pacman_agent():
             next_move = self.mode(mode_handler, state)
         
         # calculate and return the key
-        if (next_move == [5,23]):
+        if (next_move == [5,23] or next_move == [6,7]):
             print("KEY IS " + str(self.calculate_key(state['pacman'], next_move)))
 
         logger.debug("KEY IS " + str(self.calculate_key(state['pacman'], next_move)) + "\n\n")
@@ -188,6 +188,7 @@ class Pacman_agent():
 
         acessible_energies = []
         points = state['energy'] + state['boost']
+        possible_moves = []
         
         for energy in points:
 
@@ -214,8 +215,10 @@ class Pacman_agent():
 
             if search_results != None:
                 #? avoid repetead energies. 
-                if (search_results[0] not in acessible_energies):       
-                    acessible_energies += [search_results[0]]
+                #if (search_results[0] not in acessible_energies):       
+                    #acessible_energies += [search_results[0]]
+                acessible_energies += [energy]
+                possible_moves += [search_results[0]]
 
         logger.debug("NEW! PACMAN POS" + str(advisor.pacman_info.position))
         #acessible_energies = [a for a in acessible_energies if a != advisor.pacman_info.position]
@@ -223,8 +226,8 @@ class Pacman_agent():
         logger.debug(acessible_energies)
         logger.debug("#######################################")
         
-        logger.debug("Returning " + str(acessible_energies[0]))
-        return acessible_energies[0]
+        logger.debug("Returning " + str(possible_moves[0]))
+        return possible_moves[0]
     
 
     def flight_agent(self, advisor):

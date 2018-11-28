@@ -175,7 +175,8 @@ class SearchTree:
         
         self.open_nodes = [root]
         self.strategy = strategy
-        self.lvisited = []
+        #self.lvisited = []
+        self.lvisited = [root.state]
         self.cost = None
 
 
@@ -198,7 +199,7 @@ class SearchTree:
                 print("\n\n###############################################################\n")
             
             node = self.open_nodes.pop()
-            self.lvisited += [node.state]
+            #self.lvisited += [node.state]
             if (self.problem.debug):
                 print("node.state = " + str(node.state))
                 print("self.open_nodes = " + str(self.open_nodes))
@@ -210,9 +211,12 @@ class SearchTree:
                     #print("node.state = " + str(node.state))
                     #print("node.parent.state = " + str(node.parent.state))
                     if node.parent.state.ends[0] in node.state.ends:
+                        #print("RETURNED ---> SOMETHING")
                         return node.parent.state.coordinates[1], self.cost, self.get_path(node)
+                        #print("RETURNED ---> SOMETHING")
                     elif node.parent.state.ends[1] in node.state.ends:
                         return node.parent.state.coordinates[node.parent.state.length], self.cost, self.get_path(node)
+                #print("RETURNED ---> NONE")
                 return None
 
             lnewnodes = []
@@ -259,7 +263,7 @@ class SearchTree:
 
             self.add_to_open(lnewnodes)
             self.lvisited.extend(node.state for node in lnewnodes)
-
+        #print("RETURNED ---> NONE")
         return None
 
     # juntar novos nos a lista de nos abertos de acordo com a estrategia
