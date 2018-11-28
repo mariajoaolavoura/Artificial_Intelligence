@@ -104,6 +104,7 @@ class Pacman_agent():
         logger.debug('CREATING PACMAN AGENT\n')
 
         self.map_ = Static_Analysis(map_)
+        self.debug = False
 
         logger.debug('CREATED PACMAN AGENT')
 
@@ -134,6 +135,10 @@ class Pacman_agent():
             next_move = self.mode(mode_handler, state)
         
         # calculate and return the key
+        if (next_move == [5,23]):
+            print("KEY IS " + str(self.calculate_key(state['pacman'], next_move)))
+
+        logger.debug("KEY IS " + str(self.calculate_key(state['pacman'], next_move)) + "\n\n")
         return self.calculate_key(state['pacman'], next_move)
 
 
@@ -161,7 +166,7 @@ class Pacman_agent():
         Returns:
         The 'wasd' key for moving from pacman to next_move
         """
-        print("NEXT MOVE: " + str(pacman) + ", " + str(next_move))
+        #print("NEXT MOVE: " + str(pacman) + ", " + str(next_move))
         px, py = pacman
         nx, ny = next_move
         if nx > px:
@@ -183,9 +188,10 @@ class Pacman_agent():
 
         acessible_energies = []
         points = state['energy'] + state['boost']
+        
         for energy in points:
 
-            
+            domain = Pathways(self.map_.corr_adjacencies.copy(), [state['energy'] + state['boost']])
             # print("Energy #######################################")
             # print(energy)
             # print("#######################################")
@@ -198,19 +204,26 @@ class Pacman_agent():
             # print("Corridor #######################################")
             # print(corridor)
             # print("#######################################")
-            
+            if (self.debug):
+                pass
+                #print(energy)
             my_prob = SearchProblem(domain, corridor, energy, advisor.pacman_info.corridor, advisor.pacman_info.position)
             my_tree = SearchTree(my_prob, "a*")
             search_results = my_tree.search()
             
 
             if search_results != None:
-                acessible_energies += [search_results[0]]
+                #? avoid repetead energies. 
+                if (search_results[0] not in acessible_energies):       
+                    acessible_energies += [search_results[0]]
 
-        # print("Acessible_Energies #######################################")
-        # print(acessible_energies)
-        # print("#######################################")
-
+        logger.debug("NEW! PACMAN POS" + str(advisor.pacman_info.position))
+        #acessible_energies = [a for a in acessible_energies if a != advisor.pacman_info.position]
+        logger.debug("Acessible_Energies #######################################")
+        logger.debug(acessible_energies)
+        logger.debug("#######################################")
+        
+        logger.debug("Returning " + str(acessible_energies[0]))
         return acessible_energies[0]
     
 

@@ -63,7 +63,12 @@ class SearchProblem:
         or initial_pos == [4,13] or initial_pos == [4,14] or initial_pos == [4,15] \
         or initial_pos == [4,16] or initial_pos == [4,17] or initial_pos == [4,18] \
         or initial_pos == [4,19] or initial_pos == [4,20] ):
-            self.debug = True
+            self.debug = False
+
+        if (initial_pos == [4,23] or initial_pos == [4,24]):
+            self.debug = False
+
+        #self.debug = True    
         #self.debug = False
 
         # Divide initial/goal corridor in 3 corridors:
@@ -116,10 +121,10 @@ class SearchProblem:
         
         self.domain.adjacencies = [[A,B] for [A, B] in self.domain.adjacencies if (corridor != A and corridor != B) ]
 
-        #if sub_corr != sub_corr0:
-        self.domain.adjacencies += [[sub_corr, sub_corr0]]
-        #if sub_corr != sub_corr1:
-        self.domain.adjacencies += [[sub_corr, sub_corr1]]
+        if sub_corr != sub_corr0:
+            self.domain.adjacencies += [[sub_corr, sub_corr0]]
+        if sub_corr != sub_corr1:
+            self.domain.adjacencies += [[sub_corr, sub_corr1]]
 
     
     def goal_test(self, state):
