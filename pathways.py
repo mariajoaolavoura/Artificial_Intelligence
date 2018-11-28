@@ -10,7 +10,7 @@ class Pathways(SearchDomain):
 
     def actions(self,corridor):
         actlist = []
-        print(self.targets)
+        #print(self.targets)
         for (corr1, corr2) in self.adjacencies:
             
             if (corr1 == corridor):

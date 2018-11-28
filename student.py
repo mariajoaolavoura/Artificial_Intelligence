@@ -135,10 +135,10 @@ class Pacman_agent():
             next_move = self.mode(mode_handler, state)
         
         # calculate and return the key
-        if (next_move == [5,23] or next_move == [6,7]):
-            print("KEY IS " + str(self.calculate_key(state['pacman'], next_move)))
+        # if (next_move == [5,23] or next_move == [6,7]):
+        #     print("KEY IS " + str(self.calculate_key(state['pacman'], next_move)))
 
-        logger.debug("KEY IS " + str(self.calculate_key(state['pacman'], next_move)) + "\n\n")
+        # logger.debug("KEY IS " + str(self.calculate_key(state['pacman'], next_move)) + "\n\n")
         return self.calculate_key(state['pacman'], next_move)
 
 
@@ -187,12 +187,12 @@ class Pacman_agent():
         domain = Pathways(self.map_.corr_adjacencies, state['energy'] + state['boost'])
 
         acessible_energies = []
-        points = state['energy'] + state['boost']
+        targets = state['energy'] + state['boost']
         possible_moves = []
         
-        for energy in points:
+        for energy in targets:
 
-            domain = Pathways(self.map_.corr_adjacencies.copy(), [state['energy'] + state['boost']])
+            domain = Pathways(self.map_.corr_adjacencies.copy(), state['energy'] + state['boost'])
             # print("Energy #######################################")
             # print(energy)
             # print("#######################################")
@@ -222,9 +222,16 @@ class Pacman_agent():
 
         logger.debug("NEW! PACMAN POS" + str(advisor.pacman_info.position))
         #acessible_energies = [a for a in acessible_energies if a != advisor.pacman_info.position]
-        logger.debug("Acessible_Energies #######################################")
-        logger.debug(acessible_energies)
-        logger.debug("#######################################")
+        if advisor.pacman_info.position == [4,15] or advisor.pacman_info.position == [4,14] \
+        or advisor.pacman_info.position == [4,12] or advisor.pacman_info.position == [4,13] \
+        or advisor.pacman_info.position == [4,11] or advisor.pacman_info.position == [4,10] \
+        or advisor.pacman_info.position == [3,10] or advisor.pacman_info.position == [2,10] \
+        or advisor.pacman_info.position == [1,10] or advisor.pacman_info.position == [1,9] \
+        or advisor.pacman_info.position == [1,8] or advisor.pacman_info.position == [1,7] \
+        or advisor.pacman_info.position == [2,7]:
+            logger.debug("Acessible_Energies #######################################")
+            logger.debug(acessible_energies)
+            logger.debug("#######################################")
         
         logger.debug("Returning " + str(possible_moves[0]))
         return possible_moves[0]
