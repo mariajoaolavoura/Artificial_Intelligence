@@ -15,8 +15,8 @@ class Pacman_Info():
         self.semaphore1 = None
         self.dist_to_ghost_at_crossroad0 = None #
         self.dist_to_ghost_at_crossroad1 = None #
-        self.crossroad0_is_safe = None #
-        self.crossroad1_is_safe = None #
+        self.crossroad0_is_safe = None #CORRIDOR_SAFETY
+        self.crossroad1_is_safe = None #CORRIDOR_SAFETY
 
     def update_corridor(self, corridor):
         self.corridor = corridor

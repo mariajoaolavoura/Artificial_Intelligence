@@ -231,17 +231,6 @@ class Pacman_agent():
     
 
     def flight_agent(self, advisor):
-        '''
-        args:
-        advisor: instance of Strategy_Advisor
-        '''
-        
-        pac_crossroads = advisor.pac_corridor.ends
-
-        adj_corridors = [ corr for corr in self.map_.corr_adjacencies \
-                                if pac_crossroads[0] in corr.coordinates \
-                                or pac_crossroads[1] in corr.coordinates ]
-
         #crossroads YY, YR, RR -> semaphore.Y or semaphore.R for end[0] and end[1]
         #ghost.distPac
         #corr adj SAFE, UNSAFE 
@@ -309,7 +298,212 @@ class Pacman_agent():
                 #else crossroad[0].RED?
                     #morrer com dignidade
 
+
+        '''
+        args:
+        advisor: instance of Strategy_Advisor
+                self.map_ = map_
+                self.state = state
+                self.unsafe_corridors = self.set_corridors_safety()
+                self.pacman_info = Pacman_Info(state['pacman'])
+                self.calculate_pacman_corridor()
+                self.ghosts_info = self.calculate_ghosts_info()
+        '''
         
+        
+        
+        ghosts_info = advisor.ghosts_info
+        
+        pac_info = advisor.pacman_info
+        pac_corr = pac_info.corridor
+        pac_crossroads = pac_info.crossroads
+
+        ########################################################################
+        ## PAC CORR UNSAFE #####################################################
+        ########################################################################
+
+        #corr pacman tem ghost do lado do crossroad0       
+        if pac_info.crossroad0_is_safe == CORRIDOR_SAFETY.UNSAFE:
+
+            #pacman esta encurralado (corr do pacman tem ghosts dos 2 lados)
+            if pac_info.crossroad1_is_safe == CORRIDOR_SAFETY.UNSAFE:
+                
+                #escolhe lado com ghost mais afastado
+                if pac_info.dist_to_ghost_at_crossroad0 >= pac_info.dist_to_ghost_at_crossroad1:
+                    #escolhe crossroad0
+                    #TODO devolver prox coord
+                    pass
+                else:
+                    #escolhe crossroad1
+                    #TODO devolver prox coord
+                    pass
+
+            #ghost no corr do pacman apenas do lado do crossroad0 -> crossroad0 is RED
+            else:
+    
+                #pacman consegue fugir pelo crossroad1
+                if pac_info.semaphore1 == SEMAPHORE.YELLOW:   
+
+                    pac_adj1 = [ corr for corr in self.map_.corr_adjacencies\
+                                        if pac_crossroads[1] in corr.coordinates ]
+
+
+                    pac_safe_corr1 = [corr for corr in pac_adj1\
+                                        if corr.safe == CORRIDOR_SAFETY.SAFE]
+
+                    #ha corr safe
+                    if pac_safe_corr1 != []:
+                        #escolhe pac_safe_corr1[0]
+                        #TODO devolver prox coord
+                        pass
+                    
+                    #NAO ha corr safe
+                    else:
+                        #escolhe corr com ghost mais afastado
+                        #return self.calc_corridor_ghost_farther(pac_info, pac_adj1, ghosts_info)
+
+                #pacman NAO consegue fugir pelo crossroad1 -> crossroad1 is RED
+                else:
+                    #escolhe crossroad1
+                    #TODO devolver prox coord
+                    pass
+
+        #corr do pacman NAO tem ghost do lado crossroad0
+        else:
+            pac_adj0 = [ corr for corr in self.map_.corr_adjacencies\
+                                    if pac_crossroads[0] in corr.coordinates ]
+            pac_safe_corr0 = [corr for corr in pac_adj0\
+                                if corr.safe == CORRIDOR_SAFETY.SAFE]
+
+            pac_adj1 = [ corr for corr in self.map_.corr_adjacencies\
+                                if pac_crossroads[1] in corr.coordinates ]
+            pac_safe_corr1 = [corr for corr in pac_adj1\
+                                if corr.safe == CORRIDOR_SAFETY.SAFE]
+
+            #corr do pacman tem ghost apenas do lado crossroad1 -> crossroad1 is RED
+            if pac_info.crossroad1_is_safe == CORRIDOR_SAFETY.UNSAFE:
+
+                #pacman consegue fugir apenas pelo crossroad0
+                if pac_info.semaphore0 == SEMAPHORE.YELLOW:
+                    #crossroad0 liga a corr SAFE
+                    if pac_safe_corr0 != []:
+                        #escolhe pac_safe_corr0[0]
+                        #TODO devolver prox coord
+                        pass
+                    
+                    #NAO ha corr SAFE pelo crossroad0
+                    else:
+                        #escolhe corr com ghost mais afastado
+                        #return self.calc_corridor_ghost_farther(pac_info, pac_adj0, ghosts_info)
+
+                #pacman NAO consegue fugir por nenhum crossroad -> crossroad0 is RED
+                else:
+                    #escolhe lado com ghost mais afastado
+                    #return self.calc_corridor_ghost_farther(pac_info, pac_adj0 + pac_adj1, ghosts_info)
+
+
+            ####################################################################
+            ## PAC CORR SAFE ###################################################
+            ####################################################################
+
+            #corr do pacman NAO tem ghosts -> crossroad[0].SAFE and crossroad[1].SAFE
+            else:
+                
+                #pacman consegue fugir pelo crossroad0
+                if pac_info.semaphore0 == SEMAPHORE.YELLOW:
+                
+                    #pacman consegue fugir por qualquer crossroad
+                    if pac_info.semaphore1 == SEMAPHORE.YELLOW:
+
+                        #crossroad0 liga a corr SAFE
+                        if pac_safe_corr0 != []:
+                            #ambos os crossroads ligam a corr SAFE
+                            if pac_safe_corr1 != []:
+                                #escolhe o crossroad mais longe
+                                #crossroad0 mais longe do pacman
+                                if pac_info.dist_to_crossroad0 >= pac_info.dist_to_crossroad1:
+                                    #escolhe pac_safe_corr0[0]
+                                    #TODO devolver prox coord
+                                    pass
+
+                                #crossroad1 mais longe do pacman    
+                                else:
+                                    #escolhe pac_safe_corr1[0]
+                                    #TODO devolver prox coord
+                                    pass
+
+                            #apenas crossroad0 liga a corr SAFE
+                            else:
+                                #escolhe pac_safe_corr0[0]
+                                #TODO devolver prox coord
+                                pass
+                        
+                        #crossroad0 nao liga a corr SAFE
+                        else:
+                            #apenas crossroad1 liga a corr SAFE
+                            if pac_safe_corr1 != []:
+                                #escolhe pac_safe_corr1[0]
+                                #TODO devolver prox coord
+                                pass
+
+                            #NAO ha corr SAFE        
+                            else:
+                                #escolhe corr com ghost mais afastado
+                                #return self.calc_corridor_ghost_farther(pac_info, pac_adj0 + pac_adj1, ghosts_info)
+                    
+                    #pacman consegue fugir apenas pelo crossroad0
+                    else:
+
+                        #crossroad0 liga a corr SAFE
+                        if pac_safe_corr0 != []:
+                            #escolhe pac_safe_corr0[0]
+                            #TODO devolver prox coord
+                            pass
+                        
+                        #NAO ha corr SAFE pelo crossroad0
+                        else:
+                            #escolhe corr com ghost mais afastado
+                            #return self.calc_corridor_ghost_farther(pac_info, pac_adj0, ghosts_info)
+                
+                #pacman NAO consegue fugir pelo crossroad0
+                else:
+
+                    #pacman consegue fugir apenas pelo crossroad1
+                    if pac_info.semaphore1 == SEMAPHORE.YELLOW:
+                        #crossroad1 liga a corr SAFE
+                        if pac_safe_corr1 != []:
+                            #escolhe pac_safe_corr1[0]
+                            #TODO devolver prox coord
+                            pass
+                        
+                        #NAO ha corr SAFE pelo crossroad1
+                        else:
+                            #escolhe corr com ghost mais afastado
+                            #return self.calc_corridor_ghost_farther(pac_info, pac_adj1, ghosts_info)
+
+                    #pacman NAO consegue fugir por nenhum crossroad
+                    else:
+                        #escolhe lado com ghost mais afastado
+                        #return self.calc_corridor_ghost_farther(pac_info, pac_adj0 + pac_adj1, ghosts_info)
+
+        
+                
+
+                    
+ 
+
+    #escolhe corr com ghost mais afastado
+    def calc_corridor_ghost_farther(self, pac_info, pac_adj, ghosts_info):
+        dist = 0
+        corr = []
+        for adj_corr in pac_adj:
+            for g_info in ghosts_info:
+                if g_info.corridor == adj_corr and dist < g_info.dist_to_pacman:
+                    dist = g_info.dist_to_pacman
+                    corr = g_info.corridor                                                   
+        
+        #TODO devolver prox coord
+        pass
 
     
     def pursuit_agent(self, state):
