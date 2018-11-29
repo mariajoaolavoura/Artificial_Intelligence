@@ -71,7 +71,7 @@ class Strategy_Advisor():
             return MODE.EATING
 
         elif any([color == SEMAPHORE.YELLOW for color in semaphores]):
-            if len(self.state['boosts']) > 0:
+            if len(self.state['boost']) > 0:
                 return MODE.COUNTER
             return MODE.FLIGHT
         else:
@@ -215,8 +215,11 @@ class Strategy_Advisor():
         # compare distance of Pac-Man and ghosts to crossroads and
         # convert semaphores to colors
         for cross in semaphores:
-            if cross == pacman.crossroad0:
+            #print(str(cross) + ' -> ' + str(semaphores[cross]))
+            #print(str(cross) + ', ' + str(frozenset(pacman.crossroad0)))
+            if cross == frozenset(pacman.crossroad0):
                 self.pacman_info.ghost_at_crossroad0 = semaphores[cross]
+                #print('ADVISOR: ' + str(semaphores[cross]))
                 dist_to_end = pacman.dist_to_crossroad0
                 pacman.dist_to_ghost_at_crossroad0 = semaphores[cross].dist_to_crossroad
                 if semaphores[cross].crossroad_to_pacman == pacman.crossroad0:
@@ -232,6 +235,7 @@ class Strategy_Advisor():
 
             else:
                 self.pacman_info.ghost_at_crossroad1 = semaphores[cross]
+                #print('ADVISOR: ' + str(semaphores[cross]))
                 dist_to_end = pacman.dist_to_crossroad1
                 pacman.dist_to_ghost_at_crossroad1 = semaphores[cross].dist_to_crossroad
                 if semaphores[cross].crossroad_to_pacman == pacman.crossroad1:

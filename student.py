@@ -136,6 +136,8 @@ class Pacman_agent():
         # get advice on the next move
         strategy_advisor = Strategy_Advisor(self.map_, state)
         mode_handler = strategy_advisor.advise()
+        if mode_handler == MODE.PURSUIT:
+            mode_handler = MODE.EATING
         next_move = self.mode(mode_handler, strategy_advisor, state)
 
 
@@ -150,7 +152,7 @@ class Pacman_agent():
                     if (len(state['boost']) > 0):
                         self.mode(MODE.COUNTER, strategy_advisor, state)
                     else:
-                        self.mode(MODE.FLIGHT, strategy_advisor, state)
+                        self.mode(MODE.COUNTER, strategy_advisor, state)
             elif mode_handler == MODE.PURSUIT:
                 next_move = self.mode(MODE.EATING, strategy_advisor, state)
             elif mode_handler == MODE.COUNTER:
@@ -287,7 +289,7 @@ class Pacman_agent():
     #--------------------------------------------------------------------------#
     # SORT MOVES BY WHERE A GHOST IN PURSUIT IS CLOSER TO THE ENERGY THAN PAC-MAN
         f_moves = []
-        ghost_dist_to_energy = 0
+        BEST_GHOST_DIST_TO_ENERGY = 1000
         for move in possible_moves:
 
             next_move, cost, path = move
@@ -296,6 +298,8 @@ class Pacman_agent():
             
             # verify which ghost is blocking the path or if the path is clear
             if pacman.ghost_at_crossroad0 != None:
+                #print('A: ' + str(pacman.ghost_at_crossroad0.position))
+                #print('B: ' + str([c for lcoor in corr.coordinates for corr in path for c in lcoor]))
                 if pacman.ghost_at_crossroad0.position in [c for lcoor in corr.coordinates for corr in path for c in lcoor]:
                     clear_path = False
                     ghost = pacman.ghost_at_crossroad0
@@ -313,8 +317,10 @@ class Pacman_agent():
             crossroad = None
             if pacman.crossroad0 in [ c for lcoor in corr.coordinates for corr in path for c in lcoor]:
                 crossroad = pacman.crossroad0
+                #print('ps_cross0: ' + str(pacman.crossroad0))
             elif pacman.crossroad1 in [ c for lcoor in corr.coordinates for corr in path for c in lcoor]:
                 crossroad = pacman.crossroad1
+                #print('ps_cross1: ' + str(pacman.crossroad1))
 
             # if no crossroad is in the path, then the energy is inside the corridor
             # it's needed to verify from which crossroad is the energy will be accessed
@@ -334,10 +340,14 @@ class Pacman_agent():
             if energy_inside_corr:
                 cross_to_energy = pacman.dist_to_crossroad(crossroad) - cost
                 ghost_dist_to_energy = ghost.dist_to_crossroad + cross_to_energy
+                #print(ghost_dist_to_energy)
+                BEST_GHOST_DIST_TO_ENERGY = ghost_dist_to_energy if ghost_dist_to_energy < BEST_GHOST_DIST_TO_ENERGY else BEST_GHOST_DIST_TO_ENERGY
             # calculate distancies for when energy is NOT in pacman corridor
             else:
                 cross_to_energy = cost - pacman.dist_to_crossroad(crossroad)
                 ghost_dist_to_energy = ghost.dist_to_crossroad - cross_to_energy
+                #print(ghost_dist_to_energy)
+                BEST_GHOST_DIST_TO_ENERGY = ghost_dist_to_energy if ghost_dist_to_energy < BEST_GHOST_DIST_TO_ENERGY else BEST_GHOST_DIST_TO_ENERGY
             
             # if pacman distance to energy is smaller than ghost's, discard move
             if cost < ghost_dist_to_energy:
@@ -351,7 +361,8 @@ class Pacman_agent():
     # FAKE ADJUSTER
 
         option = possible_moves[0]
-        if ghost_dist_to_energy < option[1]:
+        #print('closer ghosts: ' + str(BEST_GHOST_DIST_TO_ENERGY) + 'cost: ' + str(option[1]))
+        if BEST_GHOST_DIST_TO_ENERGY < option[1]:
             return possible_moves, False
 
 
@@ -378,9 +389,16 @@ class Pacman_agent():
         pac_crossroads = pac_info.crossroads
 
         pac_adj0, pac_safe_corr0 = self.calc_adj_and_safe(pac_info.corridor, pac_crossroads[0])
+        print("---")
+        print(pac_adj0)
+        print("---")
+        print(pac_safe_corr0)
+        print("---")
 
         pac_adj1, pac_safe_corr1 = self.calc_adj_and_safe(pac_info.corridor, pac_crossroads[1])
-
+        print(pac_adj1)
+        print("---")
+        print(pac_safe_corr1)
         ########################################################################
         ## PAC CORR UNSAFE #####################################################
         ########################################################################
@@ -563,6 +581,7 @@ class Pacman_agent():
 
         #pacman esta num crossroad
         if len(next_move_pac_corr) == 1:
+            print(adj_end)
             next_moves = [ coord for corridor in adj_end\
                                     for coord in [corridor.get_coord_next_to_end(end)]]
 
@@ -767,9 +786,9 @@ class Pacman_agent():
             search_results = my_tree.search()
             
             if search_results != None:
-                #acessible_boosts += [boost]
-                possible_moves += [search_result]
-                #safeties         += [search_results[2][len(search_results[2]) - 3].safe]        #safety of two to last corridor
+                acessible_boosts += [boost]
+                possible_moves += [(search_results[0], search_results[1])]
+                safeties         += [search_results[2][len(search_results[2]) - 3].safe]        #safety of two to last corridor
 
         # print("BOOSTS"   + str(acessible_boosts) + "\n")
         # print("MOVES"    + str(possible_moves)+ "\n")
@@ -779,7 +798,7 @@ class Pacman_agent():
     # SORT MOVES BY COST
         possible_moves = sorted(possible_moves,key=lambda res: res[1])
 
-        
+
 
         other_choices = []
         blocked = True
@@ -797,7 +816,7 @@ class Pacman_agent():
 
         # should not be on this mode (no more boosts)
         if (len(possible_moves) == 0):
-            return False
+            return possible_moves, False
         
         # choose the closest boost 
         # either there are several boosts in a safe corridor 
@@ -807,7 +826,7 @@ class Pacman_agent():
         other_choices += [possible_move[0] for possible_move in possible_moves[1:]]
         #response = ModeResponse(possible_moves[0][0], other_choices, blocked)
         #print(response)
-        return possible_moves
+        return possible_moves, True
 
 
 #------------------------------------------------------------------------------#
