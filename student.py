@@ -270,12 +270,6 @@ class Pacman_agent():
 
     #-------------------------------------------------------------------------#
     # SORT MOVES BY COST
-        f_moves = []
-        for move in f_moves:
-            if move[2][-3].safe == True:
-                return move[0]
-
-        # sort possible_moves by cost
         possible_moves = sorted(possible_moves,key=lambda res: res[1])
 
 
@@ -706,12 +700,7 @@ class Pacman_agent():
         for ghost in zombie_ghosts:
             for corr in self.map_.corridors:
                 if ghost[0] in corr.coordinates:
-<<<<<<< HEAD
-                    possible_moves += self.eating_agent(advisor, state, [ghost[0]])
-                    #print(possible_moves)
-=======
                     possible_moves += self.eating_agent(advisor, state, [ghost[0]])[0]
->>>>>>> debug and fake adjuster
                     break
 
 
@@ -724,10 +713,6 @@ class Pacman_agent():
             ghosts = [ghost for ghost in zombie_ghosts if ghost[0] == path[0].coordinates[0]]
             ghost = sorted(ghosts, key=lambda g: g[2])[0]
             if cost > ghost[2] * 2:
-<<<<<<< HEAD
-                #print('cost: ' + str(cost) + ', timeout: ' + str(ghost[2]))
-=======
->>>>>>> debug and fake adjuster
                 f_moves += [move]
                     
         # sort
@@ -736,10 +721,6 @@ class Pacman_agent():
     #--------------------------------------------------------------------------#
     # IF THERE ARE NO POSSIBLE MOVES, RETURN NONE
 
-<<<<<<< HEAD
-        #print(possible_moves)
-=======
->>>>>>> debug and fake adjuster
         if possible_moves == []:
             return possible_moves, False
         return possible_moves, True
@@ -751,7 +732,6 @@ class Pacman_agent():
 
 
     def counter_agent(self, advisor, state):
-        print("COUNTER")
         """Calculates the next position of the next move, when in counter mode.
         In Counter Mode, Pac-Man is almost surrounded by ghosts and must focus on eating boosts.
         
@@ -787,16 +767,20 @@ class Pacman_agent():
             search_results = my_tree.search()
             
             if search_results != None:
-                #? avoid repetead boosts
-                #if boost not in acessible_boosts:
-                acessible_boosts += [boost]
-                possible_moves   += [(search_results[0], search_results[1])]
-                safeties         += [search_results[2][len(search_results[2]) - 3].safe]        #safety of two to last corridor
+                #acessible_boosts += [boost]
+                possible_moves += [search_result]
+                #safeties         += [search_results[2][len(search_results[2]) - 3].safe]        #safety of two to last corridor
 
         # print("BOOSTS"   + str(acessible_boosts) + "\n")
         # print("MOVES"    + str(possible_moves)+ "\n")
         # print("SAFETIES" + str(safeties)+ "\n")
         
+    #-------------------------------------------------------------------------#
+    # SORT MOVES BY COST
+        possible_moves = sorted(possible_moves,key=lambda res: res[1])
+
+        
+
         other_choices = []
         blocked = True
 
