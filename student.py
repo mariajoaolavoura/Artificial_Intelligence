@@ -151,7 +151,7 @@ class Pacman_agent():
         elif mode_handler == MODE.PURSUIT:
             next_move = self.pursuit_agent()
         else: # next_move == MODE.COUNTER
-            next_move = self.counter_agent()
+            next_move = self.counter_agent(advisor, state)
         return next_move
 
 
@@ -545,5 +545,68 @@ class Pacman_agent():
         pass
 
 
-    def counter_agent(self, state):
-        pass
+    def counter_agent(self, advisor, state):
+        """Calculates the next position of the next move, when in counter mode.
+        In Counter Mode, Pac-Man is almost surrounded by ghosts and must focus on eating boosts.
+        
+        Args:
+        advisor
+        state
+
+        Returns:
+        The [x,y] position of the next_move
+
+        Considerations/Strategy:
+        -> For each corridor where the boosts are, check for safe ones
+        -> From the safest ones, choose the closest (if no one is safe, choose the closest one)
+        
+        ghost [[9, 15], False, 0],
+        """
+        
+        boosts = state['boost'].copy()
+        acessible_boosts = []
+        possible_moves   = []
+        safeties         = []
+
+        for boost in boosts:
+            domain = Pathways(self.map_.corr_adjacencies.copy(), boosts)
+
+            corridor = None
+            for corr in self.map_.corridors:
+                if boost in corr.coordinates:
+                    corridor = corr
+                    safety = corridor.safe
+
+            my_prob = SearchProblem(domain, corridor, boost, advisor.pacman_info.corridor, advisor.pacman_info.position)
+            my_tree = SearchTree(my_prob, "a*")
+            search_results = my_tree.search()
+            
+            if search_results != None:
+                #? avoid repetead boosts
+                if boost not in acessible_boosts:
+                    acessible_boosts += [boost]
+                    possible_moves   += [(search_results[0], search_results[1])]
+                    safeties         += [safety]
+
+        # print("BOOSTS"   + str(acessible_boosts) + "\n")
+        # print("MOVES"    + str(possible_moves)+ "\n")
+        # print("SAFETIES" + str(safeties)+ "\n")
+
+        if len([safety for safety in safeties if safety == CORRIDOR_SAFETY.SAFE]): #if any corridor is safe
+            #remove unsafe corridors info
+            for i in range(0, len(acessible_boosts)):
+                if safeties[i] == CORRIDOR_SAFETY.UNSAFE:
+                #TODO it crashed one here but I can't replicate it now :(
+                    del safeties[i]
+                    del acessible_boosts[i]
+                    del possible_moves[i]        
+
+        # should not be on this mode (no more boosts)
+        if (len(possible_moves) == 0):
+            return False
+        
+        # choose the closest boost 
+        # either there are several boosts in a safe corridor 
+        # OR there are only boosts in unsafe corridors)
+        possible_moves = sorted(possible_moves,key=lambda elem: elem[1])
+        return possible_moves[0][0]
