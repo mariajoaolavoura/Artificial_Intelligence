@@ -392,10 +392,10 @@ class Pacman_agent():
         ########################################################################
 
         #corr pacman tem ghost do lado do crossroad0       
-        if pac_info.crossroad0_is_safe == CORRIDOR_SAFETY.UNSAFE:
+        if pac_info.crossroad0_is_blocked == True:
 
             #pacman esta encurralado (corr do pacman tem ghosts dos 2 lados)
-            if pac_info.crossroad1_is_safe == CORRIDOR_SAFETY.UNSAFE:
+            if pac_info.crossroad1_is_blocked == True:
                 
                 #escolhe lado com ghost mais afastado
                 if pac_info.dist_to_ghost_at_crossroad0 >= pac_info.dist_to_ghost_at_crossroad1:
@@ -431,7 +431,7 @@ class Pacman_agent():
         else:
 
             #corr do pacman tem ghost apenas do lado crossroad1 -> crossroad1 is RED
-            if pac_info.crossroad1_is_safe == CORRIDOR_SAFETY.UNSAFE:
+            if pac_info.crossroad1_is_blocked == True:
 
                 #pacman consegue fugir apenas pelo crossroad0
                 if pac_info.semaphore0 == SEMAPHORE.YELLOW:
