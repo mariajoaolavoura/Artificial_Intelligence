@@ -260,74 +260,6 @@ class Pacman_agent():
     
 
     def flight_agent(self, advisor):
-        #crossroads YY, YR, RR -> semaphore.Y or semaphore.R for end[0] and end[1]
-        #ghost.distPac
-        #corr adj SAFE, UNSAFE 
-
-        #pac corr UNSAFE? (ghost no mesmo corr do pac)
-            #crossroad[0].RED and crossroad[1].RED?
-                #distGhostPac >= SAFE_DIST_TO_GHOST?
-                    #escolhe lado
-                #distGhostPac < SAFE_DIST_TO_GHOST?
-                    #lado com maior dist
-            
-            #crossroad[0].YELLOW?
-                #próximo corr SAFE?
-                    #escolhe saída
-                #proximo corr UNSAFE?
-                    #ghost do prox corr (crossroad[0]) pode nao estar em perseguiçao, so...
-                    #distGhostPac >= SAFE_DIST_TO_GHOST?
-                        #escolhe saida
-                    #distGhostPac < SAFE_DIST_TO_GHOST?
-                        #escolhe o 1º corr
-                    
-
-            #else crossroad[1].YELLOW?
-                #próximo corr SAFE?
-                    #escolhe saída
-                #proximo corr UNSAFE?
-                    #ghost do prox corr (crossroad[1]) pode nao estar em perseguiçao, so...
-                    #distGhostPac >= SAFE_DIST_TO_GHOST?
-                        #escolhe saida
-                    #distGhostPac < SAFE_DIST_TO_GHOST?
-                        #escolhe o 1º corr
-                    
-
-        #else pac corr SAFE? (corr do pac nao tem ghost)
-            #crossroad[0].YELLOW and crossroad[1].YELLOW?
-                #pesquisar todos os prox corredores
-                #SAFE?
-                    #escolhe saida
-                #UNSAFE? 
-                    #escolhe o 1º corr do crossroad mais perto
-
-            #crossroad[0].RED?
-                #crossroad[1].YELLOW?
-                    #próximo corr SAFE?
-                        #escolhe saída do ghost mais longe
-                    #próximo corr UNSAFE?
-                        #ghost do prox corr (crossroad[1]) pode nao estar em perseguiçao, so...
-                        #distGhostPac >= SAFE_DIST_TO_GHOST?
-                            #escolhe saida
-                        #distGhostPac < SAFE_DIST_TO_GHOST?
-                            #escolhe o 1º corr
-                #else crossroad[1].RED?
-                    #morrer com dignidade
-
-            #crossroad[1].RED?
-                #crossroad[0].YELLOW?
-                    #próximo corr SAFE?
-                        #escolhe saída
-                    #próximo corr UNSAFE?
-                        #ghost do prox corr (crossroad[0]) pode nao estar em perseguiçao, so...
-                        #distGhostPac >= SAFE_DIST_TO_GHOST?
-                            #escolhe saida
-                        #distGhostPac < SAFE_DIST_TO_GHOST?
-                            #escolhe o 1º corr
-                #else crossroad[0].RED?
-                    #morrer com dignidade
-
-
         '''
         args:
         advisor: instance of Strategy_Advisor
@@ -338,30 +270,13 @@ class Pacman_agent():
                 self.calculate_pacman_corridor()
                 self.ghosts_info = self.calculate_ghosts_info()
         '''
-        
-        
-        
-        #ghosts_info = advisor.ghosts_info
+                
         pac_info = advisor.pacman_info
         pac_crossroads = pac_info.crossroads
 
-        pac_adj0 = [ [cA, cB] for [cA, cB] in self.map_.corr_adjacencies\
-                                        if pac_crossroads[0] in cA.ends\
-                                        or pac_crossroads[0] in cB.ends]
-           
-        pac_safe_corr0 = [[cA, cB] for [cA, cB] in pac_adj0\
-                            if (cA.coordinates == pac_info.coordinates and cB.safe == CORRIDOR_SAFETY.SAFE)\
-                            or (cB.coordinates == pac_info.coordinates and cA.safe == CORRIDOR_SAFETY.SAFE)]
+        pac_adj0, pac_safe_corr0 = self.calc_adj_and_safe(pac_info.corridor, pac_crossroads[0])
 
-
-
-        pac_adj1 = [ [cA, cB] for [cA, cB] in self.map_.corr_adjacencies\
-                                    if pac_crossroads[1] in cA.ends\
-                                    or pac_crossroads[1] in cB.ends]
-
-        pac_safe_corr1 = [[cA, cB] for [cA, cB] in pac_adj1\
-                            if (cA.coordinates == pac_info.coordinates and cB.safe == CORRIDOR_SAFETY.SAFE)\
-                            or (cB.coordinates == pac_info.coordinates and cA.safe == CORRIDOR_SAFETY.SAFE)]
+        pac_adj1, pac_safe_corr1 = self.calc_adj_and_safe(pac_info.corridor, pac_crossroads[1])
 
         ########################################################################
         ## PAC CORR UNSAFE #####################################################
@@ -511,12 +426,31 @@ class Pacman_agent():
                         #?return self.calc_corridor_ghost_farther(pac_info, pac_adj0 + pac_adj1, ghosts_info)
                         return self.calc_next_coord(pac_info, pac_info.crossroad0, [])
 
-        
+
+    def calc_adj_and_safe(self, pac_corr, crossroad):
+        adj = [[cA, cB] for [cA, cB] in self.map_.corr_adjacencies\
+                                        if crossroad in cA.ends\
+                                        or crossroad in cB.ends]
+           
+        safe = [[cA, cB] for [cA, cB] in adj\
+                            if (cA.coordinates == pac_corr.coordinates and cB.safe == CORRIDOR_SAFETY.SAFE)\
+                            or (cB.coordinates == pac_corr.coordinates and cA.safe == CORRIDOR_SAFETY.SAFE)]
+
+        return adj, safe
                 
+
     def calc_next_coord(self, pac_info, end, adj_end):
-    
+        '''
+            Args:
+            pac_info:   advisor.pacman_info
+            end     :   crossroad do lado escolhido para o pacman fugir
+            adj_end :   lista de corredores adjacentes ao end
+                        - adj_end == [] é porque o pacman não consegue fugir pelo end
+                                        tanto por existir um fantasma no mesmo corredor desse lado
+                                        tanto por o end ser RED
+        '''
+
         [px, py] = pac_info.position
-        [ex, ey] = end
         
         next_move_pac_corr = [ coord for coord in pac_info.corridor.coordinates\
                                         if coord == [px-1, py]\
@@ -526,43 +460,42 @@ class Pacman_agent():
 
         #pacman esta num crossroad
         if len(next_move_pac_corr) == 1:
-            next_move = [ coord for coord in [corridor.coordinates] for corridor in adj_end\
-                                    if coord == [px-1, py]\
-                                    or coord == [px+1, py]\
-                                    or coord == [px, py-1]\
-                                    or coord == [px, py+1]]
+            next_moves = [ coord for corridor in adj_end\
+                                    for coord in [corridor.get_coord_next_to_end(end)]]
 
-            next_move += next_move_pac_corr
-
-
-
+            return next_moves[0]
 
         #pacman NAO está num crossroad
-        else:         
-            [a,b] = next_move_pac_corr[0]
-            [c,d] = next_move_pac_corr[1]
+        else:      
 
-            d0x = abs(ex-a)
-            d0y = abs(ey-b)
+            [ex, ey] = end
 
-            d1x = abs(ex-c)
-            d1y = abs(ey-d)
+            next_coord = next_move_pac_corr[0]
+            dx = abs(ex - next_coord[0])
+            dy = abs(ey - next_coord[1])
 
-            if py == ey:
-                return [a,b] if d0x<d1x else [c,d]
-            if px == ex:
-                return [a,b] if d0y<d1y else [c,d]
+            for i in range(1, len(next_move_pac_corr)):
 
-            return [a,b] if (d0x==d1x and d0y<d1y)\
-                            or (d0y==d1y and d0x<d1x)\
-                            else [c,d]
+                [a,b] = next_move_pac_corr[i]
+                da = abs(ex-a)
+                db = abs(ey-b)
 
-        
+                if py == ey:
+                    next_coord, dx, dy = [[a,b], da, db] if da<dx else [next_coord, dx, dy]
+                elif px == ex:
+                    next_coord, dx, dy = [[a,b], da, db] if db<dy else [next_coord, dx, dy]
+                else:
+                    next_coord, dx, dy = [[a,b], da, db] if (da==dx and db<dy)\
+                                                            or (db==dy and da<dx)\
+                                                         else [next_coord, dx, dy]
+
+            return next_coord
 
 
 
 
     #escolhe corr com ghost mais afastado
+    #TODO not done
     def calc_corridor_ghost_farther(self, pac_info, pac_adj, ghosts_info):
         dist = 0
         corr = []
