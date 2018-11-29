@@ -58,7 +58,7 @@ class SearchProblem:
         self.initial_pos = initial_pos
         self.goal_corr = goal_corr
         self.goal_pos = goal_pos
-        self.debug = True and (goal_pos == [4,15] or goal_pos == [4,14]) and (initial_pos == [4,13] or initial_pos == [4,16])
+        self.debug = False and (goal_pos == [4,15] or goal_pos == [4,14]) and (initial_pos == [4,13] or initial_pos == [4,16])
         # if (initial_pos == [4,10] or initial_pos == [4,11] or initial_pos == [4,12] \
         # or initial_pos == [4,13] or initial_pos == [4,14] or initial_pos == [4,15] \
         # or initial_pos == [4,16] or initial_pos == [4,17] or initial_pos == [4,18] \

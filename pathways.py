@@ -15,20 +15,30 @@ class Pathways(SearchDomain):
             
             if (corr1 == corridor):
                 #verify if there is an energy in the next corridor
-                if any(([x,y] in self.targets) for [x,y] in [c for c in corr2.coordinates if c not in corr1.ends]):
-                    pass
-                else:
-                    actlist += [(corr1, corr2)]
+                # if any(([x,y] in self.targets) for [x,y] in [c for c in corr2.coordinates if c not in corr1.ends]):
+                #     actlist += [ ((corr1, corr2), False) ]
+                # else:
+                #     actlist += [ ((corr1, corr2), True) ]
+                actlist += [(corr1, corr2)]
 
 
             elif (corr2 == corridor):
                 #verify if there is an energy in the next corridor
-                if any(([x,y] in self.targets) for [x,y] in [c for c in corr1.coordinates if c not in corr2.ends]):
-                    pass
-                else:
-                    actlist += [(corr2, corr1)]
+                # if any(([x,y] in self.targets) for [x,y] in [c for c in corr1.coordinates if c not in corr2.ends]):
+                #     actlist += [ ((corr2, corr1), False) ]
+                # else:
+                #     actlist += [ ((corr2, corr1), True) ]
+                actlist += [(corr2, corr1)]
 
-        return actlist 
+        #print(actlist)
+        # free = any([y == True for (x,y) in actlist])
+        # if free:
+        #     # ret = [x for (x,y) in actlist]
+        #     # print(ret)
+        #     return [ x for (x,y) in actlist ]
+        # else:
+        #     return []
+        return actlist
 
     def result(self,corridor,action):
         corr1, corr2 = action

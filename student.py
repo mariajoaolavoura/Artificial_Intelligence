@@ -218,7 +218,7 @@ class Pacman_agent():
                 #if (search_results[0] not in acessible_energies):       
                     #acessible_energies += [search_results[0]]
                 acessible_energies += [energy]
-                possible_moves += [search_results[0]]
+                possible_moves += [(search_results[0], search_results[1])]
 
         logger.debug("NEW! PACMAN POS" + str(advisor.pacman_info.position))
         #acessible_energies = [a for a in acessible_energies if a != advisor.pacman_info.position]
@@ -234,7 +234,10 @@ class Pacman_agent():
             logger.debug("#######################################")
         
         logger.debug("Returning " + str(possible_moves[0]))
-        return possible_moves[0]
+
+
+        possible_moves = sorted(possible_moves,key=lambda t: t[1])
+        return possible_moves[0][0]
     
 
     def flight_agent(self, advisor):
