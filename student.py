@@ -211,11 +211,15 @@ class Pacman_agent():
 
     def eating_agent(self, advisor, state):
 
+        pacman = advisor.pacman_info
         acessible_energies = []
         targets = state['energy'] + state['boost']
         domain = Pathways(self.map_.corr_adjacencies, targets)
         possible_moves = []
-        
+
+    #--------------------------------------------------------------------------#
+    # SEARCH FOR ENERGIES
+  
         for energy in targets:
             
             # create domain to search
@@ -237,7 +241,7 @@ class Pacman_agent():
                 pass
             
             # create problem and search
-            my_prob = SearchProblem(domain, corridor, energy, advisor.pacman_info.corridor, advisor.pacman_info.position)
+            my_prob = SearchProblem(domain, corridor, energy, pacman.corridor, pacman.position)
             my_tree = SearchTree(my_prob, "a*")
             search_results = my_tree.search()
             
@@ -250,14 +254,93 @@ class Pacman_agent():
         if len(possible_moves) == 0:
             return None
 
-        # sort possible_moves by cost
-        possible_moves = sorted(possible_moves,key=lambda res: res[1])
-        # if a path is blocked by a ghost in the next corridor, choose another corridor
-        for move in possible_moves:
+    #--------------------------------------------------------------------------#
+    # SORT MOVES BY COST
+        f_moves = []
+        for move in f_moves:
             if move[2][-3].safe == True:
                 return move[0]
 
-        # if this code is reached, then, no path is safe (unblocked) in the next corridor
+        # sort possible_moves by cost
+        possible_moves = sorted(possible_moves,key=lambda res: res[1])
+
+
+    #--------------------------------------------------------------------------#
+    # SORT MOVES BY WHERE A GHOST IS BLOCKING THE NEXT CORRIDOR
+        f_moves = []
+        for move in possible_moves:
+            if move[2][-3].safe == True:
+                f_moves += [move]
+
+        possible_moves = [move for move in possible_moves if move not in f_moves]
+        possible_moves += f_moves
+
+
+    #--------------------------------------------------------------------------#
+    # SORT MOVES BY WHERE A GHOST IN PURSUIT IS CLOSER TO THE ENERGY THAN PAC-MAN
+        f_moves = []
+        for move in possible_moves:
+
+            next_move, cost, path = move
+            energy_inside_corr = False
+            clear_path = True
+            
+            # verify which ghost is blocking the path or if the path is clear
+            if pacman.ghost_at_crossroad0 != None and not pacman.pursued_from_crossroad0:
+                if pacman.ghost_at_crossroad0.position in [c for lcoor in corr.coordinates for corr in path for c in lcoor]:
+                    clear_path = False
+                    ghost = pacman.ghost_at_crossroad0
+                    
+            if pacman.ghost_at_crossroad1 != None and not pacman.pursued_from_crossroad1:
+                if pacman.ghost_at_crossroad1.position in [ c for lcoor in corr.coordinates for corr in path for c in lcoor]:
+                    clear_path = False
+                    ghost = pacman.ghost_at_crossroad1
+
+            if clear_path:
+                f_moves += [move]
+                continue
+
+            # verify which crossroad is in the path
+            crossroad = None
+            if pacman.crossroad0 in [ c for lcoor in corr.coordinates for corr in path for c in lcoor]:
+                crossroad = pacman.crossroad0
+            elif pacman.crossroad0 in [ c for lcoor in corr.coordinates for corr in path for c in lcoor]:
+                crossroad = pacman.crossroad1
+
+            # if no crossroad is in the path, then the energy is inside the corridor
+            # it's needed to verify from which crossroad is the energy will be accessed
+            if crossroad == None:
+                energy_inside_corr = True
+                sub_corr0 = pacman.corridor.sub_corridors(pacman.position)[0].coordinates
+                sub_corr1 = pacman.corridor.sub_corridors(pacman.position)[0].coordinates
+                if any([ c in path for c in sub_corr0]):
+                    crossroad = pacman.crossroad0
+                elif any([ c in path for c in sub_corr1]):
+                    crossroad = pacman.crossroad1
+
+            # calculate distances of pacman and ghost to energy, according to
+            # if energy is inside or outside pacman corridor
+
+            # calculate distancies for when energy is in pacman corridor
+            if energy_inside_corr:
+                cross_to_energy = pacman.dist_to_crossroad(crossroad) - cost
+                ghost_dist_to_energy = ghost.dist_to_crossroad + cross_to_energy
+            # calculate distancies for when energy is NOT in pacman corridor
+            else:
+                cross_to_energy = cost - pacman.dist_to_crossroad(crossroad)
+                ghost_dist_to_energy = ghost.dist_to_crossroad - cross_to_energy
+            
+            # if pacman distance to energy is smaller than ghost's, discard move
+            if cost < ghost_dist_to_energy:
+                f_moves += [move]
+
+            # sort
+            possible_moves = [move for move in possible_moves if move not in f_moves]
+            possible_moves += f_moves
+
+    #--------------------------------------------------------------------------#
+    # RETURN BEST OPTION
+
         return possible_moves[0][0]
     
 

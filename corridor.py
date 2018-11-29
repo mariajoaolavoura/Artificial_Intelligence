@@ -15,7 +15,7 @@ class Corridor():
     def __init__(self, coordinates):
         self.coordinates = coordinates
         self.length = len(coordinates) - 2 if len(coordinates)>1 else 0
-        self.ends = [coordinates[0], coordinates[len(coordinates)-1]]
+        self.ends = [coordinates[0], coordinates[-1]]
         self.safe = CORRIDOR_SAFETY.SAFE
         
     def dist_end0(self, coord):

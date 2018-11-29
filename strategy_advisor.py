@@ -157,7 +157,10 @@ class Strategy_Advisor():
 
         # Pac-Man position and his corridor (or list of corridors if Pac-Man is in crossroad)
         pacman = (self.state['pacman'])
-        pac_corridor = [ corr for corr in self.map_.corridors if pacman in corr.coordinates ]
+        pac_corridor = [ adj for adj in self.map_.corr_adjacencies if pacman in adj[0].coordinates or pacman in adj[1].coordinates ]
+        aux = [ adj[0] for adj in pac_corridor if pacman in adj[0].coordinates ]
+        aux += [ adj[1] for adj in pac_corridor if pacman in adj[1].coordinates ]
+        pac_corridor = list(set(aux))
         logger.debug("PACMAN POSITION:\n" + str(pacman))
         logger.debug("PACMAN CORRIDORS:\n" + str(pac_corridor))
 
@@ -213,6 +216,7 @@ class Strategy_Advisor():
         # convert semaphores to colors
         for cross in semaphores:
             if cross == pacman.crossroad0:
+                self.pacman_info.ghost_at_crossroad0 = semaphores[cross]
                 dist_to_end = pacman.dist_to_crossroad0
                 pacman.dist_to_ghost_at_crossroad0 = semaphores[cross].dist_to_crossroad
                 if semaphores[cross].crossroad_to_pacman == pacman.crossroad0:
@@ -227,6 +231,7 @@ class Strategy_Advisor():
                     pacman.semaphore0 = SEMAPHORE.RED
 
             else:
+                self.pacman_info.ghost_at_crossroad1 = semaphores[cross]
                 dist_to_end = pacman.dist_to_crossroad1
                 pacman.dist_to_ghost_at_crossroad1 = semaphores[cross].dist_to_crossroad
                 if semaphores[cross].crossroad_to_pacman == pacman.crossroad1:
