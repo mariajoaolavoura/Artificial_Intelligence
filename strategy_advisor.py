@@ -121,7 +121,7 @@ class Strategy_Advisor():
         pac_corridor = self.pacman_info.corridor
         ghosts_info = []
 
-        for (ghost,_,_) in non_zombie_ghosts: # non zombie ghosts
+        for (ghost,zombie,timeout) in non_zombie_ghosts: # non zombie ghosts
 
             # get the corridor the ghost is in to give as argument in search
             ghost_corr = None
@@ -147,7 +147,7 @@ class Strategy_Advisor():
             ghost_dist = cost - pac_corridor.dist_end(pacman, crossroad)
 
             # update sel.ghosts with new attribute of distance_to_pacman
-            ghosts_info += [Ghost_Info(ghost, ghost_corr, cost, crossroad, ghost_dist)]
+            ghosts_info += [Ghost_Info((ghost, zombie, timeout), ghost_corr, cost, crossroad, ghost_dist)]
 
         return ghosts_info
 
@@ -196,10 +196,16 @@ class Strategy_Advisor():
         # verify crossroads semaphores
         semaphores = {} # {crossroad : [Ghost_Info]}
         for ghost in self.ghosts_info:
-            if ghost.crossroad_to_pacman not in semaphores:
-                semaphores[ghost.crossroad_to_pacman] = [ghost]
+            #print("\n\n")
+            #print(semaphores)
+            #print(ghost.crossroad_to_pacman)
+            
+            #! FIXED BUG. LISTS CAN'T BE KEYS IN DICTIONARIES
+            key = ghost.crossroad_to_pacman[0], ghost.crossroad_to_pacman[1]
+            if key not in semaphores.keys():
+                semaphores[key] = [ghost]
             else: # gdt(p/c) -> ghost.dist_to_(pacman/crossroad)
-                semaphores[ghost.crossroad_to_pacman] += [ghost]
+                semaphores[key] += [ghost]
                 
         # select most dangerous ghost distancies
         if len(semaphores) > 0: # there are no ghosts, or all are zombie
@@ -227,15 +233,27 @@ class Strategy_Advisor():
 
             else:
                 dist_to_end = pacman.dist_to_crossroad1
-                pacman.dist_to_ghost_at_crossroad1 = semaphores[cross].dist_to_crossroad
-                pacman.crossroad1_is_safe = semaphores[cross].dist_to_pacman >= SAFE_DIST_TO_GHOST
+                print("----" + str(cross))
+                print(semaphores[cross])
+                print("--------")
 
-                if semaphores[cross].dist_to_crossroad > dist_to_end + 1:
-                    pacman.semaphore1 = SEMAPHORE.GREEN
-                elif semaphores[cross].dist_to_crossroad == dist_to_end + 1:
-                    pacman.semaphore1 = SEMAPHORE.YELLOW
-                else:
-                    pacman.semaphore1 = SEMAPHORE.RED
+                #! several ghosts for a given crossroad
+                #! please verify. the idea is, for each ghost i verify the way it was being done
+                #! the worst color wins 
+                pacman.semaphore1 = SEMAPHORE.GREEN
+                for ghost in semaphores[cross]:
+                    pacman.dist_to_ghost_at_crossroad1 = ghost.dist_to_crossroad
+                    pacman.crossroad1_is_safe = ghost.dist_to_pacman >= SAFE_DIST_TO_GHOST
+
+                    if ghost.dist_to_crossroad > dist_to_end + 1:
+                        if pacman.semaphore1 == SEMAPHORE.GREEN:
+                            pacman.semaphore1 = SEMAPHORE.GREEN     #can only be green if it's currently green
+                            # could simply be ignored
+                    elif ghost.dist_to_crossroad == dist_to_end + 1:
+                        if pacman.semaphore1 != SEMAPHORE.RED:
+                            pacman.semaphore1 = SEMAPHORE.YELLOW    #can only be yellow if it's currently yellow or green (ie not red)
+                    else:
+                        pacman.semaphore1 = SEMAPHORE.RED           #can always be red 
 
 
 
