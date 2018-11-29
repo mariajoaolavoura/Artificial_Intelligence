@@ -58,7 +58,7 @@ class SearchProblem:
         self.initial_pos = initial_pos
         self.goal_corr = goal_corr
         self.goal_pos = goal_pos
-        self.debug = True
+        self.debug = True and (goal_pos == [4,15] or goal_pos == [4,14]) and (initial_pos == [4,13] or initial_pos == [4,16])
         # if (initial_pos == [4,10] or initial_pos == [4,11] or initial_pos == [4,12] \
         # or initial_pos == [4,13] or initial_pos == [4,14] or initial_pos == [4,15] \
         # or initial_pos == [4,16] or initial_pos == [4,17] or initial_pos == [4,18] \
@@ -77,22 +77,21 @@ class SearchProblem:
         # sub_init1/sub_goal1 = corridor with all coordinates from the initial/goal position's index to end (inclusive)
         # so it can be possible to calculate the path for the 2 ends of initial/goal corridor
 
-        
-
+        if self.debug:
+            print("Analizing path: " + str(initial_pos) + " --> " + str(goal_pos))    
 
         self.initial = Corridor([self.initial_pos])
         
         sub_init0, sub_init1 = self.initial_corr.sub_corridors(self.initial_pos)
         self.update_domain(self.initial_corr, self.initial, sub_init0, sub_init1)
 
+        if goal_pos in sub_init0.coordinates:
+            self.goal_corr = sub_init0
+        elif goal_pos in sub_init1.coordinates:
+            self.goal_corr = sub_init1
 
         self.goal = Corridor([self.goal_pos])
 
-        if goal_pos in sub_init0.coordinates:
-            self.goal_corr = sub_init0
-        if goal_pos in sub_init1.coordinates:
-            self.goal_corr = sub_init1
-        
         sub_goal0, sub_goal1 = self.goal_corr.sub_corridors(self.goal_pos)
         self.update_domain(self.goal_corr, self.goal, sub_goal0, sub_goal1)
 
@@ -100,67 +99,93 @@ class SearchProblem:
     def update_domain(self, corridor, sub_corr, sub_corr0, sub_corr1):
         
         new_adjacencies = []
+        debug = self.debug
+        if debug:
+            print()
+            print("initial_pos: " + str(self.initial_pos))
+            print("goal_pos: " + str(self.goal_pos))
+            print("corridor: " + str(corridor))
+            print("sub_corr: " + str(sub_corr))
+            print("sub_corr0: " + str(sub_corr0))
+            print("sub_corr1: " + str(sub_corr1))
 
-        if corridor != sub_corr0 and corridor != sub_corr1:
+
+        if corridor.coordinates != sub_corr0.coordinates and corridor.coordinates != sub_corr1.coordinates:
+
             for [corrA, corrB] in self.domain.adjacencies:
                 
                 
-                if corridor == corrA:
+                if corridor.coordinates == corrA.coordinates:
                     if any(e in sub_corr0.ends for e in corrB.ends):
                         new_adjacencies += [[sub_corr0, corrB]]
                     elif any(e in sub_corr1.ends for e in corrB.ends):
                         new_adjacencies += [[sub_corr1, corrB]]
                     
-                elif corridor == corrB:                
+                elif corridor.coordinates == corrB.coordinates:                
                     if any(e in sub_corr0.ends for e in corrA.ends):
                         new_adjacencies += [[sub_corr0, corrA]]
                     elif any(e in sub_corr1.ends for e in corrA.ends):
                         new_adjacencies += [[sub_corr1, corrA]]
 
             # eliminar das adjacencias o corredor inicial que foi dividido e j'a nao existe inteiro
-            self.domain.adjacencies += new_adjacencies
+            
             self.domain.adjacencies = [[A,B] for [A, B] in self.domain.adjacencies if (corridor != A and corridor != B)]
+            self.domain.adjacencies += new_adjacencies
 
         else:
             for [corrA, corrB] in self.domain.adjacencies:
 
-                if sub_corr0 == sub_corr:
+                if sub_corr0.coordinates == sub_corr.coordinates:
                     
-                    if corridor == corrA:
+                    if corridor.coordinates == corrA.coordinates:
                         if any(e in sub_corr.ends for e in corrB.ends):
+                            #self.printd(debug, ("added: " + str([[sub_corr, corrB]])))
                             new_adjacencies += [[sub_corr, corrB]]
                         elif any(e in sub_corr1.ends for e in corrB.ends):
+                            #self.printd(debug, ("added: " + str([[sub_corr1, corrB]])))
                             new_adjacencies += [[sub_corr1, corrB]]
                         
-                    elif corridor == corrB:                
+                    elif corridor.coordinates == corrB.coordinates:                
                         if any(e in sub_corr.ends for e in corrA.ends):
+                            #self.printd(debug, "added: " + str([[sub_corr, corrA]]))
                             new_adjacencies += [[sub_corr, corrA]]
                         elif any(e in sub_corr1.ends for e in corrA.ends):
+                            #self.printd(debug, "added: " + str([[sub_corr1, corrA]]))
                             new_adjacencies += [[sub_corr1, corrA]]
 
-                if sub_corr1 == sub_corr:
+                if sub_corr1.coordinates == sub_corr.coordinates:
                     
-                    if corridor == corrA:
+                    if corridor.coordinates == corrA.coordinates:
                         if any(e in sub_corr.ends for e in corrB.ends):
+                            #self.printd(debug, "added: " + str([[sub_corr, corrB]]))
                             new_adjacencies += [[sub_corr, corrB]]
                         elif any(e in sub_corr0.ends for e in corrB.ends):
-                            new_adjacencies += [[sub_corr1, corrB]]
+                            #self.printd(debug, "added: " + str([[sub_corr1, corrB]]))
+                            new_adjacencies += [[sub_corr0, corrB]]
                         
-                    elif corridor == corrB:                
+                    elif corridor.coordinates == corrB.coordinates:                
                         if any(e in sub_corr.ends for e in corrA.ends):
+                            #self.printd(debug, "added: " + str([[sub_corr, corrA]]))
                             new_adjacencies += [[sub_corr, corrA]]
                         elif any(e in sub_corr0.ends for e in corrA.ends):
-                            new_adjacencies += [[sub_corr1, corrA]]
+                            #self.printd(debug, "added: " + str([[sub_corr1, corrA]]))
+                            new_adjacencies += [[sub_corr0, corrA]]
 
             self.domain.adjacencies = [[A,B] for [A, B] in self.domain.adjacencies if (corridor != A and corridor != B)]
+            # if debug:
+            #     print('new_adjacencies: ' + str(new_adjacencies))
             self.domain.adjacencies += new_adjacencies
 
-        if sub_corr != sub_corr0:
+
+        if sub_corr.coordinates != sub_corr0.coordinates:
             self.domain.adjacencies += [[sub_corr, sub_corr0]]
-        if sub_corr != sub_corr1:
+        if sub_corr.coordinates != sub_corr1.coordinates:
             self.domain.adjacencies += [[sub_corr, sub_corr1]]
 
 
+    def printd (self, valid, string):
+        if valid:
+            print(string)
 
     
     def goal_test(self, state):
@@ -201,7 +226,7 @@ class SearchNode:
 # Arvores de pesquisa
 class SearchTree:
     
-    def __init__(self, problem, strategy='breadth'): 
+    def __init__(self, problem, strategy='a*'): 
         
         self.problem = problem
 
@@ -230,16 +255,7 @@ class SearchTree:
     def search(self):
 
 
-        debug = self.problem.debug and (self.problem.initial_pos == [6,10] or self.problem.initial_pos == [6,20]) and self.problem.goal_pos == [4,15]
-        # or self.problem.initial_pos == [4,12] or self.problem.initial_pos == [4,13] \
-        # or self.problem.initial_pos == [4,11] or self.problem.initial_pos == [4,10] \
-        # or self.problem.initial_pos == [3,10] or self.problem.initial_pos == [2,10] \
-        # or self.problem.initial_pos == [1,10] or self.problem.initial_pos == [1,9] \
-        # or self.problem.initial_pos == [1,8] or self.problem.initial_pos == [1,7] \
-        # or self.problem.initial_pos == [2,7])
-
-        if debug:
-            print("DEBUG IS WORKING")
+        debug = self.problem.debug
 
         if debug:
             print("initial position is :" + str(self.problem.initial_pos))
@@ -332,4 +348,5 @@ class SearchTree:
         elif self.strategy == 'a*':
             self.open_nodes.extend(lnewnodes)
             self.open_nodes = sorted(self.open_nodes, key=lambda node: node.heuristic + node.cost, reverse=True)
+
 

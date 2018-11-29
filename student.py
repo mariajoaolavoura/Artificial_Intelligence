@@ -366,14 +366,16 @@ class Pacman_agent():
                     
                     #NAO ha corr safe
                     else:
+                        pass
                         #escolhe corr com ghost mais afastado
                         #return self.calc_corridor_ghost_farther(pac_info, pac_adj1, ghosts_info)
 
                 #pacman NAO consegue fugir pelo crossroad1 -> crossroad1 is RED
                 else:
+                    pass
                     #escolhe crossroad1
                     #TODO devolver prox coord
-                    pass
+                    
 
         #corr do pacman NAO tem ghost do lado crossroad0
         else:
@@ -400,11 +402,13 @@ class Pacman_agent():
                     
                     #NAO ha corr SAFE pelo crossroad0
                     else:
+                        pass
                         #escolhe corr com ghost mais afastado
                         #return self.calc_corridor_ghost_farther(pac_info, pac_adj0, ghosts_info)
 
                 #pacman NAO consegue fugir por nenhum crossroad -> crossroad0 is RED
                 else:
+                    pass
                     #escolhe lado com ghost mais afastado
                     #return self.calc_corridor_ghost_farther(pac_info, pac_adj0 + pac_adj1, ghosts_info)
 
@@ -455,6 +459,7 @@ class Pacman_agent():
 
                             #NAO ha corr SAFE        
                             else:
+                                pass
                                 #escolhe corr com ghost mais afastado
                                 #return self.calc_corridor_ghost_farther(pac_info, pac_adj0 + pac_adj1, ghosts_info)
                     
@@ -469,6 +474,7 @@ class Pacman_agent():
                         
                         #NAO ha corr SAFE pelo crossroad0
                         else:
+                            pass
                             #escolhe corr com ghost mais afastado
                             #return self.calc_corridor_ghost_farther(pac_info, pac_adj0, ghosts_info)
                 
@@ -485,11 +491,13 @@ class Pacman_agent():
                         
                         #NAO ha corr SAFE pelo crossroad1
                         else:
+                            pass
                             #escolhe corr com ghost mais afastado
                             #return self.calc_corridor_ghost_farther(pac_info, pac_adj1, ghosts_info)
 
                     #pacman NAO consegue fugir por nenhum crossroad
                     else:
+                        pass
                         #escolhe lado com ghost mais afastado
                         #return self.calc_corridor_ghost_farther(pac_info, pac_adj0 + pac_adj1, ghosts_info)
 
