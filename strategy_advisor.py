@@ -121,7 +121,7 @@ class Strategy_Advisor():
         pac_corridor = self.pacman_info.corridor
         ghosts_info = []
 
-        for (ghost,_,_) in non_zombie_ghosts: # non zombie ghosts
+        for (ghost,zombie,timeout) in non_zombie_ghosts: # non zombie ghosts
 
             # get the corridor the ghost is in to give as argument in search
             ghost_corr = None
@@ -147,7 +147,7 @@ class Strategy_Advisor():
             ghost_dist = cost - pac_corridor.dist_end(pacman, crossroad)
 
             # update sel.ghosts with new attribute of distance_to_pacman
-            ghosts_info += [Ghost_Info(ghost, ghost_corr, cost, crossroad, ghost_dist)]
+            ghosts_info += [Ghost_Info(ghost, zombie, timeout, ghost_corr, cost, crossroad, ghost_dist)]
 
         return ghosts_info
 
@@ -196,10 +196,10 @@ class Strategy_Advisor():
         # verify crossroads semaphores
         semaphores = {} # {crossroad : [Ghost_Info]}
         for ghost in self.ghosts_info:
-            if ghost.crossroad_to_pacman not in semaphores:
-                semaphores[ghost.crossroad_to_pacman] = [ghost]
+            if frozenset(ghost.crossroad_to_pacman) not in semaphores:
+                semaphores[frozenset(ghost.crossroad_to_pacman)] = [ghost]
             else: # gdt(p/c) -> ghost.dist_to_(pacman/crossroad)
-                semaphores[ghost.crossroad_to_pacman] += [ghost]
+                semaphores[frozenset(ghost.crossroad_to_pacman)] += [ghost]
                 
         # select most dangerous ghost distancies
         if len(semaphores) > 0: # there are no ghosts, or all are zombie
@@ -212,7 +212,7 @@ class Strategy_Advisor():
         # compare distance of Pac-Man and ghosts to crossroads and
         # convert semaphores to colors
         for cross in semaphores:
-
+            print(semaphores[cross])
             if cross == pacman.crossroad0:
                 dist_to_end = pacman.dist_to_crossroad0
                 pacman.dist_to_ghost_at_crossroad0 = semaphores[cross].dist_to_crossroad
@@ -227,6 +227,7 @@ class Strategy_Advisor():
 
             else:
                 dist_to_end = pacman.dist_to_crossroad1
+                print(semaphores[cross])
                 pacman.dist_to_ghost_at_crossroad1 = semaphores[cross].dist_to_crossroad
                 pacman.crossroad1_is_safe = semaphores[cross].dist_to_pacman >= SAFE_DIST_TO_GHOST
 
