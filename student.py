@@ -163,7 +163,7 @@ class Pacman_agent():
         elif mode_handler == MODE.FLIGHT:
             next_move = self.flight_agent(advisor)
         elif mode_handler == MODE.PURSUIT:
-            next_move = self.pursuit_agent()
+            next_move = self.pursuit_agent(advisor, state)
         else: # next_move == MODE.COUNTER
             next_move = self.counter_agent(advisor, state)
         return next_move
@@ -509,8 +509,67 @@ class Pacman_agent():
         pass
 
     
-    def pursuit_agent(self, state):
-        pass
+    def pursuit_agent(self, advisor, state):
+        """Calculates the next position of the next move, when in pursuit mode.
+        In Counter Mode, Pac-Man is must focus on eating zombie ghosts.
+        
+        Args:
+        advisor
+        state
+
+        Returns:
+        The [x,y] position of the next_move
+        """
+
+        #<pathways.Pathways object at 0x7fc182823208> [[2, 26], [2, 25], [2, 24], [2, 23], [1, 23], [1, 22], [1, 21], [1, 20], [2, 20], [3, 20], [4, 20]] [1, 22] [[14, 15], [15, 15], [16, 15], [17, 15], [18, 15], [0, 15], [1, 15], [2, 15], [3, 15], [4, 15]] [3, 15]
+       
+        eatable_ghosts = state['ghosts'].copy()
+        eatable_ghosts[1][1] = True # FOR TESTING PURPOSES
+        
+        eatable_ghosts = [ghost[0] for ghost in eatable_ghosts if ghost[1]]    #only get the positions
+        
+        acessible_ghosts = []
+        possible_moves   = []
+        safeties         = []
+
+        for ghost in eatable_ghosts:
+            domain = Pathways(self.map_.corr_adjacencies.copy(), eatable_ghosts)
+
+            corridor = None
+            for corr in self.map_.corridors:
+                if ghost in corr.coordinates:
+                    corridor = corr
+                    safety = corridor.safe
+            
+            print(domain, corridor, ghost, advisor.pacman_info.corridor, advisor.pacman_info.position)
+            my_prob = SearchProblem(domain, corridor, ghost, advisor.pacman_info.corridor, advisor.pacman_info.position)
+            my_tree = SearchTree(my_prob, "a*")
+            search_results = my_tree.search()
+            
+            if search_results != None:
+                #? avoid repetead boosts
+                if ghost not in acessible_ghosts:
+                    acessible_ghosts += [ghost]
+                    possible_moves   += [(search_results[0], search_results[1])]
+                    safeties         += [safety]
+
+        if len([safety for safety in safeties if safety == CORRIDOR_SAFETY.SAFE]): #if any corridor is safe
+            #remove unsafe corridors info
+            for i in range(0, len(acessible_ghosts)):
+                if safeties[i] == CORRIDOR_SAFETY.UNSAFE:
+                    del safeties[i]
+                    del acessible_ghosts[i]
+                    del possible_moves[i]        
+
+        # should not be on this mode (no more zombie ghost)
+        if (len(possible_moves) == 0):
+            return False
+        
+        # choose the closest zombie ghost 
+        # either there are several ghost in a safe corridor 
+        # OR there are only ghost in unsafe corridors)
+        possible_moves = sorted(possible_moves,key=lambda elem: elem[1])
+        return possible_moves[0][0]
 
 
     def counter_agent(self, advisor, state):
@@ -530,7 +589,6 @@ class Pacman_agent():
         
         ghost [[9, 15], False, 0],
         """
-        
         boosts = state['boost'].copy()
         acessible_boosts = []
         possible_moves   = []
@@ -543,7 +601,6 @@ class Pacman_agent():
             for corr in self.map_.corridors:
                 if boost in corr.coordinates:
                     corridor = corr
-                    safety = corridor.safe
 
             my_prob = SearchProblem(domain, corridor, boost, advisor.pacman_info.corridor, advisor.pacman_info.position)
             my_tree = SearchTree(my_prob, "a*")
@@ -551,20 +608,25 @@ class Pacman_agent():
             
             if search_results != None:
                 #? avoid repetead boosts
-                if boost not in acessible_boosts:
-                    acessible_boosts += [boost]
-                    possible_moves   += [(search_results[0], search_results[1])]
-                    safeties         += [safety]
+                #if boost not in acessible_boosts:
+                acessible_boosts += [boost]
+                possible_moves   += [(search_results[0], search_results[1])]
+                safeties         += [search_results[2][len(search_results[2]) - 3].safe]        #safety of two to last corridor
 
         # print("BOOSTS"   + str(acessible_boosts) + "\n")
         # print("MOVES"    + str(possible_moves)+ "\n")
         # print("SAFETIES" + str(safeties)+ "\n")
+        
+        other_choices = []
+        blocked = True
 
         if len([safety for safety in safeties if safety == CORRIDOR_SAFETY.SAFE]): #if any corridor is safe
+            blocked = False
             #remove unsafe corridors info
             for i in range(0, len(acessible_boosts)):
                 if safeties[i] == CORRIDOR_SAFETY.UNSAFE:
-                #TODO it crashed one here but I can't replicate it now :(
+                    other_choices += possible_moves[i]
+                    
                     del safeties[i]
                     del acessible_boosts[i]
                     del possible_moves[i]        
@@ -576,9 +638,12 @@ class Pacman_agent():
         # choose the closest boost 
         # either there are several boosts in a safe corridor 
         # OR there are only boosts in unsafe corridors)
+        
         possible_moves = sorted(possible_moves,key=lambda elem: elem[1])
+        other_choices += [possible_move[0] for possible_move in possible_moves[1:]]
+        #response = ModeResponse(possible_moves[0][0], other_choices, blocked)
+        #print(response)
         return possible_moves[0][0]
-
 
 
 #------------------------------------------------------------------------------#
