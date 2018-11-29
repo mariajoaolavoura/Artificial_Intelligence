@@ -8,3 +8,9 @@ class Ghost_Info():
         self.dist_to_pacman = dist_to_pacman
         self.crossroad_to_pacman = crossroad_to_pacman
         self.dist_to_crossroad = dist_to_crossroad
+
+    def __str__(self):
+        return 'ghost('+str(self.position)+')'
+
+    def __repr__(self):
+        return self.__str__()

@@ -120,8 +120,9 @@ class Strategy_Advisor():
         pacman = self.pacman_info.position
         pac_corridor = self.pacman_info.corridor
         ghosts_info = []
-
-        for (ghost,zombie,timeout) in non_zombie_ghosts: # non zombie ghosts
+        print('\n####')
+        print(non_zombie_ghosts)
+        for [ghost,zombie,timeout] in non_zombie_ghosts: # non zombie ghosts
 
             # get the corridor the ghost is in to give as argument in search
             ghost_corr = None
@@ -138,6 +139,7 @@ class Strategy_Advisor():
                 #TODO if result is None, program breaks
                 _, cost, path = my_tree.search()
             else:
+                print('ghost in den')
                 continue
 
             # the crossroad that the ghost will use to get to Pac-Man
@@ -146,9 +148,11 @@ class Strategy_Advisor():
             # calculate distance of every ghost to Pac-Man crossroads
             ghost_dist = cost - pac_corridor.dist_end(pacman, crossroad)
 
-            # update sel.ghosts with new attribute of distance_to_pacman
+            # update self.ghosts_info with new attribute of distance_to_pacman
+            print('added: '+str([Ghost_Info(ghost, zombie, timeout, ghost_corr, cost, crossroad, ghost_dist)]))
             ghosts_info += [Ghost_Info(ghost, zombie, timeout, ghost_corr, cost, crossroad, ghost_dist)]
 
+        print(ghosts_info)
         return ghosts_info
 
 
@@ -200,14 +204,15 @@ class Strategy_Advisor():
                 semaphores[frozenset(ghost.crossroad_to_pacman)] = [ghost]
             else: # gdt(p/c) -> ghost.dist_to_(pacman/crossroad)
                 semaphores[frozenset(ghost.crossroad_to_pacman)] += [ghost]
-                
+        print(semaphores.keys())
+
         # select most dangerous ghost distancies
-        if len(semaphores) > 0: # there are no ghosts, or all are zombie
+        if len(semaphores) == 0: # there are no ghosts, or all are zombie
             pacman.semaphore0 = SEMAPHORE.GREEN
             pacman.semaphore1 = SEMAPHORE.GREEN
         else: # TODO solve temporary solution for when ghosts are in the den, in method above
             for cross in semaphores:
-                ghost = min(semaphores[cross], key=lambda x : x.dist_to_crossroad)
+                semaphores[cross] = min(semaphores[cross], key=lambda x : x.dist_to_crossroad)
 
         # compare distance of Pac-Man and ghosts to crossroads and
         # convert semaphores to colors
