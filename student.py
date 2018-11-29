@@ -137,23 +137,28 @@ class Pacman_agent():
         strategy_advisor = Strategy_Advisor(self.map_, state)
         mode_handler = strategy_advisor.advise()
         next_move = self.mode(mode_handler, strategy_advisor, state)
-        #
-        if next_move == None:
-            return 'w' # w for win
+
 
 
         # if advice is not specific, adjustments to the strategy may be needed
-        if (next_move == False): # correct when methods are implemented
-            strategy_adjuster = Strategy_Adjuster()
-            mode_handler = strategy_adjuster.adjustStrategy()
-            next_move = self.mode(mode_handler, state)
+        if (next_move == None): # correct when methods are implemented
+
+            if mode_handler == MODE.EATING:
+                return 'w' # w for win
+            if mode_handler == MODE.PURSUIT:
+                next_move = self.mode(MODE.EATING, strategy_advisor, state)
+            
+            else: # GARBAGE CODE
+                strategy_adjuster = Strategy_Adjuster()
+                mode_handler = strategy_adjuster.adjustStrategy()
+                next_move = self.mode(mode_handler, state)
         
         # calculate and return the key
         # if (next_move == [5,23] or next_move == [6,7]):
         #     print("KEY IS " + str(self.calculate_key(state['pacman'], next_move)))
 
         # logger.debug("KEY IS " + str(self.calculate_key(state['pacman'], next_move)) + "\n\n")
-        return self.calculate_key(state['pacman'], next_move)
+        return self.calculate_key(state['pacman'], next_move[0][0])
 
 
 
@@ -161,13 +166,13 @@ class Pacman_agent():
         if mode_handler != MODE.EATING:
             print(mode_handler)
         if mode_handler == MODE.EATING:
-            next_move = self.eating_agent(advisor, state)
+            return  self.eating_agent(advisor, state, state['energy'] + state['boost'])
         elif mode_handler == MODE.FLIGHT:
-            next_move = self.flight_agent(advisor)
+            return  self.flight_agent(advisor)
         elif mode_handler == MODE.PURSUIT:
-            next_move = self.pursuit_agent(advisor, state)
+            return self.pursuit_agent_through_eating(advisor, state)
         else: # next_move == MODE.COUNTER
-            next_move = self.counter_agent(advisor, state)
+            return self.counter_agent(advisor, state)
         return next_move
 
 
@@ -209,11 +214,10 @@ class Pacman_agent():
 
 
 
-    def eating_agent(self, advisor, state):
+    def eating_agent(self, advisor, state, targets):
 
         pacman = advisor.pacman_info
         acessible_energies = []
-        targets = state['energy'] + state['boost']
         domain = Pathways(self.map_.corr_adjacencies, targets)
         possible_moves = []
 
@@ -233,6 +237,7 @@ class Pacman_agent():
             for corr in self.map_.corridors:
                 if energy in corr.coordinates:
                     corridor = corr
+                    break
 
             # print("Corridor #######################################")
             # print(corridor)
@@ -339,9 +344,12 @@ class Pacman_agent():
             possible_moves += f_moves
 
     #--------------------------------------------------------------------------#
-    # RETURN BEST OPTION
+    # FAKE ADJUSTER
 
-        return possible_moves[0][0]
+    #--------------------------------------------------------------------------#
+    # RETURN OPTIONS
+
+        return possible_moves
     
 
     def flight_agent(self, advisor):
@@ -617,6 +625,7 @@ class Pacman_agent():
         possible_moves   = []
         safeties         = []
 
+        
         for ghost in eatable_ghosts:
             domain = Pathways(self.map_.corr_adjacencies.copy(), eatable_ghosts)
 
@@ -655,6 +664,64 @@ class Pacman_agent():
         # OR there are only ghost in unsafe corridors)
         possible_moves = sorted(possible_moves,key=lambda elem: elem[1])
         return possible_moves[0][0]
+
+
+
+
+
+
+
+    def pursuit_agent_through_eating(self, advisor, state):
+        """Calculates the next position of the next move, when in pursuit mode.
+        In Counter Mode, Pac-Man is must focus on eating zombie ghosts.
+        
+        Args:
+        advisor
+        state
+
+        Returns:
+        The [x,y] position of the next_move
+        """
+
+        zombie_ghosts = [ghost for ghost in state['ghosts'] if ghost[1]]    #only get the positions
+        possible_moves   = []
+
+        # call eating agent for zombies not in den
+        for ghost in zombie_ghosts:
+            for corr in self.map_.corridors:
+                if ghost[0] in corr.coordinates:
+                    possible_moves += self.eating_agent(advisor, state, [ghost[0]])
+                    print(possible_moves)
+                    break
+
+
+    #--------------------------------------------------------------------------#
+    # SORT MOVES BY ZOMBIES TIMEOUT
+
+        f_moves = []
+        for move in possible_moves:
+            _, cost, path = move
+            ghosts = [ghost for ghost in zombie_ghosts if ghost[0] == path[0].coordinates[0]]
+            ghost = sorted(ghosts, key=lambda g: g[2])[0]
+            if cost > ghost[2] * 2:
+                print('cost: ' + str(cost) + ', timeout: ' + str(ghost[2]))
+                f_moves += [move]
+                    
+        # sort
+        possible_moves = [move for move in possible_moves if move not in f_moves]
+
+    #--------------------------------------------------------------------------#
+    # IF THERE ARE NO POSSIBLE MOVES, RETURN NONE
+
+        print(possible_moves)
+        if possible_moves == []:
+            return None
+        return possible_moves
+                
+
+
+
+
 
 
     def counter_agent(self, advisor, state):
