@@ -41,6 +41,7 @@ class Game:
     def info(self):
         return json.dumps({"map": self.map.filename,
                            "ghosts": self._n_ghosts,
+                           "ghosts_level": self._l_ghosts,
                            "fps": GAME_SPEED,
                            "timeout": TIMEOUT,
                            "lives": LIVES,
@@ -110,7 +111,11 @@ class Game:
         self._lastkeypress = key
 
     def update_pacman(self):
-        self._pacman = self.map.calc_pos(self._pacman, self._lastkeypress) 
+        try:
+            self._pacman = self.map.calc_pos(self._pacman, self._lastkeypress) 
+        except AssertionError:
+            logger.error("Invalid key <%s> pressed", self._lastkeypress)
+
         c = self.consume(self._pacman)
         if c == Tiles.ENERGY:
             self._score += POINT_ENERGY
