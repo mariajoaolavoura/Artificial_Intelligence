@@ -221,7 +221,7 @@ class Strategy_Advisor():
                 pacman.dist_to_ghost_at_crossroad0 = semaphores[cross].dist_to_crossroad
                 if semaphores[cross].crossroad_to_pacman == pacman.crossroad0:
                     pacman.crossroad0_is_blocked = semaphores[cross].dist_to_crossroad <= 0
-                    pacman.pursued_from_crossroad0 = not (semaphores[cross].dist_to_pacman >= SAFE_DIST_TO_GHOST)
+                    pacman.pursued_from_crossroad0 = semaphores[cross].dist_to_pacman < SAFE_DIST_TO_GHOST
 
                 if semaphores[cross].dist_to_crossroad > dist_to_end + 1:
                     pacman.semaphore0 = SEMAPHORE.GREEN
@@ -236,7 +236,7 @@ class Strategy_Advisor():
                 pacman.dist_to_ghost_at_crossroad1 = semaphores[cross].dist_to_crossroad
                 if semaphores[cross].crossroad_to_pacman == pacman.crossroad1:
                     pacman.crossroad1_is_blocked = semaphores[cross].dist_to_crossroad <= 0
-                    pacman.pursued_from_crossroad1 = not (semaphores[cross].dist_to_pacman >= SAFE_DIST_TO_GHOST)
+                    pacman.pursued_from_crossroad1 = semaphores[cross].dist_to_pacman < SAFE_DIST_TO_GHOST
 
                 if semaphores[cross].dist_to_crossroad > dist_to_end + 1:
                     pacman.semaphore1 = SEMAPHORE.GREEN

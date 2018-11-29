@@ -15,11 +15,14 @@ class Pacman_Info():
         self.semaphore1 = None
         self.dist_to_ghost_at_crossroad0 = None
         self.dist_to_ghost_at_crossroad1 = None
-        # evaluates if corridor
-        self.crossroad0_is_blocked = True 
-        self.crossroad1_is_blocked = True
-        self.pursued_from_crossroad0 = None
-        self.pursued_from_crossroad1 = None
+
+        # evaluates if a ghost is inside the corridor, blocking the crossroad
+        self.crossroad0_is_blocked = False 
+        self.crossroad1_is_blocked = False
+
+        # evaluates if the closest ghost in the direction of crossroad is at safe distance (game_consts.pySAFE_DIST_TO_GHOST)
+        self.pursued_from_crossroad0 = False
+        self.pursued_from_crossroad1 = False
 
         self.ghost_at_crossroad0 = None
         self.ghost_at_crossroad1 = None
@@ -33,10 +36,10 @@ class Pacman_Info():
         self.dist_to_crossroad1 = corridor.dist_end1(self.position)
 
     def dist_to_crossroad(self, crossroad):
-        if crossroad == crossroad0:
-            return crossroad0
-        elif crossroad == crossroad1:
-            return crossroad1
+        if crossroad == self.crossroad0:
+            return self.crossroad0
+        elif crossroad == self.crossroad1:
+            return self.crossroad1
         else:
             return None
         

@@ -141,13 +141,22 @@ class Pacman_agent():
 
 
         # if advice is not specific, adjustments to the strategy may be needed
-        if (next_move == None): # correct when methods are implemented
+        if (next_move[1] == False): # correct when methods are implemented
 
             if mode_handler == MODE.EATING:
-                return 'w' # w for win
-            if mode_handler == MODE.PURSUIT:
+                if len(state['energy']) == 0:
+                    return 'w' # w for win
+                else:
+                    if (len(state['boost']) > 0):
+                        self.mode(MODE.COUNTER, strategy_advisor, state)
+                    else:
+                        self.mode(MODE.FLIGHT, strategy_advisor, state)
+            elif mode_handler == MODE.PURSUIT:
                 next_move = self.mode(MODE.EATING, strategy_advisor, state)
-            
+            elif mode_handler == MODE.COUNTER:
+                pass
+            elif mode_handler == MODE.FLIGHT:
+                pass
             else: # GARBAGE CODE
                 strategy_adjuster = Strategy_Adjuster()
                 mode_handler = strategy_adjuster.adjustStrategy()
@@ -158,7 +167,7 @@ class Pacman_agent():
         #     print("KEY IS " + str(self.calculate_key(state['pacman'], next_move)))
 
         # logger.debug("KEY IS " + str(self.calculate_key(state['pacman'], next_move)) + "\n\n")
-        return self.calculate_key(state['pacman'], next_move[0][0])
+        return self.calculate_key(state['pacman'], next_move[0][0][0])
 
 
 
@@ -257,7 +266,7 @@ class Pacman_agent():
 
         # if there are no possible moves, everything is eaten
         if len(possible_moves) == 0:
-            return None
+            return (possible_moves, False)
 
     #-------------------------------------------------------------------------#
     # SORT MOVES BY COST
@@ -284,6 +293,7 @@ class Pacman_agent():
     #--------------------------------------------------------------------------#
     # SORT MOVES BY WHERE A GHOST IN PURSUIT IS CLOSER TO THE ENERGY THAN PAC-MAN
         f_moves = []
+        ghost_dist_to_energy = 0
         for move in possible_moves:
 
             next_move, cost, path = move
@@ -291,12 +301,12 @@ class Pacman_agent():
             clear_path = True
             
             # verify which ghost is blocking the path or if the path is clear
-            if pacman.ghost_at_crossroad0 != None and not pacman.pursued_from_crossroad0:
+            if pacman.ghost_at_crossroad0 != None:
                 if pacman.ghost_at_crossroad0.position in [c for lcoor in corr.coordinates for corr in path for c in lcoor]:
                     clear_path = False
                     ghost = pacman.ghost_at_crossroad0
                     
-            if pacman.ghost_at_crossroad1 != None and not pacman.pursued_from_crossroad1:
+            if pacman.ghost_at_crossroad1 != None:
                 if pacman.ghost_at_crossroad1.position in [ c for lcoor in corr.coordinates for corr in path for c in lcoor]:
                     clear_path = False
                     ghost = pacman.ghost_at_crossroad1
@@ -309,7 +319,7 @@ class Pacman_agent():
             crossroad = None
             if pacman.crossroad0 in [ c for lcoor in corr.coordinates for corr in path for c in lcoor]:
                 crossroad = pacman.crossroad0
-            elif pacman.crossroad0 in [ c for lcoor in corr.coordinates for corr in path for c in lcoor]:
+            elif pacman.crossroad1 in [ c for lcoor in corr.coordinates for corr in path for c in lcoor]:
                 crossroad = pacman.crossroad1
 
             # if no crossroad is in the path, then the energy is inside the corridor
@@ -346,10 +356,16 @@ class Pacman_agent():
     #--------------------------------------------------------------------------#
     # FAKE ADJUSTER
 
+        option = possible_moves[0]
+        if ghost_dist_to_energy < option[1]:
+            return possible_moves, False
+
+
+
     #--------------------------------------------------------------------------#
     # RETURN OPTIONS
 
-        return possible_moves
+        return possible_moves, True
     
 
     def flight_agent(self, advisor):
@@ -690,8 +706,12 @@ class Pacman_agent():
         for ghost in zombie_ghosts:
             for corr in self.map_.corridors:
                 if ghost[0] in corr.coordinates:
+<<<<<<< HEAD
                     possible_moves += self.eating_agent(advisor, state, [ghost[0]])
                     #print(possible_moves)
+=======
+                    possible_moves += self.eating_agent(advisor, state, [ghost[0]])[0]
+>>>>>>> debug and fake adjuster
                     break
 
 
@@ -704,7 +724,10 @@ class Pacman_agent():
             ghosts = [ghost for ghost in zombie_ghosts if ghost[0] == path[0].coordinates[0]]
             ghost = sorted(ghosts, key=lambda g: g[2])[0]
             if cost > ghost[2] * 2:
+<<<<<<< HEAD
                 #print('cost: ' + str(cost) + ', timeout: ' + str(ghost[2]))
+=======
+>>>>>>> debug and fake adjuster
                 f_moves += [move]
                     
         # sort
@@ -713,10 +736,13 @@ class Pacman_agent():
     #--------------------------------------------------------------------------#
     # IF THERE ARE NO POSSIBLE MOVES, RETURN NONE
 
+<<<<<<< HEAD
         #print(possible_moves)
+=======
+>>>>>>> debug and fake adjuster
         if possible_moves == []:
-            return None
-        return possible_moves
+            return possible_moves, False
+        return possible_moves, True
                 
 
 
@@ -742,14 +768,15 @@ class Pacman_agent():
         
         ghost [[9, 15], False, 0],
         """
-        boosts = state['boost'].copy()
+        boosts = state['boost']
         acessible_boosts = []
         possible_moves   = []
         safeties         = []
 
-        for boost in boosts:
-            domain = Pathways(self.map_.corr_adjacencies.copy(), boosts)
+        domain = Pathways(self.map_.corr_adjacencies, boosts)
 
+        for boost in boosts:
+            
             corridor = None
             for corr in self.map_.corridors:
                 if boost in corr.coordinates:
