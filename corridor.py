@@ -38,6 +38,26 @@ class Corridor():
         index = self.coordinates.index(coord)
         return Corridor(self.coordinates[:index+1]), Corridor(self.coordinates[index:])
 
+    def get_coord_next_to_end0(self):
+        if len(self.coordinates) > 1:
+            return self.coordinates[1]
+        else:
+            return None
+
+    def get_coord_next_to_end1(self):
+        if len(self.coordinates) > 1:
+            return self.coordinates[-2]
+        else:
+            return None
+
+    def get_coord_next_to_end(self, end):
+        if end == self.ends[0]:
+            return self.get_coord_next_to_end0()
+        elif end == self.ends[1]:
+            return self.get_coord_next_to_end1()
+        else:
+            return None
+
     def __str__(self):
         return str(self.coordinates)
 
