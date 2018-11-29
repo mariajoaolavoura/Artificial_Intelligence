@@ -158,6 +158,8 @@ class Pacman_agent():
 
 
     def mode(self, mode_handler, advisor, state):
+        if mode_handler != MODE.EATING:
+            print(mode_handler)
         if mode_handler == MODE.EATING:
             next_move = self.eating_agent(advisor, state)
         elif mode_handler == MODE.FLIGHT:

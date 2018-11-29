@@ -55,9 +55,8 @@ class Strategy_Advisor():
         logger.debug("########################################################")
 
         ### Advise on a Mode of play given the previous analysis 
-
-        for i in range(len(self.ghosts_info)):
-            if self.ghosts_info[i].zombie == True:
+        for ghost in self.state['ghosts']:
+            if ghost[1] == True:
                 return MODE.PURSUIT
 
         # There is at least one side of pacman with no ghosts in pursuit
@@ -117,13 +116,13 @@ class Strategy_Advisor():
     def calculate_ghosts_info(self):
 
         non_zombie_ghosts = [ghost for ghost in self.state['ghosts'] if ghost[1] == False]
+
         domain = Pathways(self.map_.corr_adjacencies, non_zombie_ghosts)
         pacman = self.pacman_info.position
         pac_corridor = self.pacman_info.corridor
         ghosts_info = []
 
         for [ghost,zombie,timeout] in non_zombie_ghosts: # non zombie ghosts
-
             # get the corridor the ghost is in to give as argument in search
             ghost_corr = None
             if ghost not in self.map_.ghosts_den:
