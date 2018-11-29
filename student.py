@@ -173,7 +173,7 @@ class Pacman_agent():
             return self.pursuit_agent_through_eating(advisor, state)
         else: # next_move == MODE.COUNTER
             return self.counter_agent(advisor, state)
-        return next_move
+        
 
 
 
@@ -259,7 +259,7 @@ class Pacman_agent():
         if len(possible_moves) == 0:
             return None
 
-    #--------------------------------------------------------------------------#
+    #-------------------------------------------------------------------------#
     # SORT MOVES BY COST
         f_moves = []
         for move in f_moves:
@@ -635,7 +635,7 @@ class Pacman_agent():
                     corridor = corr
                     safety = corridor.safe
             
-            print(domain, corridor, ghost, advisor.pacman_info.corridor, advisor.pacman_info.position)
+            #print(domain, corridor, ghost, advisor.pacman_info.corridor, advisor.pacman_info.position)
             my_prob = SearchProblem(domain, corridor, ghost, advisor.pacman_info.corridor, advisor.pacman_info.position)
             my_tree = SearchTree(my_prob, "a*")
             search_results = my_tree.search()
@@ -682,7 +682,7 @@ class Pacman_agent():
         Returns:
         The [x,y] position of the next_move
         """
-
+        
         zombie_ghosts = [ghost for ghost in state['ghosts'] if ghost[1]]    #only get the positions
         possible_moves   = []
 
@@ -691,7 +691,7 @@ class Pacman_agent():
             for corr in self.map_.corridors:
                 if ghost[0] in corr.coordinates:
                     possible_moves += self.eating_agent(advisor, state, [ghost[0]])
-                    print(possible_moves)
+                    #print(possible_moves)
                     break
 
 
@@ -704,7 +704,7 @@ class Pacman_agent():
             ghosts = [ghost for ghost in zombie_ghosts if ghost[0] == path[0].coordinates[0]]
             ghost = sorted(ghosts, key=lambda g: g[2])[0]
             if cost > ghost[2] * 2:
-                print('cost: ' + str(cost) + ', timeout: ' + str(ghost[2]))
+                #print('cost: ' + str(cost) + ', timeout: ' + str(ghost[2]))
                 f_moves += [move]
                     
         # sort
@@ -713,7 +713,7 @@ class Pacman_agent():
     #--------------------------------------------------------------------------#
     # IF THERE ARE NO POSSIBLE MOVES, RETURN NONE
 
-        print(possible_moves)
+        #print(possible_moves)
         if possible_moves == []:
             return None
         return possible_moves
@@ -725,6 +725,7 @@ class Pacman_agent():
 
 
     def counter_agent(self, advisor, state):
+        print("COUNTER")
         """Calculates the next position of the next move, when in counter mode.
         In Counter Mode, Pac-Man is almost surrounded by ghosts and must focus on eating boosts.
         
@@ -772,7 +773,7 @@ class Pacman_agent():
         other_choices = []
         blocked = True
 
-        if len([safety for safety in safeties if safety == CORRIDOR_SAFETY.SAFE]): #if any corridor is safe
+        if len([safety for safety in safeties if safety == CORRIDOR_SAFETY.SAFE]) > 1: #if any corridor is safe
             blocked = False
             #remove unsafe corridors info
             for i in range(0, len(acessible_boosts)):
@@ -795,7 +796,7 @@ class Pacman_agent():
         other_choices += [possible_move[0] for possible_move in possible_moves[1:]]
         #response = ModeResponse(possible_moves[0][0], other_choices, blocked)
         #print(response)
-        return possible_moves[0][0]
+        return possible_moves
 
 
 #------------------------------------------------------------------------------#
@@ -841,7 +842,6 @@ SERVER = os.environ.get('SERVER', 'localhost')
 PORT = os.environ.get('PORT', '8000')
 NAME = os.environ.get('NAME', 'student')
 loop.run_until_complete(agent_loop("{}:{}".format(SERVER,PORT), NAME))
-if __name__ == "__main__":
-    agent_loop()
+
 #------------------------------------------------------------------------------#
 #------------------------------------------------------------------------------#
