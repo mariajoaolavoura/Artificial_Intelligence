@@ -1,3 +1,4 @@
+import os
 import asyncio
 import pygame
 import random
@@ -110,7 +111,7 @@ class Ghost(pygame.sprite.Sprite):
 
     def update(self, state):
         if 'ghosts' in state:
-            (x, y) , zombie = state['ghosts'][self.index]
+            (x, y), zombie, z_timeout = state['ghosts'][self.index]
             sx, sy = scale((x, y))
             self.rect = pygame.Rect((sx, sy) + CHAR_SIZE)
             self.image = pygame.Surface(CHAR_SIZE)
@@ -216,10 +217,13 @@ async def main_loop(q):
         
 
 if __name__ == "__main__":
+    SERVER = os.environ.get('SERVER', 'localhost')
+    PORT = os.environ.get('PORT', '8000')
+    
     parser = argparse.ArgumentParser()
-    parser.add_argument("--server", help="IP address of the server", default="localhost")
+    parser.add_argument("--server", help="IP address of the server", default=SERVER)
     parser.add_argument("--scale", help="reduce size of window by x times", type=int, default=1)
-    parser.add_argument("--port", help="TCP port", type=int, default=8000)
+    parser.add_argument("--port", help="TCP port", type=int, default=PORT)
     args = parser.parse_args()
     SCALE = args.scale
 
