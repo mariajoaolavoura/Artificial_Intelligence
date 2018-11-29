@@ -14,9 +14,12 @@ class Pacman_Info():
         self.semaphore0 = None
         self.semaphore1 = None
         self.dist_to_ghost_at_crossroad0 = None #
-        self.dist_to_ghost_at_crossroad1 = None #
-        self.crossroad0_is_safe = None #CORRIDOR_SAFETY
-        self.crossroad1_is_safe = None #CORRIDOR_SAFETY
+        self.dist_to_ghost_at_crossroad1 = None
+        # evaluates if corridor
+        self.crossroad0_is_blocked = True 
+        self.crossroad1_is_blocked = True
+        self.pursued_from_crossroad0 = None
+        self.pursued_from_crossroad1 = None
 
     def update_corridor(self, corridor):
         self.corridor = corridor

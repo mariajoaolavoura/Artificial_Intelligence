@@ -137,6 +137,10 @@ class Pacman_agent():
         strategy_advisor = Strategy_Advisor(self.map_, state)
         mode_handler = strategy_advisor.advise()
         next_move = self.mode(mode_handler, strategy_advisor, state)
+        #
+        if next_move == None:
+            return 'w' # w for win
+
 
         # if advice is not specific, adjustments to the strategy may be needed
         if (next_move == False): # correct when methods are implemented
@@ -157,7 +161,7 @@ class Pacman_agent():
         if mode_handler == MODE.EATING:
             next_move = self.eating_agent(advisor, state)
         elif mode_handler == MODE.FLIGHT:
-            next_move = self.flight_agent()
+            next_move = self.flight_agent(advisor)
         elif mode_handler == MODE.PURSUIT:
             next_move = self.pursuit_agent()
         else: # next_move == MODE.COUNTER
@@ -179,14 +183,25 @@ class Pacman_agent():
         #print("NEXT MOVE: " + str(pacman) + ", " + str(next_move))
         px, py = pacman
         nx, ny = next_move
-        if nx > px:
+
+
+
+        if nx == px + 1:
             key = 'd'
-        elif nx < px:
+        elif nx == px -1:
             key = 'a'
-        elif ny > py:
+        elif ny == py + 1:
             key = 's'
-        else: # ny < py
+        elif ny == py -1:
             key = 'w'
+        elif nx > px:
+            key = 'a'
+        elif nx < px:
+            key = 'd'
+        elif ny > py:
+            key = 'w'
+        else:
+            key = 's'
         
         return key
 
@@ -194,19 +209,20 @@ class Pacman_agent():
 
     def eating_agent(self, advisor, state):
 
-        domain = Pathways(self.map_.corr_adjacencies, state['energy'] + state['boost'])
-
         acessible_energies = []
         targets = state['energy'] + state['boost']
+        domain = Pathways(self.map_.corr_adjacencies, targets)
         possible_moves = []
         
         for energy in targets:
-
-            domain = Pathways(self.map_.corr_adjacencies.copy(), state['energy'] + state['boost'])
+            
+            # create domain to search
+            
             # print("Energy #######################################")
             # print(energy)
             # print("#######################################")
 
+            # find this energy corridor
             corridor = None
             for corr in self.map_.corridors:
                 if energy in corr.coordinates:
@@ -217,36 +233,29 @@ class Pacman_agent():
             # print("#######################################")
             if (self.debug):
                 pass
-                #print(energy)
+            
+            # create problem and search
             my_prob = SearchProblem(domain, corridor, energy, advisor.pacman_info.corridor, advisor.pacman_info.position)
             my_tree = SearchTree(my_prob, "a*")
             search_results = my_tree.search()
             
-
+            # filter valid results and store them in possible_moves
             if search_results != None:
-                #? avoid repetead energies. 
-                #if (search_results[0] not in acessible_energies):       
-                    #acessible_energies += [search_results[0]]
                 acessible_energies += [energy]
-                possible_moves += [(search_results[0], search_results[1])]
+                possible_moves += [search_results]
 
-        logger.debug("NEW! PACMAN POS" + str(advisor.pacman_info.position))
-        #acessible_energies = [a for a in acessible_energies if a != advisor.pacman_info.position]
-        if advisor.pacman_info.position == [4,15] or advisor.pacman_info.position == [4,14] \
-        or advisor.pacman_info.position == [4,12] or advisor.pacman_info.position == [4,13] \
-        or advisor.pacman_info.position == [4,11] or advisor.pacman_info.position == [4,10] \
-        or advisor.pacman_info.position == [3,10] or advisor.pacman_info.position == [2,10] \
-        or advisor.pacman_info.position == [1,10] or advisor.pacman_info.position == [1,9] \
-        or advisor.pacman_info.position == [1,8] or advisor.pacman_info.position == [1,7] \
-        or advisor.pacman_info.position == [2,7]:
-            logger.debug("Acessible_Energies #######################################")
-            logger.debug(acessible_energies)
-            logger.debug("#######################################")
-        
-        logger.debug("Returning " + str(possible_moves[0]))
+        # if there are no possible moves, everything is eaten
+        if len(possible_moves) == 0:
+            return None
 
+        # sort possible_moves by cost
+        possible_moves = sorted(possible_moves,key=lambda res: res[1])
+        # if a path is blocked by a ghost in the next corridor, choose another corridor
+        for move in possible_moves:
+            if move[2][-3].safe == True:
+                return move[0]
 
-        possible_moves = sorted(possible_moves,key=lambda t: t[1])
+        # if this code is reached, then, no path is safe (unblocked) in the next corridor
         return possible_moves[0][0]
     
 

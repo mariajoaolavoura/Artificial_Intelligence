@@ -58,18 +58,7 @@ class SearchProblem:
         self.initial_pos = initial_pos
         self.goal_corr = goal_corr
         self.goal_pos = goal_pos
-        self.debug = False
-        # if (initial_pos == [4,10] or initial_pos == [4,11] or initial_pos == [4,12] \
-        # or initial_pos == [4,13] or initial_pos == [4,14] or initial_pos == [4,15] \
-        # or initial_pos == [4,16] or initial_pos == [4,17] or initial_pos == [4,18] \
-        # or initial_pos == [4,19] or initial_pos == [4,20] ):
-        #     self.debug = False
-
-        # if (initial_pos == [4,23] or initial_pos == [4,24]):
-        #     self.debug = False
-
-        #self.debug = True    
-        #self.debug = False
+        self.debug = False and (goal_pos == [0,15] or goal_pos == [1,15])
 
         # Divide initial/goal corridor in 3 corridors:
         # root/goal = corridor with just 1 coordinate, the initial/goal position
