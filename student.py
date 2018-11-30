@@ -267,6 +267,7 @@ class Pacman_agent():
                 possible_moves += [search_results]
 
         # if there are no possible moves, everything is eaten
+        print(len(possible_moves))
         if len(possible_moves) == 0:
             return (possible_moves, False)
 
@@ -852,7 +853,7 @@ async def agent_loop(server_address = "localhost:8000", agent_name="student"):
             state = json.loads(r) #receive game state
 
             # game over (unnecessary for actual play
-            if not state['lives']:
+            if state['lives'] == 0:
                 print("GAME OVER")
                 return
             #------------------------------------------------------------------#

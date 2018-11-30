@@ -14,30 +14,22 @@ class Pathways(SearchDomain):
         for (corr1, corr2) in self.adjacencies:
             
             if (corr1.coordinates == corridor.coordinates):
-                #verify if there is an energy in the next corridor
-                # if any(([x,y] in self.targets) for [x,y] in [c for c in corr2.coordinates if c not in corr1.ends]):
-                #     actlist += [ ((corr1, corr2), False) ]
-                # else:
-                #     actlist += [ ((corr1, corr2), True) ]
                 actlist += [(corr1, corr2)]
 
-
             elif (corr2.coordinates == corridor.coordinates):
-                #verify if there is an energy in the next corridor
-                # if any(([x,y] in self.targets) for [x,y] in [c for c in corr1.coordinates if c not in corr2.ends]):
-                #     actlist += [ ((corr2, corr1), False) ]
-                # else:
-                #     actlist += [ ((corr2, corr1), True) ]
                 actlist += [(corr2, corr1)]
 
-        #print(actlist)
-        # free = any([y == True for (x,y) in actlist])
-        # if free:
-        #     # ret = [x for (x,y) in actlist]
-        #     # print(ret)
-        #     return [ x for (x,y) in actlist ]
-        # else:
-        #     return []
+        if corridor.length == 0: #is the initial or final corridor
+            surrounded = []
+            for (corr1, corr2) in actlist:
+                if corr2.get_coord_next_to_end(corridor.coordinates[0]) in self.targets:
+                    surrounded += [True]
+                else:
+                    surrounded += [False]
+            
+            if all(surrounded):
+                actlist = []
+
         return actlist
 
     def result(self,corridor,action):
