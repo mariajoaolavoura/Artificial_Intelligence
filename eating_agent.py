@@ -16,13 +16,12 @@ class EatingAgent:
 
     def __init__(self, advisor, targets):
         self.advisor = advisor
-        self.state = state
         self.targets = targets
 
 
     def eat(self):
-        """Creates the Eating Agent, which calculates the path to all accessible
-        targets, and sorts them by cost and safety with the following criteria:
+        """Calculates the path to all accessible targets, and sorts them by cost
+        and safety with the following criteria:
         1 - cost
         2 - if being pursued, distance of pacman to target smaller than ghost's
         3 - proximity of ghost in path to target

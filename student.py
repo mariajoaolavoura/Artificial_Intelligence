@@ -158,6 +158,7 @@ class Pacman_agent():
                     else:
                         self.mode(MODE.COUNTER, strategy_advisor, state)
             elif mode_handler == MODE.PURSUIT:
+                zombie_ghosts = [ghost for ghost in self.advisor.state['ghosts'] if ghost[1]]
                 next_move = self.mode(MODE.EATING, strategy_advisor, state)
             elif mode_handler == MODE.COUNTER:
                 pass

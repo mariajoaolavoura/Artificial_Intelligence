@@ -1,16 +1,25 @@
 from tree_search import *
 from pathways import Pathways
+from eating_agent import EatingAgent
 
 
 class PursuitAgent:
+    """Creates the Pursuit Agent, which calculates the path to all accessible
+    targets, and sorts them by cost and safety with the following criteria:
+    1 - cost
+    2 - if being pursued, distance of pacman to target smaller than ghost's
+    3 - proximity of ghost in path to target
 
-    def __init__(self, advisor, state, targets):
+    Attr:
+    advisor: provides extensive information about the current situation of the map
+    targets: the targets to search paths to
+    """
+    def __init__(self, advisor, targets):
         self.advisor = advisor
-        self.state = state
         self.targets = targets
 
 
-    def pursuit(self, advisor, state):
+    def pursuit(self, advisor, targets):
         """Calculates the next position of the next move, when in pursuit mode.
         In Counter Mode, Pac-Man is must focus on eating zombie ghosts.
         
@@ -22,16 +31,10 @@ class PursuitAgent:
         The [x,y] position of the next_move
         """
         
-        zombie_ghosts = [ghost for ghost in state['ghosts'] if ghost[1]]    #only get the positions
-        possible_moves   = []
+            #only get the positions
 
-        # call eating agent for zombies not in den
-        for ghost in zombie_ghosts:
-            for corr in self.map_.corridors:
-                if ghost[0] in corr.coordinates:
-                    possible_moves += self.eating_agent(advisor, state, [ghost[0]])[0]
-                    break
-
+        eating_agent = EatingAgent(advisor, targets)
+        possible_moves = eating_agent.eat()
 
     #--------------------------------------------------------------------------#
     # SORT MOVES BY ZOMBIES TIMEOUT
@@ -39,7 +42,7 @@ class PursuitAgent:
         f_moves = []
         for move in possible_moves:
             _, cost, path = move
-            ghosts = [ghost for ghost in zombie_ghosts if ghost[0] == path[0].coordinates[0]]
+            ghosts = [ghost for ghost in targets if ghost[0] == path[0].coordinates[0]]
             ghost = sorted(ghosts, key=lambda g: g[2])[0]
             if cost > ghost[2] * 2:
                 f_moves += [move]

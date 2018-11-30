@@ -4,9 +4,8 @@ from pathways import Pathways
 
 class FlightAgent:
 
-    def __init__(self, advisor, state, targets):
+    def __init__(self, advisor, targets):
         self.advisor = advisor
-        self.state = state
         self.targets = targets
 
 
