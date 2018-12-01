@@ -69,25 +69,27 @@ class Pacman_Info():
     
     def __str__(self):
         string = \
-        'Pac-Man is in position ' + str(self.position) + '\n' + \
-        'Ghost ' + str(self.ghost_at_crossroad0) + ' is at crossroad ' + str(self.crossroad0) + \
-        'at distance ' + str(self.dist_to_ghost_at_crossroad0) + ' from Pc-Man ' + '\n'
+        'Pac-Man is in position ' + str(self.position) + '\n'
 
+        if self.ghost_at_crossroad0 != None:
+            string += \
+            'Ghost ' + str(self.ghost_at_crossroad0.position) + ' is at crossroad ' + str(self.crossroad0) + \
+            ' at distance ' + str(self.dist_to_ghost_at_crossroad0) + ' from Pc-Man '
         if (self.dist_to_ghost_at_crossroad0 != None):
-            string += 'at distance ' + str(self.dist_to_ghost_at_crossroad0 - self.dist_to_crossroad0) + '\n'
-        
-        string += \
-        'with the semaphore ' + str(self.semaphore0) + '\n' + \
-        'Pac-Man distance to this crossroad is ' + str(self.dist_to_crossroad0) + '\n' + \
-        'Ghost ' + str(self.ghost_at_crossroad1) + ' is at crossroad ' + str(self.crossroad1) + \
-        'at distance ' + str(self.dist_to_ghost_at_crossroad1) + ' from Pc-Man' + '\n' \
-        
+            string += \
+            ' at distance ' + str(self.dist_to_ghost_at_crossroad0 - self.dist_to_crossroad0) + ' of crossroad \n' + \
+            'with the semaphore ' + str(self.semaphore0) + '\n' + \
+            'Pac-Man distance to this crossroad is ' + str(self.dist_to_crossroad0) + '\n'
+
+        if self.ghost_at_crossroad1 != None:
+            string += \
+            'Ghost ' + str(self.ghost_at_crossroad1.position) + ' is at crossroad ' + str(self.crossroad1) + \
+            ' at distance ' + str(self.dist_to_ghost_at_crossroad1) + ' from Pc-Man'
         if (self.dist_to_ghost_at_crossroad1 != None):
-            'at distance ' + str(self.dist_to_ghost_at_crossroad1 - self.dist_to_crossroad1) + '\n'
-        
-        string += \
-        'with the semaphore ' + str(self.semaphore1) + '\n' \
-        'Pac-Man distance to this crossroad is ' + str(self.dist_to_crossroad1)
+            string += \
+            ' at distance ' + str(self.dist_to_ghost_at_crossroad1 - self.dist_to_crossroad1) + ' of crossroad \n' + \
+            'with the semaphore ' + str(self.semaphore1) + '\n' \
+            'Pac-Man distance to this crossroad is ' + str(self.dist_to_crossroad1)
 
         return string
 
