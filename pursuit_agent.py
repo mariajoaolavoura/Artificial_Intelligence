@@ -48,10 +48,14 @@ class PursuitAgent:
         f_moves = []
         for move in possible_moves:
             _, cost, path = move
-            ghosts = [ghost for ghost in self.targets if ghost[0] == path[0].coordinates[0]]
+            ghosts = [ghost for ghost in self.advisor.state['ghosts'] \
+                            if ghost[0] == path[0].coordinates[0]]
             ghost = sorted(ghosts, key=lambda g: g[2])[0]
-            if cost > ghost[2] * 2:
+            # filter distante ghosts
+            if cost > ghost[2] * GHOST_PURSUIT_MULTIPLIER:
                 f_moves += [move]
-                    
+
         # sort
         possible_moves = [move for move in possible_moves if move not in f_moves]
+
+        return possible_moves

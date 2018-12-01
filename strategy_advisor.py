@@ -44,40 +44,6 @@ class StrategyAdvisor():
         self.calculate_semaphores()
     
 
-    # def advise(self):
-    #     """Given the safety of corridors and crossroads, advises a MODE of play
-
-    #     Returns: the advised MODE of play
-    #     """
-        
-    #     logger.debug("########################################################")
-    #     logger.debug("ADVISE()")
-    #     logger.debug("########################################################")
-
-    #     ### Advise on a Mode of play given the previous analysis 
-    #     for ghost in self.state['ghosts']:
-    #         if ghost[1] == True:
-    #             return MODE.PURSUIT
-
-    #     # There is at least one side of pacman with no ghosts in pursuit
-    #     # Eating Mode is advised
-    #     if not self.pacman_info.pursued_from_crossroad0 or not self.pacman_info.pursued_from_crossroad0:
-    #         return MODE.EATING
-
-    #     # All directions from Pac-Man have ghosts closer than the safe distance
-    #     # Semaphores must be evaluated to choose better Mode
-    #     semaphores = [self.pacman_info.semaphore0, self.pacman_info.semaphore1]
-    #     if any([color == SEMAPHORE.GREEN for color in semaphores]):
-    #         return MODE.EATING
-
-    #     elif any([color == SEMAPHORE.YELLOW for color in semaphores]):
-    #         if len(self.state['boost']) > 0:
-    #             return MODE.COUNTER
-    #         return MODE.FLIGHT
-    #     else:
-    #         return MODE.EATING
-
-        
 
     #* COMPLETE - NOT TESTED
     def set_corridors_safety(self):
@@ -133,7 +99,7 @@ class StrategyAdvisor():
 
             # calculate trajectory of every ghost towards Pac-Man
             if not ghost_corr == None: # if ghost is not in ghosts_den
-                my_prob = SearchProblem(domain, ghost_corr, ghost, self.pacman_info.corridor, pacman)
+                my_prob = SearchProblem(domain, ghost_corr, ghost, self.pacman_info.corridor, pacman, self.state)
                 my_tree = SearchTree(my_prob, "a*")
                 #TODO if result is None, program breaks
                 _, cost, path = my_tree.search()

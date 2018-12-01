@@ -1,4 +1,5 @@
 from abc import ABC, abstractmethod
+from game_consts import *
 from corridor import Corridor
 # DOMAIN ----------------------------------------------------------------------
 # -----------------------------------------------------------------------------
@@ -51,7 +52,7 @@ class SearchProblem:
         """
 
     
-    def __init__(self, domain, initial_corr, initial_pos, goal_corr, goal_pos):
+    def __init__(self, domain, initial_corr, initial_pos, goal_corr, goal_pos, state):
         
         self.domain = domain.copy() #so we can change the domain as we wish
         self.initial_corr = initial_corr
@@ -60,11 +61,6 @@ class SearchProblem:
         self.goal_pos = goal_pos
         self.debug = False and (goal_pos == [0,15] or goal_pos == [1,15])
 
-        # Divide initial/goal corridor in 3 corridors:
-        # root/goal = corridor with just 1 coordinate, the initial/goal position
-        # sub_init0/sub_goal0 = corridor with all coordinates from 0 to the initial/goal position's index (inclusive)
-        # sub_init1/sub_goal1 = corridor with all coordinates from the initial/goal position's index to end (inclusive)
-        # so it can be possible to calculate the path for the 2 ends of initial/goal corridor
 
         if self.debug:
             print("Analizing path: " + str(initial_pos) + " --> " + str(goal_pos))    
@@ -72,6 +68,10 @@ class SearchProblem:
         self.initial = Corridor([self.initial_pos])
         
         sub_init0, sub_init1 = self.initial_corr.sub_corridors(self.initial_pos)
+        if any([g[0] in sub_init0.coordinates for g in state['ghosts'] if g[1] == False]):
+            sub_init0.safe = CORRIDOR_SAFETY.UNSAFE
+        if any([g[0] in sub_init1.coordinates for g in state['ghosts'] if g[1] == False]):
+            sub_init1.safe = CORRIDOR_SAFETY.UNSAFE
         self.update_domain(self.initial_corr, self.initial, sub_init0, sub_init1)
 
         if goal_pos in sub_init0.coordinates:
@@ -82,6 +82,10 @@ class SearchProblem:
         self.goal = Corridor([self.goal_pos])
 
         sub_goal0, sub_goal1 = self.goal_corr.sub_corridors(self.goal_pos)
+        if any([g[0] in sub_goal0.coordinates for g in state['ghosts'] if g[1] == False]):
+            sub_goal0.safe = CORRIDOR_SAFETY.UNSAFE
+        if any([g[0] in sub_goal1.coordinates for g in state['ghosts'] if g[1] == False]):
+            sub_goal1.safe = CORRIDOR_SAFETY.UNSAFE
         self.update_domain(self.goal_corr, self.goal, sub_goal0, sub_goal1)
 
 
@@ -218,14 +222,11 @@ class SearchTree:
     def __init__(self, problem, strategy='a*'): 
         
         self.problem = problem
-
-        heur = abs(self.problem.goal.ends[0][0]-self.problem.initial.ends[0][0]) + abs(self.problem.goal.ends[0][1]-self.problem.initial.ends[0][1]) #self.problem.domain.heuristic(self.problem.initial, self.problem.initial, self.problem.goal) 
-              
+        heur = abs(self.problem.goal.ends[0][0]-self.problem.initial.ends[0][0]) \
+               + abs(self.problem.goal.ends[0][1]-self.problem.initial.ends[0][1])   
         root = SearchNode(self.problem.initial, parent=None, cost=self.problem.initial.length, heuristic=heur)
-        
         self.open_nodes = [root]
         self.strategy = strategy
-        #self.lvisited = []
         self.lvisited = [root.state]
         self.cost = None
 
