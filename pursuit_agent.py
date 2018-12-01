@@ -19,7 +19,7 @@ class PursuitAgent:
         self.targets = targets
 
 
-    def pursuit(self, advisor, targets):
+    def pursue(self):
         """Calculates the next position of the next move, when in pursuit mode.
         In Counter Mode, Pac-Man is must focus on eating zombie ghosts.
         
@@ -33,7 +33,7 @@ class PursuitAgent:
         
             #only get the positions
 
-        eating_agent = EatingAgent(advisor, targets)
+        eating_agent = EatingAgent(self.advisor, self.targets)
         possible_moves = eating_agent.eat()
 
     #--------------------------------------------------------------------------#

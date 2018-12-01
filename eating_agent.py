@@ -63,7 +63,7 @@ class EatingAgent:
         # if there are no possible moves, everything is eaten
         print(len(possible_moves))
         if len(possible_moves) == 0:
-            return (possible_moves, False)
+            return possible_moves
 
     #-------------------------------------------------------------------------#
     # SORT MOVES BY COST
@@ -156,9 +156,9 @@ class EatingAgent:
         option = possible_moves[0]
         #print('closer ghosts: ' + str(BEST_GHOST_DIST_TO_ENERGY) + 'cost: ' + str(option[1]))
         if BEST_GHOST_DIST_TO_ENERGY < option[1]:
-            return possible_moves, False
+            return possible_moves
 
     #--------------------------------------------------------------------------#
     # RETURN OPTIONS
     #TODO verificar semaforos quando energia está ao virar da esquina e há ghosts
-        return possible_moves, True
+        return possible_moves

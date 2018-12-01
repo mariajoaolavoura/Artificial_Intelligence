@@ -3,7 +3,8 @@ from static_analysis import Static_Analysis
 from pathways import Pathways
 from tree_search import SearchTree, SearchProblem
 from corridor import Corridor
-from strategy_advisor import Strategy_Advisor
+from strategy_advisor import StrategyAdvisor
+from strategy_analyst import StrategyAnalyst
 import logging
 import sys
 import json
@@ -15,9 +16,6 @@ from eating_agent import *
 from counter_agent import *
 from pursuit_agent import *
 from flight_agent import *
-
-
-
 
 
 #$ PORT=80 SERVER=pacman-aulas.ws.atnog.av.it.pt python client.py
@@ -138,8 +136,19 @@ class Pacman_agent():
         
 
         # get advice on the next move
-        strategy_advisor = Strategy_Advisor(self.map_, state)
-        mode_handler = strategy_advisor.advise()
+        strategy_advisor = StrategyAdvisor(self.map_, state)
+        #mode_handler = strategy_advisor.advise()
+
+        # first always try to eat
+        strategy_analyst = StrategyAnalyst(strategy_advisor)
+        next_move = strategy_analyst.decide()
+
+        # if next_move is None, then the game is over
+        if next_move == None:
+            return 'w' # w is for WIN
+        
+        
+        
         if mode_handler == MODE.PURSUIT:
             mode_handler = MODE.EATING
         next_move = self.mode(mode_handler, strategy_advisor, state)

@@ -11,20 +11,32 @@ s()
 	python server.py --ghosts $ghosts
 }
 
+#####
+
 v()
 {	
 	python viewer.py
 }
 
+#####
+
 c()
 {	
-	python client.py
+	python student.py
 }
+s()
+{
+	c
+}
+
+#####
 
 ks()
 {
 	fuser 8000/tcp
 }
+
+#####
 
 k()
 {
@@ -35,7 +47,7 @@ k()
 ##################
 
 # chama o server online e joga
-sr()
+os()
 {
 	ghosts=$1
 
@@ -47,7 +59,7 @@ sr()
 }
 
 # viewer para servidor online
-vr()
+ov()
 {
-	python viewer.py --server pacman-aulas.ws.atnog.av.it.pt --port 80 --scale 2
+	python viewer.py --server pacman-aulas.ws.atnog.av.it.pt --port 80 --scale
 }

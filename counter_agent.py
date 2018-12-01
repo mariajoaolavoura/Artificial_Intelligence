@@ -17,7 +17,7 @@ class CounterAgent:
         self.targets = targets
 
 
-    def counter(self, advisor, targets):
+    def counter(self):
         """Calculates the path to all accessible targets using EatingAgent class,
         and sorts them by cost and safety which are sorted according to the
         following criteria:
@@ -29,7 +29,7 @@ class CounterAgent:
         A list of paths to every accessible target, ordered by cost and safety
         """
 
-        eating_agent = EatingAgent(advisor, targets)
+        eating_agent = EatingAgent(self.advisor, self.targets)
         possible_moves = eating_agent.eat()
         return possible_moves
 

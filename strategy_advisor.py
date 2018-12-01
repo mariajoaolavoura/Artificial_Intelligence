@@ -22,7 +22,7 @@ logging.basicConfig(format=logger_format, filename='advisor.log', filemode='w', 
 # how to use: logger.typeOfMessage('message')
 logger = setup_logger('strategy_advisor', 'strategy_advisor.log')
 
-class Strategy_Advisor():
+class StrategyAdvisor():
     """Analyses corridors safety (if contains ghost or not) and crossroads
     semaphores. Advises on a strategy for the given conditions.
 
@@ -44,38 +44,38 @@ class Strategy_Advisor():
         self.calculate_semaphores()
     
 
-    def advise(self):
-        """Given the safety of corridors and crossroads, advises a MODE of play
+    # def advise(self):
+    #     """Given the safety of corridors and crossroads, advises a MODE of play
 
-        Returns: the advised MODE of play
-        """
+    #     Returns: the advised MODE of play
+    #     """
         
-        logger.debug("########################################################")
-        logger.debug("ADVISE()")
-        logger.debug("########################################################")
+    #     logger.debug("########################################################")
+    #     logger.debug("ADVISE()")
+    #     logger.debug("########################################################")
 
-        ### Advise on a Mode of play given the previous analysis 
-        for ghost in self.state['ghosts']:
-            if ghost[1] == True:
-                return MODE.PURSUIT
+    #     ### Advise on a Mode of play given the previous analysis 
+    #     for ghost in self.state['ghosts']:
+    #         if ghost[1] == True:
+    #             return MODE.PURSUIT
 
-        # There is at least one side of pacman with no ghosts in pursuit
-        # Eating Mode is advised
-        if not self.pacman_info.pursued_from_crossroad0 or not self.pacman_info.pursued_from_crossroad0:
-            return MODE.EATING
+    #     # There is at least one side of pacman with no ghosts in pursuit
+    #     # Eating Mode is advised
+    #     if not self.pacman_info.pursued_from_crossroad0 or not self.pacman_info.pursued_from_crossroad0:
+    #         return MODE.EATING
 
-        # All directions from Pac-Man have ghosts closer than the safe distance
-        # Semaphores must be evaluated to choose better Mode
-        semaphores = [self.pacman_info.semaphore0, self.pacman_info.semaphore1]
-        if any([color == SEMAPHORE.GREEN for color in semaphores]):
-            return MODE.EATING
+    #     # All directions from Pac-Man have ghosts closer than the safe distance
+    #     # Semaphores must be evaluated to choose better Mode
+    #     semaphores = [self.pacman_info.semaphore0, self.pacman_info.semaphore1]
+    #     if any([color == SEMAPHORE.GREEN for color in semaphores]):
+    #         return MODE.EATING
 
-        elif any([color == SEMAPHORE.YELLOW for color in semaphores]):
-            if len(self.state['boost']) > 0:
-                return MODE.COUNTER
-            return MODE.FLIGHT
-        else:
-            return MODE.EATING
+    #     elif any([color == SEMAPHORE.YELLOW for color in semaphores]):
+    #         if len(self.state['boost']) > 0:
+    #             return MODE.COUNTER
+    #         return MODE.FLIGHT
+    #     else:
+    #         return MODE.EATING
 
         
 
