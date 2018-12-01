@@ -37,7 +37,7 @@ class EatingAgent:
 
     #--------------------------------------------------------------------------#
     # CREATE DOMAIN AND AUXILIAR VARIABLES
-        pacman = advisor.pacman_info
+        pacman = self.advisor.pacman_info
         acessible_energies = []
         possible_moves = []
         domain = Pathways(self.advisor.map_.corr_adjacencies, self.targets)
@@ -49,7 +49,7 @@ class EatingAgent:
             
             # find this energy corridor
             corridor = None
-            for corr in self.map_.corridors:
+            for corr in self.advisor.map_.corridors:
                 if energy in corr.coordinates:
                     corridor = corr
                     break
@@ -65,7 +65,6 @@ class EatingAgent:
                 possible_moves += [search_results]
 
         # if there are no possible moves, everything is eaten
-        print(len(possible_moves))
         if len(possible_moves) == 0:
             return possible_moves
 

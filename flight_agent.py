@@ -9,7 +9,7 @@ class FlightAgent:
         self.targets = targets
 
 
-    def flee(self, advisor):
+    def flee(self):
         '''
         args:
         advisor: instance of Strategy_Advisor

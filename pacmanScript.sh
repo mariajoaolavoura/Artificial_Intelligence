@@ -24,10 +24,6 @@ c()
 {	
 	python student.py
 }
-s()
-{
-	c
-}
 
 #####
 

@@ -143,61 +143,26 @@ class Pacman_agent():
         strategy_analyst = StrategyAnalyst(strategy_advisor)
         next_move = strategy_analyst.decide()
 
-        # if next_move is None, then the game is over
+        # if next_move is None, the the game is finished
         if next_move == None:
-            return 'w' # w is for WIN
-        
-        
-        
-        if mode_handler == MODE.PURSUIT:
-            mode_handler = MODE.EATING
-        next_move = self.mode(mode_handler, strategy_advisor, state)
-
-
-
-        # if advice is not specific, adjustments to the strategy may be needed
-        if (next_move[1] == False): # correct when methods are implemented
-
-            if mode_handler == MODE.EATING:
-                if len(state['energy']) == 0:
-                    return 'w' # w for win
-                else:
-                    if (len(state['boost']) > 0):
-                        self.mode(MODE.COUNTER, strategy_advisor, state)
-                    else:
-                        self.mode(MODE.COUNTER, strategy_advisor, state)
-            elif mode_handler == MODE.PURSUIT:
-                zombie_ghosts = [ghost for ghost in self.advisor.state['ghosts'] if ghost[1]]
-                next_move = self.mode(MODE.EATING, strategy_advisor, state)
-            elif mode_handler == MODE.COUNTER:
-                pass
-            elif mode_handler == MODE.FLIGHT:
-                pass
-            else: # GARBAGE CODE
-                strategy_adjuster = Strategy_Adjuster()
-                mode_handler = strategy_adjuster.adjustStrategy()
-                next_move = self.mode(mode_handler, state)
-        
-        # calculate and return the key
-        # if (next_move == [5,23] or next_move == [6,7]):
-        #     print("KEY IS " + str(self.calculate_key(state['pacman'], next_move)))
+            sys.exit(0)
 
         # logger.debug("KEY IS " + str(self.calculate_key(state['pacman'], next_move)) + "\n\n")
-        return self.calculate_key(state['pacman'], next_move[0][0][0])
+        return self.calculate_key(state['pacman'], next_move)
 
 
 
-    def mode(self, mode_handler, advisor, state):
-        if mode_handler != MODE.EATING:
-            print(mode_handler)
-        if mode_handler == MODE.EATING:
-            return  eating_agent(advisor=advisor, state=state, targets=(state['energy'] + state['boost']))
-        elif mode_handler == MODE.FLIGHT:
-            return  self.flight_agent(advisor)
-        elif mode_handler == MODE.PURSUIT:
-            return self.pursuit_agent_through_eating(advisor, state)
-        else: # next_move == MODE.COUNTER
-            return self.counter_agent(advisor, state)
+    # def mode(self, mode_handler, advisor, state):
+    #     if mode_handler != MODE.EATING:
+    #         print(mode_handler)
+    #     if mode_handler == MODE.EATING:
+    #         return  eating_agent(advisor=advisor, state=state, targets=(state['energy'] + state['boost']))
+    #     elif mode_handler == MODE.FLIGHT:
+    #         return  self.flight_agent(advisor)
+    #     elif mode_handler == MODE.PURSUIT:
+    #         return self.pursuit_agent_through_eating(advisor, state)
+    #     else: # next_move == MODE.COUNTER
+    #         return self.counter_agent(advisor, state)
         
 
 
