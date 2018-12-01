@@ -31,7 +31,13 @@ class PursuitAgent:
         The [x,y] position of the next_move
         """
         
-            #only get the positions
+    #--------------------------------------------------------------------------#
+    # IN CASE THERE ARE NO TARGETS TO SEARCH FOR
+        if self.targets == []:
+            return None
+
+    #--------------------------------------------------------------------------#
+    # CALL EATING AGENT FOR AN INITIAL COMMON SEARCH AND RESULTS SORT
 
         eating_agent = EatingAgent(self.advisor, self.targets)
         possible_moves = eating_agent.eat()
@@ -42,19 +48,10 @@ class PursuitAgent:
         f_moves = []
         for move in possible_moves:
             _, cost, path = move
-            ghosts = [ghost for ghost in targets if ghost[0] == path[0].coordinates[0]]
+            ghosts = [ghost for ghost in self.targets if ghost[0] == path[0].coordinates[0]]
             ghost = sorted(ghosts, key=lambda g: g[2])[0]
             if cost > ghost[2] * 2:
                 f_moves += [move]
                     
         # sort
         possible_moves = [move for move in possible_moves if move not in f_moves]
-
-    #--------------------------------------------------------------------------#
-    # IF THERE ARE NO POSSIBLE MOVES, RETURN NONE
-
-        if possible_moves == []:
-            return possible_moves, False
-        return possible_moves, True
-                
-

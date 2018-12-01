@@ -20,6 +20,14 @@ class FlightAgent:
                 self.calculate_pacman_corridor()
                 self.ghosts_info = self.calculate_ghosts_info()
         '''
+
+    #--------------------------------------------------------------------------#
+    # IN CASE THERE ARE NO TARGETS TO SEARCH FOR
+        if self.targets == []:
+            return None
+
+    #--------------------------------------------------------------------------#
+    # 
                 
         pac_info = advisor.pacman_info
         pac_crossroads = pac_info.crossroads

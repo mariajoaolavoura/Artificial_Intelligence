@@ -31,8 +31,12 @@ class EatingAgent:
         """
 
     #--------------------------------------------------------------------------#
+    # IN CASE THERE ARE NO TARGETS TO SEARCH FOR
+        if self.targets == []:
+            return None
+
+    #--------------------------------------------------------------------------#
     # CREATE DOMAIN AND AUXILIAR VARIABLES
-    #TODO verificar semaforos quando energia está ao virar da esquina e há ghosts
         pacman = advisor.pacman_info
         acessible_energies = []
         possible_moves = []
@@ -160,5 +164,4 @@ class EatingAgent:
 
     #--------------------------------------------------------------------------#
     # RETURN OPTIONS
-    #TODO verificar semaforos quando energia está ao virar da esquina e há ghosts
         return possible_moves

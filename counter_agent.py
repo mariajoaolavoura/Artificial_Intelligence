@@ -29,9 +29,21 @@ class CounterAgent:
         A list of paths to every accessible target, ordered by cost and safety
         """
 
+    #--------------------------------------------------------------------------#
+    # IN CASE THERE ARE NO TARGETS TO SEARCH FOR
+        if self.targets == []:
+            return None
+
+    #--------------------------------------------------------------------------#
+    # 
+
         eating_agent = EatingAgent(self.advisor, self.targets)
         possible_moves = eating_agent.eat()
         return possible_moves
+
+
+
+
 
 
     #     boosts = state['boost']
