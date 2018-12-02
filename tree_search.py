@@ -184,10 +184,8 @@ class SearchProblem:
 
     
     def goal_test(self, state):
-        #state=corridor
-        #print("state = " + str(state))
-        #print("self.goal = " + str(self.goal))
-        return state.coordinates == self.goal.coordinates
+        return all([ coord in self.goal.coordinates for coord in state.coordinates])
+        
         
 
 # NODE ------------------------------------------------------------------------
@@ -266,13 +264,15 @@ class SearchTree:
                 print("self.problem.goal_test(node.state) = " + str(self.problem.goal_test(node.state)))
             if self.problem.goal_test(node.state):
                 self.cost = node.cost
+                #print('found goal with cost ' + str(self.cost))
                 if node.parent != None:
+                    
                     #print("node.state = " + str(node.state))
                     #print("node.parent.state = " + str(node.parent.state))
                     if node.parent.state.ends[0] in node.state.ends:
-                        #print("RETURNED ---> SOMETHING")
+                        #print("RETURNED ---> SOMETHING1")
                         return node.parent.state.coordinates[1], self.cost, self.get_path(node)
-                        #print("RETURNED ---> SOMETHING")
+                        #print("RETURNED ---> SOMETHING2")
                     elif node.parent.state.ends[1] in node.state.ends:
                         return node.parent.state.coordinates[node.parent.state.length], self.cost, self.get_path(node)
                 #print("RETURNED ---> NONE")
@@ -298,7 +298,7 @@ class SearchTree:
                 else:
                     # calculate cost of next node
                     cost = node.cost + self.problem.domain.cost(node.state, action)
-                    if (debug): 
+                    if (debug):
                         print("cost = " + str(cost))
                     # calculate heuristic of next node
                     heuristic = self.problem.domain.heuristic(curr_state=node.state, \

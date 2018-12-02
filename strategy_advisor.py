@@ -98,13 +98,14 @@ class StrategyAdvisor():
                         break
 
             # calculate trajectory of every ghost towards Pac-Man
-            if not ghost_corr == None: # if ghost is not in ghosts_den
+            if ghost_corr != None: # if ghost is not in ghosts_den
                 my_prob = SearchProblem(domain, ghost_corr, ghost, \
                                         self.pacman_info.corridor, pacman, \
                                         self.map_, self.state)
                 my_tree = SearchTree(my_prob, "a*")
                 #TODO if result is None, program breaks
                 _, cost, path = my_tree.search()
+                print(str(ghost) + ' -> ' + str(cost) + ' -> ' + str(path))
             else:
                 continue
 
