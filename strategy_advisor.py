@@ -87,7 +87,7 @@ class StrategyAdvisor():
         pacman = self.pacman_info.position
         pac_corridor = self.pacman_info.corridor
         ghosts_info = []
-
+        print('\n --------------- ')
         for [ghost,zombie,timeout] in non_zombie_ghosts: # non zombie ghosts
             # get the corridor the ghost is in to give as argument in search
             ghost_corr = None
@@ -105,6 +105,7 @@ class StrategyAdvisor():
                 my_tree = SearchTree(my_prob, "a*")
                 #TODO if result is None, program breaks
                 _, cost, path = my_tree.search()
+               
                 print(str(ghost) + ' -> ' + str(cost) + ' -> ' + str(path))
             else:
                 continue
@@ -188,9 +189,9 @@ class StrategyAdvisor():
             #print(str(cross) + ', ' + str(frozenset(pacman.crossroad0)))
             if cross == frozenset(pacman.crossroad0):
                 self.pacman_info.ghost_at_crossroad0 = semaphores[cross]
-                #print('ADVISOR: ' + str(semaphores[cross]))
+                print('ADVISOR: ' + str(semaphores[cross]))
                 dist_to_end = pacman.dist_to_crossroad0
-                pacman.dist_to_ghost_at_crossroad0 = semaphores[cross].dist_to_crossroad
+                pacman.dist_to_ghost_at_crossroad0 = semaphores[cross].dist_to_pacman
                 if semaphores[cross].crossroad_to_pacman == pacman.crossroad0:
                     pacman.crossroad0_is_blocked = semaphores[cross].dist_to_crossroad <= 0
                     pacman.pursued_from_crossroad0 = semaphores[cross].dist_to_pacman < SAFE_DIST_TO_GHOST
@@ -204,9 +205,9 @@ class StrategyAdvisor():
 
             else:
                 self.pacman_info.ghost_at_crossroad1 = semaphores[cross]
-                #print('ADVISOR: ' + str(semaphores[cross]))
+                print('ADVISOR: ' + str(semaphores[cross]))
                 dist_to_end = pacman.dist_to_crossroad1
-                pacman.dist_to_ghost_at_crossroad1 = semaphores[cross].dist_to_crossroad
+                pacman.dist_to_ghost_at_crossroad1 = semaphores[cross].dist_to_pacman
                 if semaphores[cross].crossroad_to_pacman == pacman.crossroad1:
                     pacman.crossroad1_is_blocked = semaphores[cross].dist_to_crossroad <= 0
                     pacman.pursued_from_crossroad1 = semaphores[cross].dist_to_pacman < SAFE_DIST_TO_GHOST
