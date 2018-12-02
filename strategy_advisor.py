@@ -83,7 +83,7 @@ class StrategyAdvisor():
 
         non_zombie_ghosts = [ghost for ghost in self.state['ghosts'] if ghost[1] == False]
 
-        domain = Pathways(self.map_.corr_adjacencies, non_zombie_ghosts)
+        domain = Pathways(self.map_.corr_adjacencies, non_zombie_ghosts, self.map_)
         pacman = self.pacman_info.position
         pac_corridor = self.pacman_info.corridor
         ghosts_info = []
@@ -99,7 +99,9 @@ class StrategyAdvisor():
 
             # calculate trajectory of every ghost towards Pac-Man
             if not ghost_corr == None: # if ghost is not in ghosts_den
-                my_prob = SearchProblem(domain, ghost_corr, ghost, self.pacman_info.corridor, pacman, self.state)
+                my_prob = SearchProblem(domain, ghost_corr, ghost, \
+                                        self.pacman_info.corridor, pacman, \
+                                        self.map_, self.state)
                 my_tree = SearchTree(my_prob, "a*")
                 #TODO if result is None, program breaks
                 _, cost, path = my_tree.search()

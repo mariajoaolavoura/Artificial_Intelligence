@@ -25,13 +25,15 @@ class Static_Analysis():
     """
 
     def __init__(self, map_):
+        self.hor_tunnel_exists = False
+        self.ver_tunnel_exists = False
         self.map_ = map_
         self.pathways = self.create_pathways_list()
         self.crossroads = self.create_crossroads_list(self.pathways)
         self.corridors = self.create_corridors(self.pathways, self.crossroads)
         self.corridors = [ Corridor(corr) for corr in self.corridors ]
         self.corr_adjacencies =self.create_corridor_adjacencies(self.corridors)
-        self.ghosts_den = []
+        self.ghosts_den = []   
         
 
 
@@ -437,27 +439,37 @@ class Static_Analysis():
             
             if tun[0][0] == 0: # end 0, x coordinate
                 o_tun = [tun for tun in tunnels if tun[len(tun)-1][0] == self.map_.hor_tiles-1]
-                connected += o_tun[0] + tun
+                connected += [o_tun[0] + tun]
                 tunnels.remove(o_tun[0])
 
             elif tun[len(tun)-1][0] == self.map_.hor_tiles -1: # end 0, x coordinate
                 o_tun = [tun for tun in tunnels if tun[0][0] == 0]
-                connected += tun + o_tun[0]
+                connected += [tun + o_tun[0]]
                 tunnels.remove(o_tun[0])
 
             elif tun[0][1] == 0: # end 0, x coordinate
                 o_tun = [tun for tun in tunnels if tun[len(tun)-1][1] == self.map_.ver_tiles-1]
-                connected += o_tun[0] + tun
+                connected += [o_tun[0] + tun]
                 tunnels.remove(o_tun[0])
 
             elif tun[len(tun)-1][1] == self.map_.ver_tiles -1: # end 0, x coordinate
                 o_tun = [tun for tun in tunnels if tun[0][1] == 0]
-                connected += tun + o_tun[0]
+                connected += [tun + o_tun[0]]
                 tunnels.remove(o_tun[0])
 
         logger.debug("TUNNELS:\n" + str(connected) + "\n")
         
-        return [connected]
+        for corr in connected:
+            hor = [x for [x,y] in corr]
+            ver = [y for [x,y] in corr]
+            if all([x == hor[0] for x in hor]):
+                self.ver_tunnel_exists = True
+            if all([y == ver[0] for y in ver]):
+                self.hor_tunnel_exists = True
+        
+        logger.debug('TUNNELS EXIST:\n' + str(self.hor_tunnel_exists) + ', ' + str(self.ver_tunnel_exists) + '\n')
+
+        return connected
 
 #------------------------------------------------------------------------------#
 

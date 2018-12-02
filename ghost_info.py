@@ -14,3 +14,10 @@ class Ghost_Info():
 
     def __repr__(self):
         return self.__str__()
+
+    def print(self):
+        string = \
+        'Ghost ' + str(self.position) + ' is at distance ' + str(self.dist_to_pacman) + \
+        ' from Pac-Man and ' + str(self.dist_to_crossroad) + ' from crossroad ' + str(self.crossroad_to_pacman)
+
+        return string

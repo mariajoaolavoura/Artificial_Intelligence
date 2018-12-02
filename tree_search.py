@@ -52,13 +52,15 @@ class SearchProblem:
         """
 
     
-    def __init__(self, domain, initial_corr, initial_pos, goal_corr, goal_pos, state):
+    def __init__(self, domain, initial_corr, initial_pos, goal_corr, goal_pos, map_, state):
         
         self.domain = domain.copy() #so we can change the domain as we wish
         self.initial_corr = initial_corr
         self.initial_pos = initial_pos
         self.goal_corr = goal_corr
         self.goal_pos = goal_pos
+        self.state = state
+        self.map_ = map_
         self.debug = False and (goal_pos == [0,15] or goal_pos == [1,15])
 
 
@@ -224,7 +226,7 @@ class SearchTree:
         self.problem = problem
         heur = abs(self.problem.goal.ends[0][0]-self.problem.initial.ends[0][0]) \
                + abs(self.problem.goal.ends[0][1]-self.problem.initial.ends[0][1])   
-        root = SearchNode(self.problem.initial, parent=None, cost=self.problem.initial.length, heuristic=heur)
+        root = SearchNode(self.problem.initial, parent=None, cost=0, heuristic=heur)
         self.open_nodes = [root]
         self.strategy = strategy
         self.lvisited = [root.state]
@@ -295,11 +297,15 @@ class SearchTree:
                     pass
                 else:
                     # calculate cost of next node
-                    cost = node.cost + 1 + self.problem.domain.cost(node.state, action)
+                    cost = node.cost + self.problem.domain.cost(node.state, action)
                     if (debug): 
                         print("cost = " + str(cost))
                     # calculate heuristic of next node
-                    heuristic = self.problem.domain.heuristic(node.state, new_state, self.problem.goal)
+                    heuristic = self.problem.domain.heuristic(curr_state=node.state, \
+                                                              new_state=new_state, \
+                                                              goal=self.problem.goal, \
+                                                              hor_tunnel=self.problem.map_.hor_tunnel_exists, \
+                                                              ver_tunnel=self.problem.map_.ver_tunnel_exists)
                     if (debug): 
                         print("heuristic = " + str(heuristic))
                     # create new node

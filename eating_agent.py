@@ -41,7 +41,7 @@ class EatingAgent:
         pacman = self.advisor.pacman_info
         acessible_energies = []
         possible_moves = []
-        domain = Pathways(self.advisor.map_.corr_adjacencies, self.targets)
+        domain = Pathways(self.advisor.map_.corr_adjacencies, self.targets, self.advisor.map_)
 
     #--------------------------------------------------------------------------#
     # SEARCH FOR ENERGIES
@@ -56,7 +56,8 @@ class EatingAgent:
                     break
             
             # create problem and search
-            my_prob = SearchProblem(domain, corridor, energy, pacman.corridor, pacman.position, self.advisor.state)
+            my_prob = SearchProblem(domain, corridor, energy, pacman.corridor, \
+                                    pacman.position, self.advisor.map_, self.advisor.state)
             my_tree = SearchTree(my_prob, "a*")
             search_results = my_tree.search()
             
