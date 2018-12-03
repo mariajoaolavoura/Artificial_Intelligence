@@ -16,6 +16,7 @@ class Ghost_Info():
         ghost_intercept_dist = 0
         for corr in self.path:
             if corr.coordinates in pacman_path:
+                print('SIDE INTERCEPT FOUND A CORRIDOR')
                 intercept_corr = corr
                 break
             else:

@@ -215,7 +215,7 @@ async def agent_loop(server_address = "localhost:8000", agent_name="student"):
             # game over (unnecessary for actual play
             if state['lives'] == 0:
                 print("GAME OVER")
-                return
+                sys.exit(0)
             #------------------------------------------------------------------#
 
             
