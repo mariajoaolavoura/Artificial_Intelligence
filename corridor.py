@@ -20,10 +20,10 @@ class Corridor():
         self.safe = CORRIDOR_SAFETY.SAFE
         
     def dist_end0(self, coord):
-        return len(self.coordinates[0:self.coordinates.index(coord)])
+        return len(self.coordinates[:self.coordinates.index(coord)])
 
     def dist_end1(self, coord):
-        return len(self.coordinates[self.coordinates.index(coord):self.length])
+        return len(self.coordinates[self.coordinates.index(coord)+1:])
 
     def dist_end(self, coord, end):
         if end == self.ends[0]:

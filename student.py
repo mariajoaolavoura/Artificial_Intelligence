@@ -149,20 +149,6 @@ class Pacman_agent():
 
         # logger.debug("KEY IS " + str(self.calculate_key(state['pacman'], next_move)) + "\n\n")
         return self.calculate_key(state['pacman'], next_move)
-
-
-
-    # def mode(self, mode_handler, advisor, state):
-    #     if mode_handler != MODE.EATING:
-    #         print(mode_handler)
-    #     if mode_handler == MODE.EATING:
-    #         return  eating_agent(advisor=advisor, state=state, targets=(state['energy'] + state['boost']))
-    #     elif mode_handler == MODE.FLIGHT:
-    #         return  self.flight_agent(advisor)
-    #     elif mode_handler == MODE.PURSUIT:
-    #         return self.pursuit_agent_through_eating(advisor, state)
-    #     else: # next_move == MODE.COUNTER
-    #         return self.counter_agent(advisor, state)
         
 
 

@@ -5,12 +5,14 @@ class Pacman_Info():
 
     def __init__(self, pacman):
         self.position = pacman
+
         self.corridor = None
         self.crossroads = None
         self.crossroad0 = None
         self.crossroad1 = None
         self.dist_to_crossroad0 = None
         self.dist_to_crossroad1 = None
+
         self.semaphore0 = None
         self.semaphore1 = None
         self.dist_to_ghost_at_crossroad0 = None
@@ -27,6 +29,7 @@ class Pacman_Info():
         self.ghost_at_crossroad0 = None
         self.ghost_at_crossroad1 = None
 
+    # called in strategy_advisor, calculate_pacman_corridor()
     def update_corridor(self, corridor):
         self.corridor = corridor
         self.crossroads = corridor.ends
@@ -34,6 +37,9 @@ class Pacman_Info():
         self.crossroad1 = corridor.ends[1]
         self.dist_to_crossroad0 = corridor.dist_end0(self.position)
         self.dist_to_crossroad1 = corridor.dist_end1(self.position)
+        # print("##########################################")
+        # print(str(self.dist_to_crossroad0) + ', ' + str(self.dist_to_crossroad1))
+        # print("##########################################")
 
     def dist_to_crossroad(self, crossroad):
         if crossroad == self.crossroad0:
@@ -79,7 +85,7 @@ class Pacman_Info():
             string += \
             ' at distance ' + str(self.dist_to_ghost_at_crossroad0 - self.dist_to_crossroad0) + ' of crossroad \n' + \
             'with the semaphore ' + str(self.semaphore0) + '\n' + \
-            'Pac-Man distance to this crossroad is ' + str(self.dist_to_crossroad0) + '\n'
+            'Pac-Man distance to this crossroad0 is ' + str(self.dist_to_crossroad0) + '\n'
 
         if self.ghost_at_crossroad1 != None:
             string += \
@@ -89,7 +95,7 @@ class Pacman_Info():
             string += \
             ' at distance ' + str(self.dist_to_ghost_at_crossroad1 - self.dist_to_crossroad1) + ' of crossroad \n' + \
             'with the semaphore ' + str(self.semaphore1) + '\n' \
-            'Pac-Man distance to this crossroad is ' + str(self.dist_to_crossroad1)
+            'Pac-Man distance to this crossroad1 is ' + str(self.dist_to_crossroad1)
 
         return string
 

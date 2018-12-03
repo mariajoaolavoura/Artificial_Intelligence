@@ -41,6 +41,7 @@ class StrategyAdvisor():
         self.pacman_info = Pacman_Info(state['pacman'])
         self.calculate_pacman_corridor()
         self.ghosts_info = self.calculate_ghosts_info()
+        self.zombie_ghosts = []
         self.calculate_semaphores()
     
 
@@ -82,12 +83,13 @@ class StrategyAdvisor():
     def calculate_ghosts_info(self):
 
         non_zombie_ghosts = [ghost for ghost in self.state['ghosts'] if ghost[1] == False]
+        self.zombie_ghosts = [ghost for ghost in self.state['ghosts'] if ghost[1] == True]
 
         domain = Pathways(self.map_.corr_adjacencies, non_zombie_ghosts, self.map_)
         pacman = self.pacman_info.position
         pac_corridor = self.pacman_info.corridor
         ghosts_info = []
-        print('\n --------------- ')
+        #print('\n --------------- ')
         for [ghost,zombie,timeout] in non_zombie_ghosts: # non zombie ghosts
             # get the corridor the ghost is in to give as argument in search
             ghost_corr = None
@@ -105,19 +107,32 @@ class StrategyAdvisor():
                 my_tree = SearchTree(my_prob, "a*")
                 #TODO if result is None, program breaks
                 _, cost, path = my_tree.search()
+                
                
-                print(str(ghost) + ' -> ' + str(cost) + ' -> ' + str(path))
+                #print(str(ghost) + ' -> ' + str(cost) + ' -> ' + str(path))
             else:
                 continue
 
             # the crossroad that the ghost will use to get to Pac-Man
-            crossroad = path[-2].ends[0] if path[-2].ends[0] != pacman else path[-2].ends[1]
+            sub_corr0, sub_corr1 = pac_corridor.sub_corridors(pacman)
+            if ghost in sub_corr0.coordinates:
+                crossroad = pac_corridor.ends[0]
+            elif ghost in sub_corr1.coordinates:
+                crossroad = pac_corridor.ends[1]
+            else:
+                path_coordinates = [c for corr in path for c in corr.coordinates]
+                if pac_corridor.ends[0] in path_coordinates:
+                    crossroad = pac_corridor.ends[0]
+                elif pac_corridor.ends[1] in path_coordinates:
+                    crossroad = pac_corridor.ends[1]
+
+                
 
             # calculate distance of every ghost to Pac-Man crossroads
-            ghost_dist = cost - pac_corridor.dist_end(pacman, crossroad)
+            ghost_dist = cost - self.pacman_info.dist_to_crossroad(crossroad)
 
             # update self.ghosts_info with new attribute of distance_to_pacman
-            ghosts_info += [Ghost_Info(ghost, zombie, timeout, ghost_corr, cost, crossroad, ghost_dist)]
+            ghosts_info += [Ghost_Info(ghost, zombie, timeout, ghost_corr, cost, crossroad, ghost_dist, path)]
 
         return ghosts_info
 
@@ -127,19 +142,25 @@ class StrategyAdvisor():
 
         # Pac-Man position and his corridor (or list of corridors if Pac-Man is in crossroad)
         pacman = (self.state['pacman'])
-        pac_corridor = [ adj for adj in self.map_.corr_adjacencies if pacman in adj[0].coordinates or pacman in adj[1].coordinates ]
-        aux = [ adj[0] for adj in pac_corridor if pacman in adj[0].coordinates ]
-        aux += [ adj[1] for adj in pac_corridor if pacman in adj[1].coordinates ]
-        pac_corridor = list(set(aux))
+        pac_corridors = [ adj for adj in self.map_.corr_adjacencies if pacman in adj[0].coordinates or pacman in adj[1].coordinates ]
+        aux = [ adj[0] for adj in pac_corridors if pacman in adj[0].coordinates ]
+        aux += [ adj[1] for adj in pac_corridors if pacman in adj[1].coordinates ]
+        pac_corridors = list(set(aux))
         logger.debug("PACMAN POSITION:\n" + str(pacman))
-        logger.debug("PACMAN CORRIDORS:\n" + str(pac_corridor))
+        logger.debug("PACMAN CORRIDORS:\n" + str(pac_corridors))
 
         # Pac-Man might be at a crossroad. Choose unsafe corridor if available.
-        for corr in pac_corridor:
+        pac_corridor = None
+        for corr in pac_corridors:
             if corr.safe == CORRIDOR_SAFETY.UNSAFE:
-                pac_corridor = [corr]
+                pac_corridor = corr
                 break
-        self.pacman_info.update_corridor(pac_corridor[0])
+        if pac_corridor == None:
+            for corr in pac_corridors:
+                if pacman in corr.coordinates:
+                    pac_corridor = corr
+                    break
+        self.pacman_info.update_corridor(pac_corridor)
         logger.debug("PACMAN CHOSEN CORRIDOR:\n" + str(pac_corridor))
 
 
@@ -189,7 +210,7 @@ class StrategyAdvisor():
             #print(str(cross) + ', ' + str(frozenset(pacman.crossroad0)))
             if cross == frozenset(pacman.crossroad0):
                 self.pacman_info.ghost_at_crossroad0 = semaphores[cross]
-                print('ADVISOR: ' + str(semaphores[cross]))
+                #print('ADVISOR: ' + str(semaphores[cross]))
                 dist_to_end = pacman.dist_to_crossroad0
                 pacman.dist_to_ghost_at_crossroad0 = semaphores[cross].dist_to_pacman
                 if semaphores[cross].crossroad_to_pacman == pacman.crossroad0:
@@ -205,7 +226,7 @@ class StrategyAdvisor():
 
             else:
                 self.pacman_info.ghost_at_crossroad1 = semaphores[cross]
-                print('ADVISOR: ' + str(semaphores[cross]))
+                #print('ADVISOR: ' + str(semaphores[cross]))
                 dist_to_end = pacman.dist_to_crossroad1
                 pacman.dist_to_ghost_at_crossroad1 = semaphores[cross].dist_to_pacman
                 if semaphores[cross].crossroad_to_pacman == pacman.crossroad1:

@@ -73,7 +73,7 @@ class EatingAgent:
     #-------------------------------------------------------------------------#
     # SORT MOVES BY COST
         possible_moves = sorted(possible_moves,key=lambda res: res[1])
-
+    
     #--------------------------------------------------------------------------#
     # SORT MOVES BY WHERE A GHOST IS BLOCKING THE NEXT CORRIDOR
         f_moves = []

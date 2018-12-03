@@ -26,9 +26,9 @@ class SEMAPHORE(Enum):
 # GLOBAL VARIABLES
 
 # minimum escape margin if pacman is racing towards crossroad against a ghost
-SAFE_DIST_TO_CROSSROAD = 1
+SAFE_DIST_TO_CROSSROAD = 2
 # distance at which ghost probably isn't in pursuit of pacman
-SAFE_DIST_TO_GHOST = 7
+SAFE_DIST_TO_GHOST = 9
 # value from 0 to 1.
 # 0 -> Pac-Man does not pursue the ghots
 # 1 -> Pac-Man pursues ant ghost in maximum range until timeout
