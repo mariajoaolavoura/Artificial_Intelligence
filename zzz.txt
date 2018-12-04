@@ -1,0 +1,831 @@
+pygame 1.9.4
+Hello from the pygame community. https://www.pygame.org/contribute.html
+GOT INTO: MODE.PURSUIT
+GOT INTO: MODE.EATING
+
+Pac-Man is in position [3, 15]
+
+Pac-Man distance to target is: 1
+crossroad: [4, 15]
+ghost at crossroad: None
+valid: no ghost
+EATING MODE IS RETURNING NEXT MOVE: [4, 15]
+GOT INTO: MODE.PURSUIT
+GOT INTO: MODE.EATING
+
+Pac-Man is in position [4, 15]
+
+Pac-Man distance to target is: 1
+crossroad: [4, 15]
+ghost at crossroad: None
+valid: no ghost
+EATING MODE IS RETURNING NEXT MOVE: [4, 14]
+GOT INTO: MODE.PURSUIT
+GOT INTO: MODE.EATING
+
+Pac-Man is in position [4, 14]
+
+Pac-Man distance to target is: 1
+crossroad: None
+ghost at crossroad: None
+valid: no ghost
+EATING MODE IS RETURNING NEXT MOVE: [4, 13]
+GOT INTO: MODE.PURSUIT
+GOT INTO: MODE.EATING
+
+Pac-Man is in position [4, 13]
+
+Pac-Man distance to target is: 1
+crossroad: None
+ghost at crossroad: None
+valid: no ghost
+EATING MODE IS RETURNING NEXT MOVE: [4, 12]
+GOT INTO: MODE.PURSUIT
+GOT INTO: MODE.EATING
+
+Pac-Man is in position [4, 12]
+
+Pac-Man distance to target is: 1
+crossroad: None
+ghost at crossroad: None
+valid: no ghost
+EATING MODE IS RETURNING NEXT MOVE: [4, 11]
+GOT INTO: MODE.PURSUIT
+GOT INTO: MODE.EATING
+
+Pac-Man is in position [4, 11]
+
+Pac-Man distance to target is: 1
+crossroad: [4, 10]
+ghost at crossroad: None
+valid: no ghost
+EATING MODE IS RETURNING NEXT MOVE: [4, 10]
+GOT INTO: MODE.PURSUIT
+GOT INTO: MODE.EATING
+
+Pac-Man is in position [4, 10]
+
+Pac-Man distance to target is: 1
+crossroad: [4, 10]
+ghost at crossroad: None
+valid: no ghost
+EATING MODE IS RETURNING NEXT MOVE: [3, 10]
+GOT INTO: MODE.PURSUIT
+GOT INTO: MODE.EATING
+
+Pac-Man is in position [4, 9]
+
+Pac-Man distance to target is: 1
+crossroad: None
+ghost at crossroad: None
+valid: no ghost
+EATING MODE IS RETURNING NEXT MOVE: [4, 8]
+GOT INTO: MODE.PURSUIT
+GOT INTO: MODE.EATING
+
+Pac-Man is in position [4, 8]
+
+Pac-Man distance to target is: 1
+crossroad: [4, 7]
+ghost at crossroad: None
+valid: no ghost
+EATING MODE IS RETURNING NEXT MOVE: [4, 7]
+GOT INTO: MODE.PURSUIT
+GOT INTO: MODE.EATING
+
+Pac-Man is in position [4, 8]
+
+Pac-Man distance to target is: 1
+crossroad: [4, 7]
+ghost at crossroad: None
+valid: no ghost
+EATING MODE IS RETURNING NEXT MOVE: [4, 7]
+GOT INTO: MODE.PURSUIT
+GOT INTO: MODE.EATING
+
+Pac-Man is in position [4, 8]
+
+Pac-Man distance to target is: 1
+crossroad: [4, 7]
+ghost at crossroad: None
+valid: no ghost
+EATING MODE IS RETURNING NEXT MOVE: [4, 7]
+GOT INTO: MODE.PURSUIT
+GOT INTO: MODE.EATING
+
+Pac-Man is in position [4, 7]
+
+Pac-Man distance to target is: 1
+crossroad: [4, 7]
+ghost at crossroad: None
+valid: no ghost
+EATING MODE IS RETURNING NEXT MOVE: [4, 6]
+GOT INTO: MODE.PURSUIT
+GOT INTO: MODE.EATING
+
+Pac-Man is in position [4, 6]
+
+Pac-Man distance to target is: 1
+crossroad: None
+ghost at crossroad: None
+valid: no ghost
+EATING MODE IS RETURNING NEXT MOVE: [4, 5]
+GOT INTO: MODE.PURSUIT
+GOT INTO: MODE.EATING
+
+Pac-Man is in position [4, 5]
+
+Pac-Man distance to target is: 1
+crossroad: None
+ghost at crossroad: None
+valid: no ghost
+EATING MODE IS RETURNING NEXT MOVE: [4, 4]
+GOT INTO: MODE.PURSUIT
+GOT INTO: MODE.EATING
+
+Pac-Man is in position [4, 4]
+
+Pac-Man distance to target is: 1
+crossroad: None
+ghost at crossroad: None
+valid: no ghost
+EATING MODE IS RETURNING NEXT MOVE: [3, 4]
+GOT INTO: MODE.PURSUIT
+GOT INTO: MODE.EATING
+
+Pac-Man is in position [4, 4]
+
+Pac-Man distance to target is: 1
+crossroad: None
+ghost at crossroad: None
+valid: no ghost
+EATING MODE IS RETURNING NEXT MOVE: [3, 4]
+GOT INTO: MODE.PURSUIT
+GOT INTO: MODE.EATING
+
+Pac-Man is in position [4, 4]
+Ghost [6, 15] is at crossroad [4, 7] at distance 13 from Pc-Man at distance 10 of crossroad 
+with the semaphore SEMAPHORE.GREEN
+Pac-Man distance to this crossroad1 is 3
+Pac-Man distance to target is: 1
+crossroad: None
+ghost at crossroad: None
+Ghost [6, 15] is at distance 13 from Pac-Man and 10 from crossroad [4, 7]
+before condition: 13, 1
+MOVE IS REMAING VALID
+ ------------ 
+
+EATING MODE IS RETURNING NEXT MOVE: [3, 4]
+GOT INTO: MODE.PURSUIT
+GOT INTO: MODE.EATING
+
+Pac-Man is in position [4, 4]
+Ghost [6, 14] is at crossroad [4, 7] at distance 12 from Pc-Man at distance 9 of crossroad 
+with the semaphore SEMAPHORE.GREEN
+Pac-Man distance to this crossroad1 is 3
+Pac-Man distance to target is: 1
+crossroad: None
+ghost at crossroad: None
+Ghost [6, 14] is at distance 12 from Pac-Man and 9 from crossroad [4, 7]
+before condition: 12, 1
+MOVE IS REMAING VALID
+ ------------ 
+
+EATING MODE IS RETURNING NEXT MOVE: [3, 4]
+GOT INTO: MODE.PURSUIT
+GOT INTO: MODE.EATING
+
+Pac-Man is in position [4, 4]
+Ghost [6, 13] is at crossroad [4, 7] at distance 11 from Pc-Man at distance 8 of crossroad 
+with the semaphore SEMAPHORE.GREEN
+Pac-Man distance to this crossroad1 is 3
+Pac-Man distance to target is: 1
+crossroad: None
+ghost at crossroad: None
+Ghost [6, 13] is at distance 11 from Pac-Man and 8 from crossroad [4, 7]
+before condition: 11, 1
+MOVE IS REMAING VALID
+ ------------ 
+
+EATING MODE IS RETURNING NEXT MOVE: [3, 4]
+GOT INTO: MODE.PURSUIT
+GOT INTO: MODE.EATING
+
+Pac-Man is in position [4, 4]
+Ghost [6, 12] is at crossroad [4, 7] at distance 10 from Pc-Man at distance 7 of crossroad 
+with the semaphore SEMAPHORE.GREEN
+Pac-Man distance to this crossroad1 is 3
+Pac-Man distance to target is: 1
+crossroad: None
+ghost at crossroad: None
+Ghost [6, 12] is at distance 10 from Pac-Man and 7 from crossroad [4, 7]
+before condition: 10, 1
+MOVE IS REMAING VALID
+ ------------ 
+
+EATING MODE IS RETURNING NEXT MOVE: [3, 4]
+GOT INTO: MODE.PURSUIT
+GOT INTO: MODE.EATING
+
+Pac-Man is in position [4, 4]
+Ghost [7, 12] is at crossroad [4, 7] at distance 11 from Pc-Man at distance 8 of crossroad 
+with the semaphore SEMAPHORE.GREEN
+Pac-Man distance to this crossroad1 is 3
+Pac-Man distance to target is: 1
+crossroad: None
+ghost at crossroad: None
+Ghost [6, 15] is at distance 13 from Pac-Man and 10 from crossroad [4, 7]
+Ghost [7, 12] is at distance 11 from Pac-Man and 8 from crossroad [4, 7]
+before condition: 11, 1
+MOVE IS REMAING VALID
+ ------------ 
+
+EATING MODE IS RETURNING NEXT MOVE: [3, 4]
+GOT INTO: MODE.PURSUIT
+GOT INTO: MODE.EATING
+
+Pac-Man is in position [4, 4]
+Ghost [6, 14] is at crossroad [4, 7] at distance 12 from Pc-Man at distance 9 of crossroad 
+with the semaphore SEMAPHORE.GREEN
+Pac-Man distance to this crossroad1 is 3
+Pac-Man distance to target is: 1
+crossroad: None
+ghost at crossroad: None
+Ghost [6, 14] is at distance 12 from Pac-Man and 9 from crossroad [4, 7]
+Ghost [8, 12] is at distance 12 from Pac-Man and 9 from crossroad [4, 7]
+before condition: 12, 1
+MOVE IS REMAING VALID
+ ------------ 
+
+EATING MODE IS RETURNING NEXT MOVE: [3, 4]
+GOT INTO: MODE.PURSUIT
+GOT INTO: MODE.EATING
+
+Pac-Man is in position [4, 4]
+Ghost [6, 13] is at crossroad [4, 7] at distance 11 from Pc-Man at distance 8 of crossroad 
+with the semaphore SEMAPHORE.GREEN
+Pac-Man distance to this crossroad1 is 3
+Pac-Man distance to target is: 1
+crossroad: None
+ghost at crossroad: None
+Ghost [6, 13] is at distance 11 from Pac-Man and 8 from crossroad [4, 7]
+Ghost [9, 12] is at distance 13 from Pac-Man and 10 from crossroad [4, 7]
+before condition: 13, 1
+MOVE IS REMAING VALID
+ ------------ 
+
+EATING MODE IS RETURNING NEXT MOVE: [3, 4]
+GOT INTO: MODE.PURSUIT
+GOT INTO: MODE.EATING
+
+Pac-Man is in position [3, 4]
+Ghost [6, 12] is at crossroad [4, 7] at distance 11 from Pc-Man at distance 7 of crossroad 
+with the semaphore SEMAPHORE.GREEN
+Pac-Man distance to this crossroad1 is 4
+Pac-Man distance to target is: 1
+crossroad: [2, 4]
+ghost at crossroad: None
+Ghost [6, 12] is at distance 11 from Pac-Man and 7 from crossroad [4, 7]
+Ghost [10, 12] is at distance 15 from Pac-Man and 11 from crossroad [4, 7]
+before condition: 15, 1
+MOVE IS REMAING VALID
+ ------------ 
+
+EATING MODE IS RETURNING NEXT MOVE: [2, 4]
+GOT INTO: MODE.PURSUIT
+GOT INTO: MODE.EATING
+
+Pac-Man is in position [2, 4]
+Ghost [7, 12] is at crossroad [2, 4] at distance 13 from Pc-Man  at distance 13 of crossroad 
+with the semaphore SEMAPHORE.GREEN
+Pac-Man distance to this crossroad0 is 0
+
+Pac-Man distance to target is: 1
+crossroad: [2, 4]
+ghost at crossroad: ghost([7, 12])
+Ghost [7, 12] is at distance 13 from Pac-Man and 13 from crossroad [2, 4]
+Ghost [11, 12] is at distance 17 from Pac-Man and 17 from crossroad [2, 4]
+before condition: 17, 1
+MOVE IS REMAING VALID
+ ------------ 
+
+EATING MODE IS RETURNING NEXT MOVE: [1, 4]
+GOT INTO: MODE.PURSUIT
+GOT INTO: MODE.EATING
+
+Pac-Man is in position [1, 4]
+Ghost [8, 12] is at crossroad [2, 4] at distance 15 from Pc-Man at distance 14 of crossroad 
+with the semaphore SEMAPHORE.GREEN
+Pac-Man distance to this crossroad1 is 1
+Pac-Man distance to target is: 1
+crossroad: None
+ghost at crossroad: None
+Ghost [8, 12] is at distance 15 from Pac-Man and 14 from crossroad [2, 4]
+Ghost [12, 12] is at distance 19 from Pac-Man and 18 from crossroad [2, 4]
+before condition: 19, 1
+MOVE IS REMAING VALID
+ ------------ 
+
+EATING MODE IS RETURNING NEXT MOVE: [1, 3]
+GOT INTO: MODE.PURSUIT
+GOT INTO: MODE.EATING
+
+Pac-Man is in position [1, 4]
+Ghost [9, 12] is at crossroad [2, 4] at distance 16 from Pc-Man at distance 15 of crossroad 
+with the semaphore SEMAPHORE.GREEN
+Pac-Man distance to this crossroad1 is 1
+Pac-Man distance to target is: 1
+crossroad: None
+ghost at crossroad: None
+Ghost [9, 12] is at distance 16 from Pac-Man and 15 from crossroad [2, 4]
+Ghost [12, 11] is at distance 18 from Pac-Man and 17 from crossroad [2, 4]
+before condition: 18, 1
+MOVE IS REMAING VALID
+ ------------ 
+
+EATING MODE IS RETURNING NEXT MOVE: [1, 3]
+GOT INTO: MODE.PURSUIT
+GOT INTO: MODE.EATING
+
+Pac-Man is in position [1, 4]
+Ghost [10, 12] is at crossroad [2, 4] at distance 17 from Pc-Man at distance 16 of crossroad 
+with the semaphore SEMAPHORE.GREEN
+Pac-Man distance to this crossroad1 is 1
+Pac-Man distance to target is: 1
+crossroad: None
+ghost at crossroad: None
+Ghost [10, 12] is at distance 17 from Pac-Man and 16 from crossroad [2, 4]
+Ghost [12, 10] is at distance 17 from Pac-Man and 16 from crossroad [2, 4]
+before condition: 17, 1
+MOVE IS REMAING VALID
+ ------------ 
+
+EATING MODE IS RETURNING NEXT MOVE: [1, 3]
+GOT INTO: MODE.PURSUIT
+GOT INTO: MODE.EATING
+
+Pac-Man is in position [1, 4]
+Ghost [11, 12] is at crossroad [2, 4] at distance 18 from Pc-Man at distance 17 of crossroad 
+with the semaphore SEMAPHORE.GREEN
+Pac-Man distance to this crossroad1 is 1
+Pac-Man distance to target is: 1
+crossroad: None
+ghost at crossroad: None
+Ghost [11, 12] is at distance 18 from Pac-Man and 17 from crossroad [2, 4]
+Ghost [13, 10] is at distance 18 from Pac-Man and 17 from crossroad [2, 4]
+before condition: 18, 1
+MOVE IS REMAING VALID
+ ------------ 
+
+EATING MODE IS RETURNING NEXT MOVE: [1, 3]
+GOT INTO: MODE.PURSUIT
+GOT INTO: MODE.EATING
+
+Pac-Man is in position [1, 4]
+Ghost [12, 12] is at crossroad [2, 4] at distance 19 from Pc-Man at distance 18 of crossroad 
+with the semaphore SEMAPHORE.GREEN
+Pac-Man distance to this crossroad1 is 1
+Pac-Man distance to target is: 1
+crossroad: None
+ghost at crossroad: None
+Ghost [12, 12] is at distance 19 from Pac-Man and 18 from crossroad [2, 4]
+Ghost [14, 10] is at distance 19 from Pac-Man and 18 from crossroad [2, 4]
+before condition: 19, 1
+MOVE IS REMAING VALID
+ ------------ 
+
+EATING MODE IS RETURNING NEXT MOVE: [1, 3]
+GOT INTO: MODE.PURSUIT
+GOT INTO: MODE.EATING
+
+Pac-Man is in position [1, 3]
+Ghost [12, 11] is at crossroad [2, 4] at distance 19 from Pc-Man at distance 17 of crossroad 
+with the semaphore SEMAPHORE.GREEN
+Pac-Man distance to this crossroad1 is 2
+Pac-Man distance to target is: 1
+crossroad: None
+ghost at crossroad: None
+Ghost [12, 11] is at distance 19 from Pac-Man and 17 from crossroad [2, 4]
+Ghost [15, 10] is at distance 21 from Pac-Man and 19 from crossroad [2, 4]
+before condition: 21, 1
+MOVE IS REMAING VALID
+ ------------ 
+
+EATING MODE IS RETURNING NEXT MOVE: [1, 2]
+GOT INTO: MODE.PURSUIT
+GOT INTO: MODE.EATING
+
+Pac-Man is in position [1, 2]
+Ghost [12, 10] is at crossroad [2, 4] at distance 19 from Pc-Man at distance 16 of crossroad 
+with the semaphore SEMAPHORE.GREEN
+Pac-Man distance to this crossroad1 is 3
+Pac-Man distance to target is: 1
+crossroad: None
+ghost at crossroad: None
+Ghost [12, 10] is at distance 19 from Pac-Man and 16 from crossroad [2, 4]
+Ghost [16, 10] is at distance 23 from Pac-Man and 20 from crossroad [2, 4]
+before condition: 23, 1
+MOVE IS REMAING VALID
+ ------------ 
+
+EATING MODE IS RETURNING NEXT MOVE: [1, 1]
+GOT INTO: MODE.PURSUIT
+GOT INTO: MODE.EATING
+
+Pac-Man is in position [1, 1]
+Ghost [13, 10] is at crossroad [2, 4] at distance 21 from Pc-Man at distance 17 of crossroad 
+with the semaphore SEMAPHORE.GREEN
+Pac-Man distance to this crossroad1 is 4
+Pac-Man distance to target is: 1
+crossroad: None
+ghost at crossroad: None
+Ghost [13, 10] is at distance 21 from Pac-Man and 17 from crossroad [2, 4]
+Ghost [17, 10] is at distance 25 from Pac-Man and 21 from crossroad [2, 4]
+before condition: 25, 1
+MOVE IS REMAING VALID
+ ------------ 
+
+EATING MODE IS RETURNING NEXT MOVE: [2, 1]
+GOT INTO: MODE.PURSUIT
+GOT INTO: MODE.EATING
+
+Pac-Man is in position [2, 1]
+Ghost [14, 10] is at crossroad [8, 1] at distance 21 from Pc-Man  at distance 15 of crossroad 
+with the semaphore SEMAPHORE.GREEN
+Pac-Man distance to this crossroad0 is 6
+
+Pac-Man distance to target is: 1
+crossroad: None
+ghost at crossroad: None
+Ghost [14, 10] is at distance 21 from Pac-Man and 15 from crossroad [8, 1]
+Ghost [17, 9] is at distance 25 from Pac-Man and 19 from crossroad [8, 1]
+before condition: 25, 1
+MOVE IS REMAING VALID
+ ------------ 
+
+EATING MODE IS RETURNING NEXT MOVE: [3, 1]
+GOT INTO: MODE.PURSUIT
+GOT INTO: MODE.EATING
+
+Pac-Man is in position [3, 1]
+Ghost [14, 11] is at crossroad [8, 1] at distance 21 from Pc-Man  at distance 16 of crossroad 
+with the semaphore SEMAPHORE.GREEN
+Pac-Man distance to this crossroad0 is 5
+
+Pac-Man distance to target is: 1
+crossroad: None
+ghost at crossroad: None
+Ghost [14, 11] is at distance 21 from Pac-Man and 16 from crossroad [8, 1]
+Ghost [17, 8] is at distance 23 from Pac-Man and 18 from crossroad [8, 1]
+before condition: 23, 1
+MOVE IS REMAING VALID
+ ------------ 
+
+EATING MODE IS RETURNING NEXT MOVE: [4, 1]
+GOT INTO: MODE.PURSUIT
+GOT INTO: MODE.EATING
+
+Pac-Man is in position [4, 1]
+Ghost [14, 12] is at crossroad [8, 1] at distance 21 from Pc-Man  at distance 17 of crossroad 
+with the semaphore SEMAPHORE.GREEN
+Pac-Man distance to this crossroad0 is 4
+Ghost [6, 15] is at crossroad [2, 4] at distance 22 from Pc-Man at distance 15 of crossroad 
+with the semaphore SEMAPHORE.GREEN
+Pac-Man distance to this crossroad1 is 7
+Pac-Man distance to target is: 1
+crossroad: None
+ghost at crossroad: None
+Ghost [14, 12] is at distance 21 from Pac-Man and 17 from crossroad [8, 1]
+Ghost [6, 15] is at distance 22 from Pac-Man and 15 from crossroad [2, 4]
+Ghost [17, 7] is at distance 21 from Pac-Man and 17 from crossroad [8, 1]
+before condition: 21, 1
+MOVE IS REMAING VALID
+ ------------ 
+
+EATING MODE IS RETURNING NEXT MOVE: [5, 1]
+GOT INTO: MODE.PURSUIT
+GOT INTO: MODE.EATING
+
+Pac-Man is in position [5, 1]
+Ghost [16, 7] is at crossroad [8, 1] at distance 19 from Pc-Man  at distance 16 of crossroad 
+with the semaphore SEMAPHORE.GREEN
+Pac-Man distance to this crossroad0 is 3
+Ghost [5, 15] is at crossroad [2, 4] at distance 22 from Pc-Man at distance 14 of crossroad 
+with the semaphore SEMAPHORE.GREEN
+Pac-Man distance to this crossroad1 is 8
+Pac-Man distance to target is: 1
+crossroad: None
+ghost at crossroad: None
+Ghost [14, 13] is at distance 21 from Pac-Man and 18 from crossroad [8, 1]
+Ghost [5, 15] is at distance 22 from Pac-Man and 14 from crossroad [2, 4]
+Ghost [16, 7] is at distance 19 from Pac-Man and 16 from crossroad [8, 1]
+before condition: 19, 1
+MOVE IS REMAING VALID
+ ------------ 
+
+EATING MODE IS RETURNING NEXT MOVE: [6, 1]
+GOT INTO: MODE.PURSUIT
+GOT INTO: MODE.EATING
+
+Pac-Man is in position [6, 1]
+Ghost [16, 6] is at crossroad [8, 1] at distance 17 from Pc-Man  at distance 15 of crossroad 
+with the semaphore SEMAPHORE.GREEN
+Pac-Man distance to this crossroad0 is 2
+
+Pac-Man distance to target is: 1
+crossroad: None
+ghost at crossroad: None
+Ghost [14, 14] is at distance 21 from Pac-Man and 19 from crossroad [8, 1]
+Ghost [6, 15] is at distance 22 from Pac-Man and 20 from crossroad [8, 1]
+Ghost [16, 6] is at distance 17 from Pac-Man and 15 from crossroad [8, 1]
+before condition: 17, 1
+MOVE IS REMAING VALID
+ ------------ 
+
+EATING MODE IS RETURNING NEXT MOVE: [7, 1]
+GOT INTO: MODE.PURSUIT
+GOT INTO: MODE.EATING
+
+Pac-Man is in position [7, 1]
+Ghost [16, 5] is at crossroad [8, 1] at distance 15 from Pc-Man  at distance 14 of crossroad 
+with the semaphore SEMAPHORE.GREEN
+Pac-Man distance to this crossroad0 is 1
+
+Pac-Man distance to target is: 1
+crossroad: [8, 1]
+ghost at crossroad: ghost([16, 5])
+Ghost [14, 15] is at distance 21 from Pac-Man and 20 from crossroad [8, 1]
+Ghost [6, 16] is at distance 22 from Pac-Man and 21 from crossroad [8, 1]
+Ghost [16, 5] is at distance 15 from Pac-Man and 14 from crossroad [8, 1]
+before condition: 15, 1
+MOVE IS REMAING VALID
+ ------------ 
+
+EATING MODE IS RETURNING NEXT MOVE: [8, 1]
+GOT INTO: MODE.PURSUIT
+GOT INTO: MODE.EATING
+
+Pac-Man is in position [8, 1]
+Ghost [16, 4] is at crossroad [8, 1] at distance 13 from Pc-Man  at distance 13 of crossroad 
+with the semaphore SEMAPHORE.GREEN
+Pac-Man distance to this crossroad0 is 0
+
+Pac-Man distance to target is: 1
+crossroad: [8, 1]
+ghost at crossroad: ghost([16, 4])
+Ghost [13, 15] is at distance 21 from Pac-Man and 21 from crossroad [8, 1]
+Ghost [6, 17] is at distance 22 from Pac-Man and 22 from crossroad [8, 1]
+Ghost [16, 4] is at distance 13 from Pac-Man and 13 from crossroad [8, 1]
+before condition: 13, 1
+MOVE IS REMAING VALID
+ ------------ 
+
+EATING MODE IS RETURNING NEXT MOVE: [8, 2]
+GOT INTO: MODE.PURSUIT
+GOT INTO: MODE.EATING
+
+Pac-Man is in position [8, 2]
+Ghost [15, 4] is at crossroad [8, 1] at distance 15 from Pc-Man  at distance 14 of crossroad 
+with the semaphore SEMAPHORE.GREEN
+Pac-Man distance to this crossroad0 is 1
+Ghost [12, 15] is at crossroad [6, 7] at distance 21 from Pc-Man at distance 14 of crossroad 
+with the semaphore SEMAPHORE.GREEN
+Pac-Man distance to this crossroad1 is 7
+Pac-Man distance to target is: 1
+crossroad: None
+ghost at crossroad: None
+Ghost [12, 15] is at distance 21 from Pac-Man and 14 from crossroad [6, 7]
+Ghost [6, 18] is at distance 22 from Pac-Man and 15 from crossroad [6, 7]
+Ghost [15, 4] is at distance 15 from Pac-Man and 14 from crossroad [8, 1]
+before condition: 15, 1
+MOVE IS REMAING VALID
+ ------------ 
+
+EATING MODE IS RETURNING NEXT MOVE: [8, 3]
+GOT INTO: MODE.PURSUIT
+GOT INTO: MODE.EATING
+
+Pac-Man is in position [8, 3]
+Ghost [14, 4] is at crossroad [6, 7] at distance 17 from Pc-Man at distance 11 of crossroad 
+with the semaphore SEMAPHORE.GREEN
+Pac-Man distance to this crossroad1 is 6
+Pac-Man distance to target is: 1
+crossroad: None
+ghost at crossroad: None
+Ghost [12, 16] is at distance 21 from Pac-Man and 15 from crossroad [6, 7]
+Ghost [6, 19] is at distance 22 from Pac-Man and 16 from crossroad [6, 7]
+Ghost [14, 4] is at distance 17 from Pac-Man and 11 from crossroad [6, 7]
+before condition: 17, 1
+MOVE IS REMAING VALID
+ ------------ 
+
+EATING MODE IS RETURNING NEXT MOVE: [8, 4]
+GOT INTO: MODE.PURSUIT
+GOT INTO: MODE.EATING
+
+Pac-Man is in position [8, 4]
+Ghost [14, 5] is at crossroad [6, 7] at distance 15 from Pc-Man at distance 10 of crossroad 
+with the semaphore SEMAPHORE.GREEN
+Pac-Man distance to this crossroad1 is 5
+Pac-Man distance to target is: 1
+crossroad: None
+ghost at crossroad: None
+Ghost [12, 17] is at distance 21 from Pac-Man and 16 from crossroad [6, 7]
+Ghost [6, 20] is at distance 22 from Pac-Man and 17 from crossroad [6, 7]
+Ghost [14, 5] is at distance 15 from Pac-Man and 10 from crossroad [6, 7]
+before condition: 15, 1
+MOVE IS REMAING VALID
+ ------------ 
+
+EATING MODE IS RETURNING NEXT MOVE: [7, 4]
+GOT INTO: MODE.PURSUIT
+GOT INTO: MODE.EATING
+
+Pac-Man is in position [7, 4]
+Ghost [14, 6] is at crossroad [6, 7] at distance 13 from Pc-Man at distance 9 of crossroad 
+with the semaphore SEMAPHORE.GREEN
+Pac-Man distance to this crossroad1 is 4
+Pac-Man distance to target is: 1
+crossroad: None
+ghost at crossroad: None
+Ghost [12, 18] is at distance 21 from Pac-Man and 17 from crossroad [6, 7]
+Ghost [7, 20] is at distance 22 from Pac-Man and 18 from crossroad [6, 7]
+Ghost [14, 6] is at distance 13 from Pac-Man and 9 from crossroad [6, 7]
+before condition: 13, 1
+MOVE IS REMAING VALID
+ ------------ 
+
+EATING MODE IS RETURNING NEXT MOVE: [6, 4]
+GOT INTO: MODE.PURSUIT
+GOT INTO: MODE.EATING
+
+Pac-Man is in position [6, 4]
+Ghost [14, 7] is at crossroad [6, 7] at distance 11 from Pc-Man at distance 8 of crossroad 
+with the semaphore SEMAPHORE.GREEN
+Pac-Man distance to this crossroad1 is 3
+Pac-Man distance to target is: 1
+crossroad: None
+ghost at crossroad: None
+Ghost [11, 18] is at distance 21 from Pac-Man and 18 from crossroad [6, 7]
+Ghost [8, 20] is at distance 22 from Pac-Man and 19 from crossroad [6, 7]
+Ghost [14, 7] is at distance 11 from Pac-Man and 8 from crossroad [6, 7]
+before condition: 11, 1
+MOVE IS REMAING VALID
+ ------------ 
+
+EATING MODE IS RETURNING NEXT MOVE: [6, 5]
+GOT INTO: MODE.PURSUIT
+GOT INTO: MODE.EATING
+
+Pac-Man is in position [6, 5]
+Ghost [13, 7] is at crossroad [6, 7] at distance 9 from Pc-Man at distance 7 of crossroad 
+with the semaphore SEMAPHORE.GREEN
+Pac-Man distance to this crossroad1 is 2
+Pac-Man distance to target is: 1
+crossroad: None
+ghost at crossroad: None
+Ghost [10, 18] is at distance 21 from Pac-Man and 19 from crossroad [6, 7]
+Ghost [8, 21] is at distance 22 from Pac-Man and 20 from crossroad [6, 7]
+Ghost [13, 7] is at distance 9 from Pac-Man and 7 from crossroad [6, 7]
+before condition: 9, 1
+MOVE IS REMAING VALID
+ ------------ 
+
+EATING MODE IS RETURNING NEXT MOVE: [6, 6]
+GOT INTO: MODE.PURSUIT
+GOT INTO: MODE.EATING
+
+Pac-Man is in position [6, 6]
+Ghost [12, 7] is at crossroad [6, 7] at distance 7 from Pc-Man at distance 6 of crossroad 
+with the semaphore SEMAPHORE.GREEN
+Pac-Man distance to this crossroad1 is 1
+Pac-Man distance to target is: 1
+crossroad: [6, 7]
+ghost at crossroad: ghost([12, 7])
+Ghost [9, 18] is at distance 19 from Pac-Man and 18 from crossroad [6, 7]
+Ghost [8, 22] is at distance 22 from Pac-Man and 21 from crossroad [6, 7]
+Ghost [12, 7] is at distance 7 from Pac-Man and 6 from crossroad [6, 7]
+before condition: 7, 1
+valid: ghost nearby cannot intercept
+EATING MODE IS RETURNING NEXT MOVE: [6, 7]
+GOT INTO: MODE.PURSUIT
+GOT INTO: MODE.EATING
+
+Pac-Man is in position [6, 7]
+Ghost [11, 7] is at crossroad [6, 7] at distance 5 from Pc-Man  at distance 5 of crossroad 
+with the semaphore SEMAPHORE.GREEN
+Pac-Man distance to this crossroad0 is 0
+
+Pac-Man distance to target is: 1
+crossroad: [6, 7]
+ghost at crossroad: ghost([11, 7])
+Ghost [8, 18] is at distance 17 from Pac-Man and 17 from crossroad [6, 7]
+Ghost [8, 23] is at distance 22 from Pac-Man and 22 from crossroad [6, 7]
+Ghost [11, 7] is at distance 5 from Pac-Man and 5 from crossroad [6, 7]
+before condition: 5, 1
+valid: ghost nearby cannot intercept
+EATING MODE IS RETURNING NEXT MOVE: [5, 7]
+GOT INTO: MODE.PURSUIT
+GOT INTO: MODE.EATING
+
+Pac-Man is in position [5, 7]
+Ghost [7, 18] is at crossroad [4, 7] at distance 15 from Pc-Man  at distance 14 of crossroad 
+with the semaphore SEMAPHORE.GREEN
+Pac-Man distance to this crossroad0 is 1
+Ghost [10, 7] is at crossroad [6, 7] at distance 5 from Pc-Man at distance 4 of crossroad 
+with the semaphore SEMAPHORE.GREEN
+Pac-Man distance to this crossroad1 is 1
+Pac-Man distance to target is: 2
+crossroad: [6, 7]
+ghost at crossroad: ghost([10, 7])
+Ghost [7, 18] is at distance 15 from Pac-Man and 14 from crossroad [4, 7]
+Ghost [9, 23] is at distance 22 from Pac-Man and 21 from crossroad [4, 7]
+Ghost [10, 7] is at distance 5 from Pac-Man and 4 from crossroad [6, 7]
+before condition: 5, 2
+valid: ghost nearby cannot intercept
+EATING MODE IS RETURNING NEXT MOVE: [6, 7]
+GOT INTO: MODE.PURSUIT
+GOT INTO: MODE.EATING
+
+Pac-Man is in position [6, 7]
+Ghost [9, 7] is at crossroad [6, 7] at distance 3 from Pc-Man  at distance 3 of crossroad 
+with the semaphore SEMAPHORE.GREEN
+Pac-Man distance to this crossroad0 is 0
+
+Pac-Man distance to target is: 1
+crossroad: [6, 7]
+ghost at crossroad: ghost([9, 7])
+Ghost [6, 18] is at distance 15 from Pac-Man and 15 from crossroad [6, 7]
+Ghost [10, 23] is at distance 24 from Pac-Man and 24 from crossroad [6, 7]
+Ghost [9, 7] is at distance 3 from Pac-Man and 3 from crossroad [6, 7]
+before condition: 3, 1
+valid: ghost nearby cannot intercept
+EATING MODE IS RETURNING NEXT MOVE: [7, 7]
+GOT INTO: MODE.PURSUIT
+GOT INTO: MODE.EATING
+
+Pac-Man is in position [7, 7]
+Ghost [8, 7] is at crossroad [8, 7] at distance 1 from Pc-Man at distance 0 of crossroad 
+with the semaphore SEMAPHORE.RED
+Pac-Man distance to this crossroad1 is 1
+Pac-Man distance to target is: 7
+crossroad: [6, 7]
+ghost at crossroad: None
+Ghost [6, 17] is at distance 13 from Pac-Man and 12 from crossroad [8, 7]
+Ghost [10, 22] is at distance 22 from Pac-Man and 21 from crossroad [8, 7]
+Ghost [8, 7] is at distance 1 from Pac-Man and 0 from crossroad [8, 7]
+before condition: 1, 7
+MOVE IS REMAING VALID
+ ------------ 
+
+EATING MODE IS RETURNING NEXT MOVE: [6, 7]
+GOT INTO: MODE.PURSUIT
+GOT INTO: MODE.EATING
+
+Pac-Man is in position [6, 7]
+Ghost [6, 16] is at crossroad [6, 7] at distance 13 from Pc-Man  at distance 13 of crossroad 
+with the semaphore SEMAPHORE.GREEN
+Pac-Man distance to this crossroad0 is 0
+Ghost [7, 7] is at crossroad [8, 7] at distance 1 from Pc-Man at distance -1 of crossroad 
+with the semaphore SEMAPHORE.RED
+Pac-Man distance to this crossroad1 is 2
+Pac-Man distance to target is: 6
+crossroad: [6, 7]
+ghost at crossroad: ghost([6, 16])
+Ghost [6, 16] is at distance 13 from Pac-Man and 13 from crossroad [6, 7]
+Ghost [10, 21] is at distance 22 from Pac-Man and 22 from crossroad [6, 7]
+Ghost [7, 7] is at distance 1 from Pac-Man and -1 from crossroad [8, 7]
+before condition: 1, 6
+invalid: ghost pursuing from behind and trap ahead
+GOT INTO: MODE.COUNTER
+
+Pac-Man is in position [6, 7]
+Ghost [6, 16] is at crossroad [6, 7] at distance 13 from Pc-Man  at distance 13 of crossroad 
+with the semaphore SEMAPHORE.GREEN
+Pac-Man distance to this crossroad0 is 0
+Ghost [7, 7] is at crossroad [8, 7] at distance 1 from Pc-Man at distance -1 of crossroad 
+with the semaphore SEMAPHORE.RED
+Pac-Man distance to this crossroad1 is 2
+Pac-Man distance to target is: 9
+crossroad: [6, 7]
+ghost at crossroad: ghost([6, 16])
+Ghost [6, 16] is at distance 13 from Pac-Man and 13 from crossroad [6, 7]
+Ghost [10, 21] is at distance 22 from Pac-Man and 22 from crossroad [6, 7]
+Ghost [7, 7] is at distance 1 from Pac-Man and -1 from crossroad [8, 7]
+before condition: 1, 9
+invalid: ghost pursuing from behind and trap ahead
+GOT INTO: MODE.FLIGHT
+2 - blocked from side: [8, 7] goes for [6, 7]which is yellow or green
+MODE.FLIGHT
+
+Pac-Man is in position [6, 7]
+Ghost [6, 16] is at crossroad [6, 7] at distance 13 from Pc-Man  at distance 13 of crossroad 
+with the semaphore SEMAPHORE.GREEN
+Pac-Man distance to this crossroad0 is 0
+Ghost [7, 7] is at crossroad [8, 7] at distance 1 from Pc-Man at distance -1 of crossroad 
+with the semaphore SEMAPHORE.RED
+Pac-Man distance to this crossroad1 is 2
+Ghost [6, 16] is at distance 13 from Pac-Man and 13 from crossroad [6, 7]
+Ghost [10, 21] is at distance 22 from Pac-Man and 22 from crossroad [6, 7]
+Ghost [7, 7] is at distance 1 from Pac-Man and -1 from crossroad [8, 7]
+FLIGHT MODE IS RETURNING NEXT MOVE: None

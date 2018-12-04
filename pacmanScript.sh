@@ -3,12 +3,14 @@
 s()
 {
 	ghosts=$1
+	level=$2
 
 	if [ $# -eq 0 ]; then	
 		ghosts=0
+		level=0
 	fi
 
-	python server.py --ghosts $ghosts
+	python server.py --ghosts $ghosts --level $level
 }
 
 #####

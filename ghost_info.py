@@ -12,28 +12,30 @@ class Ghost_Info():
 
 
     def side_interception(self, pacman_path):
-        intercept_corr = None
+        intercept_coord = None
         ghost_intercept_dist = 0
-        for corr in self.path:
-            if corr.coordinates in pacman_path:
+        path = [c for c in self.path[1].coordinates]
+        pacman_path = [c for corr in pacman_path for c in corr.coordinates]
+        for c in path:
+            if c in pacman_path:
                 print('SIDE INTERCEPT FOUND A CORRIDOR')
-                intercept_corr = corr
+                intercept_coord = c
+                ghost_intercept_dist += 1
                 break
             else:
-                ghost_intercept_dist += corr.cost
+                ghost_intercept_dist += 1
 
-        if intercept_corr == None:
+        if intercept_coord == None:
             return None
 
-        pac_intersept_dist = 0
-        for corr in pacman_path[::-1]:
-            if corr != intercept_corr:
-                pac_intercept_dist += corr.cost
+        pac_intercept_dist = 0
+        for c in pacman_path[::-1]:
+            if c != intercept_coord:
+                pac_intercept_dist += 1
             else:
-                pac_intercept_dist += corr.cost
                 break
-
-        return pac_intersept_dist < ghost_intercept_dist
+        print('pac dist to intersept: ' + str(pac_intercept_dist) + 'ghost dist to intercept: ' + str(ghost_intercept_dist))
+        return pac_intercept_dist < ghost_intercept_dist
 
 
     def __str__(self):

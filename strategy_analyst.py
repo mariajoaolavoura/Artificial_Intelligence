@@ -32,7 +32,7 @@ class StrategyAnalyst():
 
         # ----- if there are zombie ghost nearby, pursuing them is the priority
         mode = MODE.PURSUIT
-
+        print('GOT INTO: ' + str(mode))
         targets = [ghost[0] for ghost in self.advisor.state['ghosts'] if ghost[1] == True]
 
         # verify that zombies ghosts are not in the den, if they are, don't pursue
@@ -43,19 +43,20 @@ class StrategyAnalyst():
             pursuer_possible_moves = pursuer.pursue()
             valid_next_move = self._analyse_best_move(pursuer_possible_moves)
             if valid_next_move:
-                print('valid move from : ' + str(mode))
+                print('PURSUIT MODE IS RETURNING NEXT MOVE: ' + str(pursuer_possible_moves[0][0]))
                 return pursuer_possible_moves[0][0]  
         
 
         # ----- if there are no zombie ghosts, eating energies is the priority
         mode = MODE.EATING
-
+        print('GOT INTO: ' + str(mode))
         targets = self.advisor.state['energy'] + self.advisor.state['boost']
         if targets != []:
             eater = EatingAgent(self.advisor, targets)
             eater_possible_moves = eater.eat()
             valid_next_move = self._analyse_best_move(eater_possible_moves)
             if valid_next_move:
+                print('EATING MODE IS RETURNING NEXT MOVE: ' + str(eater_possible_moves[0][0]))
                 return eater_possible_moves[0][0]
 
 
@@ -69,7 +70,7 @@ class StrategyAnalyst():
             counter_possible_moves = counter.counter()
             valid_next_move = self._analyse_best_move(counter_possible_moves)
             if valid_next_move:
-                print('valid move from: ' + str(mode))
+                print('COUNTER MODE IS RETURNING NEXT MOVE: ' + str(counter_possible_moves[0][0]))
                 return counter_possible_moves[0][0]
 
 
@@ -97,10 +98,14 @@ class StrategyAnalyst():
             # best_moves = sorted(best_moves,key=lambda res: res[1])
 
             # flee to a safe corridor (if possible, one in a best_move path)
+<<<<<<< HEAD
             #print("best_moves = " + str(best_moves))
             #targets = [move[0] for move in best_moves if move != []]
             #print("targets = " + str(targets))
             targets = self.advisor.state['energy']
+=======
+            targets = [move[0] for move in best_moves if move != []]
+>>>>>>> debug (not stable version)
             fleer = FlightAgent(self.advisor, targets)
             next_move = fleer.flee()
 
@@ -131,43 +136,68 @@ class StrategyAnalyst():
         if possible_moves == []:
             return False
 
-        for move in possible_moves:
-            path = move[2]
-            pacman = self.advisor.pacman_info
-            ghost = None
-            # print()
-            # print(pacman)
-            # print(' ------------ \n')
-            # for ghost in self.advisor.ghosts_info:
-            #     print(ghost.print())
+        move = possible_moves[0]
+        path = move[2]
+        pacman = self.advisor.pacman_info
+        ghost = None
+        
 
-            # verify which crossroad is in the path
-            crossroad = None
-            semaphore = None
-            if any([c == pacman.crossroad0 for corr in path for c in corr.coordinates]):
-                crossroad = pacman.crossroad0
-                semaphore = pacman.semaphore0
-                ghost = pacman.ghost_at_crossroad0
-            elif any([c == pacman.crossroad1 for corr in path for c in corr.coordinates]):
-                crossroad = pacman.crossroad1
-                semaphore = pacman.semaphore1
-                ghost = pacman.ghost_at_crossroad1
+        # verify which crossroad is in the path
+        crossroad = None
+        semaphore = None
+        if any([c == pacman.crossroad0 for corr in path for c in corr.coordinates]):
+            crossroad = pacman.crossroad0
+            semaphore = pacman.semaphore0
+            ghost = pacman.ghost_at_crossroad0
+        elif any([c == pacman.crossroad1 for corr in path for c in corr.coordinates]):
+            crossroad = pacman.crossroad1
+            semaphore = pacman.semaphore1
+            ghost = pacman.ghost_at_crossroad1
 
-            if ghost == None:
-                print('valid: no ghost')
-                return True
-            
-            # if semaphore == SEMAPHORE.GREEN:
-            #     print('valid: semaphore is green')
-            #     return True
-             
+        print()
+        print(pacman)
+        print('Pac-Man distance to target is: ' + str(move[1]))
+        print('crossroad: ' + str(crossroad))
+        print('ghost at crossroad: ' + str(ghost))
+        for ghost in self.advisor.ghosts_info:
+            print(ghost.print())
+        
+
+        # There is no ghost reaching pacman at the crossroad
+        if ghost == None:
+            print('valid: no ghost')
+            return True
+        
+        # The ghost is just after the target
+        print('before condition: ' + str(ghost.dist_to_pacman) + ', ' + str(move[1]))
+        if ghost.dist_to_pacman == 2 and move[1] == 1:
+            print('invalid: the ghost is just after the target')
+            return False
+
+        # ghost is in first corridor of path (dangerous)
+        if ghost.position in path[-2].coordinates:
+            print('invalid: ghost in the first corridor of path')
+            return False
+
+        # pacman is being pursued from behind and there is a ghost in the next corridor of path
+        if self.advisor.pacman_info.pursued_from_other_crossroad(crossroad):
+            for c in ghost.corridor.coordinates:
+                if c in path[-2].coordinates:
+                    print('invalid: ghost pursuing from behind and trap ahead')
+                    return False
+        
+        # TODO interception...
+        if self.advisor.pacman_info.pursued_from_crossroad(crossroad):
             if ghost.position not in [c for corr in path for c in corr.coordinates]:
                 if not ghost.side_interception(path):
                     print('valid: ghost nearby cannot intercept')
                     return True
-        
-        print('MOVE IS NOT VALID')
-        return False
+                else:
+                    print('invalid: pacman will be intercepted')
+    
+        print('MOVE IS REMAING VALID')
+        print(' ------------ \n')
+        return True
 
 
     def _get_best_moves_from_agent(self, possible_moves):

@@ -57,6 +57,14 @@ class Pacman_Info():
         else:
             return None
 
+    def pursued_from_other_crossroad(self, crossroad):
+        if crossroad == self.crossroad0:
+            return self.pursued_from_crossroad1
+        elif crossroad == self.crossroad1:
+            return self.pursued_from_crossroad0
+        else:
+            return None
+
     def ghost_at_crossroad(self, crossroad):
         if crossroad == self.crossroad0:
             return self.ghost_at_crossroad0

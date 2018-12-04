@@ -196,12 +196,10 @@ class StrategyAdvisor():
                 semaphores[frozenset(ghost.crossroad_to_pacman)] += [ghost]
 
         # select most dangerous ghost distancies
-        if len(semaphores) == 0: # there are no ghosts, or all are zombie
-            pacman.semaphore0 = SEMAPHORE.GREEN
-            pacman.semaphore1 = SEMAPHORE.GREEN
-        else: # TODO solve temporary solution for when ghosts are in the den, in method above
-            for cross in semaphores:
-                semaphores[cross] = min(semaphores[cross], key=lambda x : x.dist_to_crossroad)
+        pacman.semaphore0 = SEMAPHORE.GREEN
+        pacman.semaphore1 = SEMAPHORE.GREEN
+        for cross in semaphores:
+            semaphores[cross] = min(semaphores[cross], key=lambda x : x.dist_to_crossroad)
 
         # compare distance of Pac-Man and ghosts to crossroads and
         # convert semaphores to colors
@@ -239,7 +237,6 @@ class StrategyAdvisor():
                     pacman.semaphore1 = SEMAPHORE.YELLOW
                 else:
                     pacman.semaphore1 = SEMAPHORE.RED
-
 
 
     def boosts_analyser(self):

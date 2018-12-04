@@ -205,7 +205,7 @@ async def agent_loop(server_address = "localhost:8000", agent_name="student"):
         
         # Create the pacman agent
         pacman = Pacman_agent(Map(game_properties['map']))
-
+        lives = 3
         # play!
         while True:
             #------------------------------------------------------------------#
@@ -217,6 +217,11 @@ async def agent_loop(server_address = "localhost:8000", agent_name="student"):
                 print(state)
                 print("GAME OVER")
                 sys.exit(0)
+
+            if state['lives'] != lives:
+                lives = state['lives']
+                print('\n############\nPACMAN HAS LOST A LIFE\n#############\n')
+                sys.exit(1)
             #------------------------------------------------------------------#
 
             
