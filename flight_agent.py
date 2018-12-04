@@ -32,6 +32,36 @@ class FlightAgent:
         if self.targets == []:
             return None
 
+    # #--------------------------------------------------------------------------#
+    # # SEARCH ALL PATHS FOR ENERGIES
+        
+    #     print("SEARCH ALL PATHS FOR ENERGIES")
+
+    #     pacman = self.advisor.pacman_info
+    #     domain = Pathways(self.advisor.map_.corr_adjacencies, self.targets, self.advisor.map_)
+        
+    #     for energy in self.targets[:1]:
+    #         print("energy = " + str(energy))
+    #         # find this energy corridor
+    #         corridor = None
+    #         for corr in self.advisor.map_.corridors:
+    #             if energy in corr.coordinates:
+    #                 corridor = corr
+    #                 break
+            
+    #         print("corridor = " + str(corridor))
+    #         # create problem and search
+    #         #self, domain, initial_corr, initial_pos, goal_corr, goal_pos, map_, state):
+    #         my_prob = SearchProblem(domain, corridor, energy, pacman.corridor, \
+    #                                 pacman.position, self.advisor.map_, self.advisor.state)
+    #         my_tree = SearchTree(my_prob, "a*")
+    #         search_results = my_tree.all_path_search()
+
+    #         print(search_results)
+    #         print("\n###############################################################")
+    #         print("###############################################################\n\n")
+
+
     #--------------------------------------------------------------------------#
     # 
 
@@ -44,6 +74,8 @@ class FlightAgent:
         all_adjacent_corridors = pac_adj0 + pac_adj1
         all_safe_adjacent_corridors = pac_safe_corr0 + pac_safe_corr1
         all_escape_corridors = escape_corridors0 + escape_corridors1
+
+   
         ########################################################################
         ## PAC CORR UNSAFE #####################################################
         ########################################################################
