@@ -213,7 +213,8 @@ async def agent_loop(server_address = "localhost:8000", agent_name="student"):
             state = json.loads(r) #receive game state
 
             # game over (unnecessary for actual play
-            if state['lives'] == 0:
+            if not 'lives' in state:
+                print(state)
                 print("GAME OVER")
                 sys.exit(0)
             #------------------------------------------------------------------#

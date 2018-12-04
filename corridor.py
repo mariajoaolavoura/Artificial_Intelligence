@@ -61,7 +61,9 @@ class Corridor():
 
     def get_next_coord_to_the_side_of_crossroad(self, initial, crossroad):
         
-        
+        if crossroad == None:
+            return None
+
         initial_index = None
         for i in range(len(self.coordinates)):
             if initial == self.coordinates[i]:

@@ -93,6 +93,7 @@ class StrategyAnalyst():
             # best_moves = sorted(best_moves,key=lambda res: res[1])
 
             # flee to a safe corridor (if possible, one in a best_move path)
+            targets = [c for c in best_moves]
             fleer = FlightAgent(self.advisor, targets)
             next_move = fleer.flee()
 
