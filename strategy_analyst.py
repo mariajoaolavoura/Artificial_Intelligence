@@ -82,10 +82,14 @@ class StrategyAnalyst():
         counter_best_moves = self._get_best_moves_from_agent(counter_possible_moves)
         #best_moves = pursuer_best_moves + eater_best_moves + counter_best_moves
         
+        # print("pursuer_best_moves" + str(pursuer_best_moves))
+        # print("eater_best_moves" + str(eater_best_moves))
+        # print("counter_best_moves" + str(counter_best_moves))
+
         best_moves = []
-        best_moves += self._get_best_moves_from_agent(counter_best_moves)
-        best_moves += self._get_best_moves_from_agent(pursuer_best_moves)
-        best_moves += self._get_best_moves_from_agent(eater_best_moves)
+        best_moves += [self._get_best_moves_from_agent(counter_best_moves)]
+        best_moves += [self._get_best_moves_from_agent(pursuer_best_moves)]
+        best_moves += [self._get_best_moves_from_agent(eater_best_moves)]
 
         if best_moves != []:
             
@@ -93,7 +97,10 @@ class StrategyAnalyst():
             # best_moves = sorted(best_moves,key=lambda res: res[1])
 
             # flee to a safe corridor (if possible, one in a best_move path)
-            targets = [c for c in best_moves]
+            #print("best_moves = " + str(best_moves))
+            #targets = [move[0] for move in best_moves if move != []]
+            #print("targets = " + str(targets))
+            targets = self.advisor.state['energy']
             fleer = FlightAgent(self.advisor, targets)
             next_move = fleer.flee()
 
@@ -173,6 +180,7 @@ class StrategyAnalyst():
         Returns:
         A list with the chosen best moves
         """
+
         if possible_moves == []:
             return []
-        return possible_moves[0]
+        return sorted(possible_moves, key=lambda move: move[1])

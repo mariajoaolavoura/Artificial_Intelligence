@@ -35,33 +35,40 @@ class FlightAgent:
     # #--------------------------------------------------------------------------#
     # # SEARCH ALL PATHS FOR ENERGIES
         
-    #     print("SEARCH ALL PATHS FOR ENERGIES")
+        print("SEARCH ALL PATHS FOR 2 ENERGIES")
 
-    #     pacman = self.advisor.pacman_info
-    #     domain = Pathways(self.advisor.map_.corr_adjacencies, self.targets, self.advisor.map_)
+        pacman = self.advisor.pacman_info
+        domain = Pathways(self.advisor.map_.corr_adjacencies, self.advisor.state['energy'] + self.advisor.state['boost'], self.advisor.map_)
         
-    #     for energy in self.targets[:1]:
-    #         print("energy = " + str(energy))
-    #         # find this energy corridor
-    #         corridor = None
-    #         for corr in self.advisor.map_.corridors:
-    #             if energy in corr.coordinates:
-    #                 corridor = corr
-    #                 break
+        #print("targets = " + str(self.targets))
+
+        all_paths_list = []
+
+        for energy in self.targets[:2]:
+            #print("energy = " + str(energy))
+            # find this energy corridor
+            corridor = None
+            for corr in self.advisor.map_.corridors:
+                if energy in corr.coordinates:
+                    corridor = corr
+                    break
             
-    #         print("corridor = " + str(corridor))
-    #         # create problem and search
-    #         #self, domain, initial_corr, initial_pos, goal_corr, goal_pos, map_, state):
-    #         my_prob = SearchProblem(domain, corridor, energy, pacman.corridor, \
-    #                                 pacman.position, self.advisor.map_, self.advisor.state)
-    #         my_tree = SearchTree(my_prob, "a*")
-    #         search_results = my_tree.all_path_search()
+            #print("corridor = " + str(corridor))
+            # create problem and search
+            #self, domain, initial_corr, initial_pos, goal_corr, goal_pos, map_, state):
+            my_prob = SearchProblem(domain, corridor, energy, pacman.corridor, \
+                                    pacman.position, self.advisor.map_, self.advisor.state)
+            my_tree = SearchTree(my_prob, "a*")
+            search_results = my_tree.all_path_search()
 
-    #         print(search_results)
-    #         print("\n###############################################################")
-    #         print("###############################################################\n\n")
+            # print("search_results = " + str(search_results))
+            # print("\n###############################################################")
+            # print("###############################################################\n\n")
+            all_paths_list += [ (search_results) ]   
 
-
+        # print("-----------------------------------------------------------------")
+        # print(len(all_paths)*10)
+        # print("-----------------------------------------------------------------")
     #--------------------------------------------------------------------------#
     # 
 

@@ -332,12 +332,12 @@ class SearchTree:
     # procurar todos os caminhos para a solucao
     def all_path_search(self):
 
-        debug = True
+        debug = False
 
         #? if debug:
         #?     print("initial position is :" + str(self.problem.initial_pos))
 
-        all_path = []
+        all_paths = []
 
         if (debug):
             print("\n\n###############################################################\n")
@@ -347,7 +347,7 @@ class SearchTree:
             
             node = self.open_nodes.pop()
             
-            self.lvisited += [node.state]
+            #self.lvisited += [node.state]
             
             #? if (debug):
             #?     print("node.state = " + str(node.state))
@@ -356,34 +356,43 @@ class SearchTree:
             #?     print("self.problem.goal_test(node.state) = " + str(self.problem.goal_test(node.state)))
             
             if self.problem.goal_test(node.state):
-                self.cost = node.cost
+                #self.cost = node.cost
                 
                 #?print('found goal with cost ' + str(self.cost))
-                print("found goal")
                 if node.parent != None:
                     
                     #? print("node.state = " + str(node.state))
                     #? print("node.parent.state = " + str(node.parent.state))
                     
+                    
+
                     if node.parent.state.ends[0] in node.state.ends:
-                        print("found goal [0] ---> all_path " + str(all_path))
-                        #*return node.parent.state.coordinates[1], self.cost, self.get_path(node)
-                        all_path += [ (node.parent.state.coordinates[1], self.cost, self.get_path(node)) ]
-                        return all_path
+                        if (debug):
+                            print("found goal [0]")
+                            print("\n###############################################################\n\n")
+            
+                        all_paths += [ (node.parent.state.coordinates[1], self.cost, self.get_path(node)) ]
+                        #return node.parent.state.coordinates[1], self.cost, self.get_path(node)
+                        
 
                     elif node.parent.state.ends[1] in node.state.ends:
-                        print("found goal [1] ---> all_path " + str(all_path))
-                        #*return node.parent.state.coordinates[node.parent.state.length], self.cost, self.get_path(node)
-                        all_path += [ (node.parent.state.coordinates[node.parent.state.length], self.cost, self.get_path(node)) ]
-                        return all_path
+                        if (debug):
+                            print("found goal [1]")
+                            print("\n###############################################################\n\n")
+                        all_paths += [ (node.parent.state.coordinates[node.parent.state.length], self.cost, self.get_path(node)) ]
+                        #return node.parent.state.coordinates[node.parent.state.length], self.cost, self.get_path(node)
+
+                    if len(all_paths) == 10:
+                        if (debug):
+                            print("found goal len==10")
+                            print("\n###############################################################\n\n")           
                 
-                #*return None
-                if len(all_path) == 10:
-                    print("RETURNED ---> len==10")
-                    print("\n#############################################################\n\n")
-                    return all_path
-                
-                return None
+                        return all_paths
+
+                elif (debug):
+                    print("found goal parent None")
+                    print("\n###############################################################\n\n")           
+                    #return None
 
             lnewnodes = []
 
@@ -401,11 +410,11 @@ class SearchTree:
                 #? if (debug): 
                 #?     print("new_state = " + str(new_state))
 
-                #* if new_state in self.lvisited:
-                #*     pass
-                if self.problem.goal_pos in new_state.coordinates:
-                    #if pacman found, does nothing and continue to another iteration
-                    pass
+                #if new_state in self.lvisited:
+                #     pass
+                if self.problem.initial.coordinates == new_state.coordinates:
+                    #if pacman is found, does nothing and continue to another iteration
+                    continue
                 else:
                     # calculate cost of next node
                     cost = node.cost + self.problem.domain.cost(node.state, action)
@@ -432,20 +441,22 @@ class SearchTree:
 
             
 
-            lnewnodes = [ newNode for newNode in lnewnodes \
-                                    if newNode.state not in self.lvisited ]
+            #lnewnodes = [ newNode for newNode in lnewnodes \
+            #                        if newNode.state not in self.lvisited ]
 
             #if (debug):
                 #print("lnewnodes = " + str(lnewnodes))
                 #print("len(open_nodes) = " + str(len(self.open_nodes)))
 
             self.add_to_open(lnewnodes)
-            self.lvisited.extend(node.state for node in lnewnodes)
+            #self.lvisited.extend(node.state for node in lnewnodes)
 
-            
-        print("RETURNED ---> all_path, len<10")
-        print("\n#############################################################\n\n")
-        return all_path
+        if debug:
+            print("return all_paths")
+            print("\n#############################################################\n\n")
+        
+        return all_paths
+        #return None
 
 
 
