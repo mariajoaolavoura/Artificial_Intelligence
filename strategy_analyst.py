@@ -33,6 +33,7 @@ class StrategyAnalyst():
 
         # ----- if there are zombie ghost nearby, pursuing them is the priority
         mode = MODE.PURSUIT
+        print('###################################################')
         print('GOT INTO: ' + str(mode))
         targets = [ghost[0] for ghost in self.advisor.state['ghosts'] if ghost[1] == True]
 
@@ -50,6 +51,7 @@ class StrategyAnalyst():
 
         # ----- if there are no zombie ghosts, eating energies is the priority
         mode = MODE.EATING
+        print('###################################################')
         print('GOT INTO: ' + str(mode))
         targets = self.advisor.state['energy'] + self.advisor.state['boost']
         if targets != []:
@@ -63,6 +65,7 @@ class StrategyAnalyst():
 
         # ----- if no path to energies was valid, Pac-Man tries to counter ghost
         mode = MODE.COUNTER
+        print('###################################################')
         print('GOT INTO: ' + str(mode))
         targets = self.advisor.state['boost']
         # Pac-Man can only counter if there are boost targets
@@ -78,12 +81,16 @@ class StrategyAnalyst():
         # ----- if neither eating or counter moves are valid, Pac-Man tries to
         # ----- flee towards a boost or some energy
         mode = MODE.FLIGHT
+        print('###################################################')
         print('GOT INTO: ' + str(mode))
 
         # get best move from every agent
         pursuer_best_moves = self._get_best_moves_from_agent(pursuer_possible_moves)
+        pursuer_best_moves = sorted(pursuer_best_moves, key=lambda move: move[1])
         eater_best_moves = self._get_best_moves_from_agent(eater_possible_moves)
+        eater_best_moves = sorted(eater_best_moves, key=lambda move: move[1])
         counter_best_moves = self._get_best_moves_from_agent(counter_possible_moves)
+        counter_best_moves = sorted(counter_best_moves, key=lambda move: move[1])
 
         best_moves = []
         best_moves += self._get_best_moves_from_agent(counter_best_moves)
@@ -93,14 +100,17 @@ class StrategyAnalyst():
         if best_moves != []:
             
             print('ANALYST: best_moves is: ')
-            for move in best_moves:
-                print('-> move: ' + str(move[2][0].coordinates[0]) + ' at cost ' + str(move[1]))
+            for m in best_moves:
+                print('-> move: ' + str(m[2][0].coordinates[0]) + ' at cost ' + str(m[1]))
 
             # flee to a safe corridor (if possible, one in a best_move path)
-            targets = [move[2][0].coordinates[0] for move in best_moves if move != []]
+            targets = [(move[2][0].coordinates[0], move[2][-2]) for move in best_moves if move != []]
             print('Flight targets: ' + str(targets))
             fleer = FlightAgent(self.advisor, targets)
             fleer_possible_moves = fleer.flee()
+            for m in fleer_possible_moves:
+                print('-> move: ' + str(m[2][0].coordinates[0]) + ' at cost ' + str(m[1]) + \
+                ' path starts with ' + str(m[2][-2]))
             for move in fleer_possible_moves:
                 print('in flight mode, analysing move: ' + str(move[2][0].coordinates[0]))
                 valid_next_move = self._analyse_best_move([move])
@@ -111,6 +121,7 @@ class StrategyAnalyst():
 
         # ----- if no strategy flight is possible, just flee to first safe position possible
         mode = MODE.PANIC
+        print('###################################################')
         print('GOT INTO: ' + str(mode))
 
         panicker = PanicAgent(self.advisor)

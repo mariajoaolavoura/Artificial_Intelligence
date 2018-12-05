@@ -13,6 +13,8 @@ class Ghost_Info():
 
     def side_interception(self, pacman_path):
         intercept_coord = None
+        print('GHOST_INFO: ghost path[0] is ' + str(self.path[0]))
+        print('GHOST_INFO: ghost path[1] is ' + str(self.path[1]))
         path = [c for c in self.path[1].coordinates]
         print('GHOST_INFO: ghost path of interception is: ' + str(path))
         pacman_path_coords = [c for corr in pacman_path for c in corr.coordinates]

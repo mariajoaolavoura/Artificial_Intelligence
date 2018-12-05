@@ -221,7 +221,7 @@ async def agent_loop(server_address = "localhost:8000", agent_name="student"):
             if state['lives'] != lives:
                 lives = state['lives']
                 print('\n############\nPACMAN HAS LOST A LIFE\n#############\n')
-                #sys.exit(1)
+                sys.exit(1)
             #------------------------------------------------------------------#
 
             

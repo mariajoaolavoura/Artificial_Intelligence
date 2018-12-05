@@ -330,7 +330,7 @@ class SearchTree:
 
 
     # procurar todos os caminhos para a solucao
-    def all_path_search(self):
+    def all_path_search(self, avoid_corridor):
 
         debug = False
 
@@ -363,9 +363,10 @@ class SearchTree:
             for action in self.problem.domain.actions(node.state):
 
                 new_state = self.problem.domain.result(node.state, action)
-
-                if self.problem.initial.coordinates[0] == new_state.coordinates[0]:
-                    #if pacman is found, does nothing and continue to another iteration
+                
+                #if starting point is found, does nothing and continue to another iteration
+                if self.problem.initial.coordinates[0] == new_state.coordinates[0] or \
+                avoid_corridor.coordinates == new_state.coordinates:
                     continue
                 else:
                     cost = node.cost + self.problem.domain.cost(node.state, action)

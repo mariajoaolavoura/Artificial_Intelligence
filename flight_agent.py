@@ -43,17 +43,22 @@ class FlightAgent:
 
         all_paths_list = []
 
+<<<<<<< HEAD
         for energy in self.targets:
+=======
+        for target in self.targets:
+
+>>>>>>> debug
             corridor = None
             for corr in self.advisor.map_.corridors:
-                if energy in corr.coordinates:
+                if target[0] in corr.coordinates:
                     corridor = corr
                     break
             
-            my_prob = SearchProblem(domain, corridor, energy, pacman.corridor, \
-                                    pacman.position, self.advisor.map_, self.advisor.state)
+            my_prob = SearchProblem(domain, pacman.corridor, pacman.position,
+                                    corridor, target[0], self.advisor.map_, self.advisor.state)
             my_tree = SearchTree(my_prob, "a*")
-            search_results = my_tree.all_path_search()
+            search_results = my_tree.all_path_search(target[1])
 
             all_paths_list += [ (search_results) ]   
 

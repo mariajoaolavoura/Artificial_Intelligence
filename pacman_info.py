@@ -91,7 +91,6 @@ class Pacman_Info():
     
     def __str__(self):
         string = \
-        '###################################################\n' + \
         'Pac-Man is in position ' + str(self.position) + '\n'
 
         if self.ghost_at_crossroad0 != None:
