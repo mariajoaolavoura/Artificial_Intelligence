@@ -25,7 +25,7 @@ class Corridor():
     def dist_end1(self, coord):
         return len(self.coordinates[self.coordinates.index(coord)+1:])
 
-    def dist_end(self, coord, end):
+    def dist_to_end(self, coord, end):
         if end == self.ends[0]:
             return self.dist_end0(coord)
         return self.dist_end1(coord)
@@ -87,7 +87,7 @@ class Corridor():
             return None
 
     def __str__(self):
-        return str(self.coordinates)
+        return 'corr<' + str(self.coordinates) + '>'
 
     def __repr__(self):
         return self.__str__()

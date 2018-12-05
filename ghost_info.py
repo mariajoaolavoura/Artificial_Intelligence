@@ -13,29 +13,29 @@ class Ghost_Info():
 
     def side_interception(self, pacman_path):
         intercept_coord = None
-        ghost_intercept_dist = 0
         path = [c for c in self.path[1].coordinates]
-        pacman_path = [c for corr in pacman_path for c in corr.coordinates]
+        print('GHOST_INFO: ghost path of interception is: ' + str(path))
+        pacman_path_coords = [c for corr in pacman_path for c in corr.coordinates]
+        print('GHOST_INFO: pacman path coordinates are: ' + str(pacman_path_coords))
         for c in path:
-            if c in pacman_path:
-                print('SIDE INTERCEPT FOUND A CORRIDOR')
+            if c in pacman_path_coords:
+                found_interception = True
                 intercept_coord = c
-                ghost_intercept_dist += 1
                 break
-            else:
-                ghost_intercept_dist += 1
-
+        ghost_intercept_dist = self.path[1].dist_to_end(self.position, intercept_coord)
+        print('GHOST_INFO: ghost coordinate of interception is: ' + str(intercept_coord))
         if intercept_coord == None:
-            return None
+            return False
 
         pac_intercept_dist = 0
-        for c in pacman_path[::-1]:
-            if c != intercept_coord:
-                pac_intercept_dist += 1
-            else:
+        for corr in pacman_path[::-1]:
+            if intercept_coord in corr.coordinates:
+                pac_intercept_dist += corr.cost
                 break
-        print('pac dist to intersept: ' + str(pac_intercept_dist) + 'ghost dist to intercept: ' + str(ghost_intercept_dist))
-        return pac_intercept_dist < ghost_intercept_dist
+            else:
+                pac_intercept_dist += corr.cost
+        print('GHOST_INFO: pac dist to intersept: ' + str(pac_intercept_dist) + ' ghost dist to intercept: ' + str(ghost_intercept_dist))
+        return pac_intercept_dist >= ghost_intercept_dist
 
 
     def __str__(self):

@@ -80,9 +80,18 @@ class Pacman_Info():
             return self.dist_to_ghost_at_crossroad1
         else:
             return None
+
+    def semaphore(self, crossroad):
+        if crossroad == self.crossroad0:
+            return self.semaphore0
+        elif crossroad == self.crossroad1:
+            return self.semaphore1
+        else:
+            return None
     
     def __str__(self):
         string = \
+        '###################################################\n' + \
         'Pac-Man is in position ' + str(self.position) + '\n'
 
         if self.ghost_at_crossroad0 != None:

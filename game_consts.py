@@ -6,10 +6,11 @@ import logging
 
 # Usage MODE.EATING
 class MODE(Enum):
-    EATING  = 1
-    FLIGHT  = 2
-    PURSUIT = 3
-    COUNTER = 4
+    PURSUIT = 1
+    EATING  = 2
+    COUNTER = 3
+    FLIGHT  = 4
+    PANIC = 5
 
 class CORRIDOR_SAFETY(Enum):
     SAFE   = 1
