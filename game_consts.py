@@ -33,7 +33,7 @@ SAFE_DIST_TO_GHOST = 9
 # value from 0 to 1.
 # 0 -> Pac-Man does not pursue the ghots
 # 1 -> Pac-Man pursues ant ghost in maximum range until timeout
-GHOST_PURSUIT_MULTIPLIER = 0.5
+GHOST_PURSUIT_MULTIPLIER = 0.4
 
 #------------------------------------------------------------------------------#
 # LOGGER 

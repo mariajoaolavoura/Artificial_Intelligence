@@ -250,125 +250,100 @@ class SearchTree:
             print("initial position is :" + str(self.problem.initial_pos))
 
         while self.open_nodes != []:
-            
-            if (debug):
-                print("\n\n###############################################################\n")
-            
+     
             node = self.open_nodes.pop()
-            #self.lvisited += [node.state]
-            if (debug):
-                print("node.state = " + str(node.state))
-                print("self.open_nodes = " + str(self.open_nodes))
-                print("self.lvisited = " + str(self.lvisited))
-                print("self.problem.goal_test(node.state) = " + str(self.problem.goal_test(node.state)))
+
             if self.problem.goal_test(node.state):
                 self.cost = node.cost
-                #print('found goal with cost ' + str(self.cost))
+
                 if node.parent != None:
-                    
-                    #print("node.state = " + str(node.state))
-                    #print("node.parent.state = " + str(node.parent.state))
                     if node.parent.state.ends[0] in node.state.ends:
-                        #print("RETURNED ---> SOMETHING1")
                         return node.parent.state.coordinates[1], self.cost, self.get_path(node)
-                        #print("RETURNED ---> SOMETHING2")
                     elif node.parent.state.ends[1] in node.state.ends:
-                        return node.parent.state.coordinates[node.parent.state.length], self.cost, self.get_path(node)
-                #print("RETURNED ---> NONE")
+                        return node.parent.state.coordinates[-2], self.cost, self.get_path(node)
                 return None
 
             lnewnodes = []
-
-            if (debug):
-                print("node.state = " + str(node.state))
-
             for action in self.problem.domain.actions(node.state):
-                
-                if (debug):
-                    print("action = " + str(action))
 
-                # calculate next state
                 new_state = self.problem.domain.result(node.state, action)
-                if (debug): 
-                    print("new_state = " + str(new_state))
 
                 if new_state in self.lvisited:
                     pass
                 else:
                     # calculate cost of next node
                     cost = node.cost + self.problem.domain.cost(node.state, action)
-                    if (debug):
-                        print("cost = " + str(cost))
                     # calculate heuristic of next node
                     heuristic = self.problem.domain.heuristic(curr_state=node.state, \
                                                               new_state=new_state, \
                                                               goal=self.problem.goal, \
                                                               hor_tunnel=self.problem.map_.hor_tunnel_exists, \
                                                               ver_tunnel=self.problem.map_.ver_tunnel_exists)
-                    if (debug): 
-                        print("heuristic = " + str(heuristic))
                     # create new node
                     new_node = SearchNode(state=new_state, parent=node, cost=cost, heuristic=heuristic)
                     
                     # add new node to list of new nodes
                     lnewnodes += [new_node]
 
-            
-
             lnewnodes = [ newNode for newNode in lnewnodes \
                                     if newNode.state not in self.lvisited ]
 
-            if (debug):
-                print("lnewnodes = " + str(lnewnodes))
-
-                print("\n#############################################################\n\n")
-
             self.add_to_open(lnewnodes)
             self.lvisited.extend(node.state for node in lnewnodes)
-        #print("RETURNED ---> NONE")
+
         return None
 
 
     # procurar todos os caminhos para a solucao
     def all_path_search(self, avoid_corridor):
 
-        debug = False
-
-        #? if debug:
-        #?     print("initial position is :" + str(self.problem.initial_pos))
-
         all_paths = []
-
-        if (debug):
-            print("\n\n###############################################################\n")
-            
-
+        
         while self.open_nodes != []:
-            
+            #print('TREE SEARCH: open nodes: ' + str(self.open_nodes))
             node = self.open_nodes.pop()
-            
+
             if self.problem.goal_test(node.state):
                 if node.parent != None:
-                    if node.parent.state.ends[0] in node.state.ends:
-                        all_paths += [ (node.parent.state.coordinates[1], node.cost, self.get_path(node)) ]
+                    path = self.get_path(node)
+                    if path[1].ends[0] in self.problem.initial.coordinates:
+                        all_paths += [ (path[1].coordinates[1], node.cost, path) ]
+                    
+                    elif path[1].ends[1] in self.problem.initial.coordinates:
+                        all_paths += [ (path[1].coordinates[-2], node.cost, path) ]
 
-                    elif node.parent.state.ends[1] in node.state.ends:
-                        all_paths += [ (node.parent.state.coordinates[node.parent.state.length], node.cost, self.get_path(node)) ]
-
-                    if len(all_paths) == 3:
-                        #print(all_paths)
+                    if len(all_paths) == 1:
+                        #print('TREE SEARCH: returning because number of searches were completed')
                         return sorted(all_paths, key=lambda move: move[1])
 
             lnewnodes = []
             for action in self.problem.domain.actions(node.state):
+                #print('action: ' + str(action))
 
                 new_state = self.problem.domain.result(node.state, action)
+                #print('result: ' + str(new_state))
                 
                 #if starting point is found, does nothing and continue to another iteration
-                if self.problem.initial.coordinates[0] == new_state.coordinates[0] or \
-                avoid_corridor.coordinates == new_state.coordinates:
+                # print('---> ' + str([c in self.problem.initial.coordinates for c in new_state.coordinates]))
+                # print(all([c in self.problem.initial.coordinates for c in new_state.coordinates]))
+                # print('---> ' + str([c in avoid_corridor.coordinates for c in new_state.coordinates]))
+                # print(all([c in avoid_corridor.coordinates for c in new_state.coordinates]))
+                # print('---> ' + str(self.lvisited))
+                # print(new_state in self.lvisited)
+                if all([c in self.problem.initial.coordinates for c in new_state.coordinates]):
+                    print('!!!!!: ' + str(self.problem.initial.coordinates) +', '+str(new_state.coordinates))
+                    print('continue1: ' + str([c in self.problem.initial.coordinates for c in new_state.coordinates]))
+                    continue
+                elif avoid_corridor != []:
+                    if all([c in avoid_corridor.coordinates for c in new_state.coordinates]):
+                        print('!!!!!: ' + str(avoid_corridor.coordinates) +', '+str(new_state.coordinates))
+                        print('continue2: ' + str([c in avoid_corridor.coordinates for c in new_state.coordinates]))
+                        continue
+                elif new_state in self.lvisited:
+                    print('continue3')
                     continue
                 else:
+                    print('continue4')
                     cost = node.cost + self.problem.domain.cost(node.state, action)
                     heuristic = self.problem.domain.heuristic(curr_state=node.state, \
                                                               new_state=new_state, \
@@ -379,9 +354,12 @@ class SearchTree:
                     new_node = SearchNode(state=new_state, parent=node, cost=cost, heuristic=heuristic)
                     # add new node to list of new nodes
                     lnewnodes += [new_node]
+                    lnewnodes = [ newNode for newNode in lnewnodes \
+                                    if newNode.state not in self.lvisited ]
 
             self.add_to_open(lnewnodes)
-        
+            self.lvisited.extend(node.state for node in lnewnodes)
+        #print('TREE SEARCH: returning because open nodes is empty')
         return sorted(all_paths, key=lambda move: move[1])
 
 

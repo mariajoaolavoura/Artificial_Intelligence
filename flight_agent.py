@@ -7,12 +7,7 @@ class FlightAgent:
     def __init__(self, advisor, targets):
         self.advisor = advisor
         self.targets = targets
-        self.pac_info = advisor.pacman_info
-        self.pacman = advisor.pacman_info.position
-        self.crossroad0 = advisor.pacman_info.crossroad0
-        self.crossroad1 = advisor.pacman_info.crossroad1
-        self.semaphore0 = advisor.pacman_info.semaphore0
-        self.semaphore1 = advisor.pacman_info.semaphore1
+        self.pacman = advisor.pacman_info
 
 
     def flee(self):
@@ -44,7 +39,7 @@ class FlightAgent:
         all_paths_list = []
 
         for target in self.targets:
-
+            print('FLIGHT AGENT: analysing target: ' + str(target))
             corridor = None
             for corr in self.advisor.map_.corridors:
                 if target[0] in corr.coordinates:
@@ -55,8 +50,9 @@ class FlightAgent:
                                     corridor, target[0], self.advisor.map_, self.advisor.state)
             my_tree = SearchTree(my_prob, "a*")
             search_results = my_tree.all_path_search(target[1])
-
-            all_paths_list += [ (search_results) ]   
+  
+            print('FLIGHT AGENT: result is: ' + str(search_results))
+            all_paths_list += [search_results]   
 
         return [move for possible_moves in all_paths_list for move in possible_moves]
     #--------------------------------------------------------------------------#

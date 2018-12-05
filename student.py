@@ -211,10 +211,17 @@ async def agent_loop(server_address = "localhost:8000", agent_name="student"):
         # play!
         while True:
             #------------------------------------------------------------------#
+<<<<<<< HEAD
             # for debug purposes : times
+=======
+
+>>>>>>> debug and improvements. flight is not working
             r = await websocket.recv()
             start = time()      # saved on key_times.log
             state = json.loads(r) #receive game state
+
+            # for debug purposes : times
+            start = time()      # saved on key_times.log
 
             # # game over (unnecessary for actual play
             # if not 'lives' in state:
@@ -225,7 +232,9 @@ async def agent_loop(server_address = "localhost:8000", agent_name="student"):
             if state['lives'] != lives:
                 lives = state['lives']
                 print('\n############\nPACMAN HAS LOST A LIFE\n#############\n')
-                sys.exit(1)
+                stop0 = time()
+                print('Last move time: ' + str((stop0-start) * 1000))
+                #sys.exit(1)
             
             #------------------------------------------------------------------#
             # for debug purposes (save scores and stress testing)
@@ -254,7 +263,8 @@ async def agent_loop(server_address = "localhost:8000", agent_name="student"):
             #print(state)
             # get next move from pacman agent
             key = pacman.get_next_move(state)
-
+            stop1 = time()
+            print('Last move time: ' + str((stop1-start) * 1000))
             
            
 
