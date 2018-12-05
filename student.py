@@ -262,7 +262,7 @@ async def agent_loop(server_address = "localhost:8000", agent_name="student"):
 
             # debug purposes (time)
             stop = time()
-            time_logger.debug(str((stop-start) * 1000))
+            time_logger.debug(str(state['step']) + " " + str(key) + "-> " + str((stop-start) * 1000))
 
             #------------------------------------------------------------------#
 
