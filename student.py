@@ -212,9 +212,8 @@ async def agent_loop(server_address = "localhost:8000", agent_name="student"):
         while True:
             #------------------------------------------------------------------#
             # for debug purposes : times
-            start = time()      # saved on key_times.log
-
             r = await websocket.recv()
+            start = time()      # saved on key_times.log
             state = json.loads(r) #receive game state
 
             # # game over (unnecessary for actual play
@@ -257,11 +256,13 @@ async def agent_loop(server_address = "localhost:8000", agent_name="student"):
             key = pacman.get_next_move(state)
 
             
+           
+
             #-send new key-----------------------------------------------------#
             await websocket.send(json.dumps({"cmd": "key", "key": key}))
 
             # debug purposes (time)
-            stop = time()
+            stop = time()            
             time_logger.debug(str(state['step']) + " " + str(key) + "-> " + str((stop-start) * 1000))
 
             #------------------------------------------------------------------#
