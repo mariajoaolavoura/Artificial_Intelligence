@@ -43,12 +43,8 @@ class FlightAgent:
 
         all_paths_list = []
 
-<<<<<<< HEAD
-        for energy in self.targets:
-=======
         for target in self.targets:
 
->>>>>>> debug
             corridor = None
             for corr in self.advisor.map_.corridors:
                 if target[0] in corr.coordinates:
