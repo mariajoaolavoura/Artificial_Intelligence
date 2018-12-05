@@ -44,7 +44,6 @@ class FlightAgent:
         all_paths_list = []
 
         for energy in self.targets:
-
             corridor = None
             for corr in self.advisor.map_.corridors:
                 if energy in corr.coordinates:
