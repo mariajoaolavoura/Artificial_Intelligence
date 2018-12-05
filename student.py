@@ -16,7 +16,7 @@ from eating_agent import *
 from counter_agent import *
 from pursuit_agent import *
 from flight_agent import *
-
+from time import time
 
 #$ PORT=80 SERVER=pacman-aulas.ws.atnog.av.it.pt python client.py
 # to kill server: fuser 8000/tcp
@@ -26,6 +26,8 @@ from flight_agent import *
 # possible messages: debug, info, warning, error, critical 
 # how to use: logger.typeOfMessage('message')
 logger = setup_logger('student', 'student.log')
+time_logger = setup_logger('key_times', 'key_times.log', format='%(message)s\n')
+time_logger.debug("TIMES IN MILISECONDS (*1000)")
 
 # for debug purposes
 debug = True
@@ -209,22 +211,47 @@ async def agent_loop(server_address = "localhost:8000", agent_name="student"):
         # play!
         while True:
             #------------------------------------------------------------------#
+            # for debug purposes : times
+            start = time()      # saved on key_times.log
+
             r = await websocket.recv()
             state = json.loads(r) #receive game state
 
-            # game over (unnecessary for actual play
-            if not 'lives' in state:
-                print(state)
-                print("GAME OVER")
-                sys.exit(0)
+            # # game over (unnecessary for actual play
+            # if not 'lives' in state:
+            #     print(state)
+            #     print("GAME OVER")
+            #     sys.exit(0)
 
             if state['lives'] != lives:
                 lives = state['lives']
                 print('\n############\nPACMAN HAS LOST A LIFE\n#############\n')
                 sys.exit(1)
-            #------------------------------------------------------------------#
-
             
+            #------------------------------------------------------------------#
+            # for debug purposes (save scores and stress testing)
+            
+            # create apropriated logger based on ghosts and level
+            if game_properties['ghosts'] == []:
+                name = 'scores_empty.log'
+            else:
+                name = 'scores_ghosts_level' + str(game_properties['ghosts_level']) + '.log'
+
+            score_logger = setup_logger('scores', name, mode='a', format='%(message)s\n')
+
+            # game won (ended)
+            if state['energy'] == [] and state['boost'] == []:
+                sys.stderr.write("\n\033[92mGAME ENDED. SCORE IS " + str(state['score']) + "\033[0m")
+                score_logger.debug(str(state['score']))
+                return
+
+            # game lost (no more lives)
+            if not state['lives']:
+                sys.stderr.write("\n\033[91mGAME OVER. SCORE IS " + str(state['score'])  + "\033[0m")
+                score_logger.debug(str(state['score']))
+                return
+
+            #------------------------------------------------------------------#
             #print(state)
             # get next move from pacman agent
             key = pacman.get_next_move(state)
@@ -232,6 +259,11 @@ async def agent_loop(server_address = "localhost:8000", agent_name="student"):
             
             #-send new key-----------------------------------------------------#
             await websocket.send(json.dumps({"cmd": "key", "key": key}))
+
+            # debug purposes (time)
+            stop = time()
+            time_logger.debug(str((stop-start) * 1000))
+
             #------------------------------------------------------------------#
 
 loop = asyncio.get_event_loop()

@@ -41,14 +41,14 @@ GHOST_PURSUIT_MULTIPLIER = 0.5
 # https://stackoverflow.com/questions/11232230/logging-to-two-files-with-different-settings)
 
 
-def setup_logger(name, log_file, level=logging.DEBUG):
+def setup_logger(name, log_file, level=logging.DEBUG, mode='w', format='[%(lineno)s - %(funcName)20s() - %(levelname)s] %(message)s\n'):
     """Function setup as many loggers as you want"""
 
     # currently writing over the logger file, change filemode to a to append
-    handler = logging.FileHandler(log_file, mode='w')        
+    handler = logging.FileHandler(log_file, mode)        
     
     # '%(levelname)s:\t%(message)' # simpler format
-    format = logging.Formatter('[%(lineno)s - %(funcName)20s() - %(levelname)s] %(message)s\n')
+    format = logging.Formatter(format)
     handler.setFormatter(format)
 
     logger = logging.getLogger(name)
