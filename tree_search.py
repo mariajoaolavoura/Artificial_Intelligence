@@ -317,8 +317,9 @@ class SearchTree:
                         return sorted(all_paths, key=lambda move: move[1])
 
             lnewnodes = []
+            print('TREE SEARCH actions: ' + str(self.problem.domain.actions(node.state)))
             for action in self.problem.domain.actions(node.state):
-                #print('action: ' + str(action))
+                print('action: ' + str(action))
 
                 new_state = self.problem.domain.result(node.state, action)
                 #print('result: ' + str(new_state))
@@ -342,20 +343,20 @@ class SearchTree:
                 elif new_state in self.lvisited:
                     print('continue3')
                     continue
-                else:
-                    print('continue4')
-                    cost = node.cost + self.problem.domain.cost(node.state, action)
-                    heuristic = self.problem.domain.heuristic(curr_state=node.state, \
-                                                              new_state=new_state, \
-                                                              goal=self.problem.goal, \
-                                                              hor_tunnel=self.problem.map_.hor_tunnel_exists, \
-                                                              ver_tunnel=self.problem.map_.ver_tunnel_exists)
-                    # create new node
-                    new_node = SearchNode(state=new_state, parent=node, cost=cost, heuristic=heuristic)
-                    # add new node to list of new nodes
-                    lnewnodes += [new_node]
-                    lnewnodes = [ newNode for newNode in lnewnodes \
-                                    if newNode.state not in self.lvisited ]
+                
+                print('continue4')
+                cost = node.cost + self.problem.domain.cost(node.state, action)
+                heuristic = self.problem.domain.heuristic(curr_state=node.state, \
+                                                            new_state=new_state, \
+                                                            goal=self.problem.goal, \
+                                                            hor_tunnel=self.problem.map_.hor_tunnel_exists, \
+                                                            ver_tunnel=self.problem.map_.ver_tunnel_exists)
+                # create new node
+                new_node = SearchNode(state=new_state, parent=node, cost=cost, heuristic=heuristic)
+                # add new node to list of new nodes
+                lnewnodes += [new_node]
+                lnewnodes = [ newNode for newNode in lnewnodes \
+                                if newNode.state not in self.lvisited ]
 
             self.add_to_open(lnewnodes)
             self.lvisited.extend(node.state for node in lnewnodes)
