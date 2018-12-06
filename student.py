@@ -211,11 +211,7 @@ async def agent_loop(server_address = "localhost:8000", agent_name="student"):
         # play!
         while True:
             #------------------------------------------------------------------#
-<<<<<<< HEAD
             # for debug purposes : times
-=======
-
->>>>>>> debug and improvements. flight is not working
             r = await websocket.recv()
             start = time()      # saved on key_times.log
             state = json.loads(r) #receive game state
