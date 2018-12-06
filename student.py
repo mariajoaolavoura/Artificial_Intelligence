@@ -229,7 +229,7 @@ async def agent_loop(server_address = "localhost:8000", agent_name="student"):
                 print('\n############\nPACMAN HAS LOST A LIFE\n#############\n')
                 stop0 = time()
                 print('Last move time: ' + str((stop0-start) * 1000))
-                sys.exit(1)
+                #sys.exit(1)
             
             #------------------------------------------------------------------#
             # for debug purposes (save scores and stress testing)

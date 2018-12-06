@@ -62,11 +62,11 @@ class StrategyAnalyst():
         # counter (if not possible, try eating)
         if ghosts_in_pursuit >= 2:
             
-            next_move = self._try_counter()
+            next_move = self._try_counter(surrounded_counter=True)
             if next_move != None:
                 return next_move
         
-            next_move = self._try_eating()
+            next_move = self._try_eating(surrounded_eating=True)
             if next_move != None:
                 return next_move
 
@@ -245,18 +245,22 @@ class StrategyAnalyst():
 
                     if pacman.ghost_at_crossroad(crossroad).is_coord_in_path(corr.get_other_end(crossroad)):
                         
-                        # logger.debug('ANALYST: corr ' + str(corr))
-                        # logger.debug('ANALYST: corr.get_other_end(crossroad) ' + str(corr.get_other_end(crossroad)))
-                        # logger.debug('ANALYST: next_move_dist_to_end ' + str(corr.dist_to_end(next_move, corr.get_other_end(crossroad))))
+                        print('ANALYST: corr ' + str(corr))
+                        print('ANALYST: corr.get_other_end(crossroad) ' + str(corr.get_other_end(crossroad)))
+                        print('ANALYST: next_move_dist_to_end ' + str(corr.dist_to_end(next_move, corr.get_other_end(crossroad))))
                         next_move_dist_to_end = corr.dist_to_end(next_move, corr.get_other_end(crossroad))
-                        # logger.debug('ANALYST: pacman.dist_to_ghost_at_crossroad(crossroad) ' + str(pacman.dist_to_ghost_at_crossroad(crossroad)))
-                        # logger.debug('ANALYST: corr.cost ' + str(corr.cost))
-                        # logger.debug('ANALYST: other_ghost_dist_to_end ' + str(pacman.dist_to_ghost_at_crossroad(crossroad) - corr.cost))
+                        print('ANALYST: pacman.dist_to_ghost_at_crossroad(crossroad) ' + str(pacman.dist_to_ghost_at_crossroad(crossroad)))
+                        print('ANALYST: corr.cost ' + str(corr.cost))
+                        print('ANALYST: other_ghost_dist_to_end ' + str(pacman.dist_to_ghost_at_crossroad(crossroad) - corr.cost))
                         other_ghost_dist_to_end = pacman.dist_to_ghost_at_crossroad(crossroad) - corr.cost
-                        if next_move_dist_to_end >= other_ghost_dist_to_end:
+                        if next_move_dist_to_end >= other_ghost_dist_to_end-1:
                             print('invalid: next crossroad is safe but pacman will be trapped')
                             self.trap_avoid_corridor = corr
                             return False
+
+                    elif pacman.ghost_at_crossroad(crossroad).position in corr.coordinates:
+                        print('invalid: next crossroad is safe but pacman will be trapped (ghost inside next corr)')
+                        return False
 
     
         print('MOVE IS REMAING VALID')
@@ -297,20 +301,20 @@ class StrategyAnalyst():
                 return self.pursuer_possible_moves[0][0]
         return None
 
-    def _try_eating(self):
+    def _try_eating(self, surrounded_eating=False):
         print('###################################################')
         print('GOT INTO: ' + str(MODE.EATING))
         targets = self.advisor.state['energy'] + self.advisor.state['boost']
         if targets != []:
             eater = EatingAgent(self.advisor, targets)
             self.eater_possible_moves = eater.eat()
-            valid_next_move = self._analyse_best_move(self.eater_possible_moves)
+            valid_next_move = self._analyse_best_move(self.eater_possible_moves, flight=False, surrounded_eating=surrounded_eating)
             if valid_next_move:
                 print('EATING MODE IS RETURNING NEXT MOVE: ' + str(self.eater_possible_moves[0][0]))
                 return self.eater_possible_moves[0][0]
         return None
     
-    def _try_counter(self):
+    def _try_counter(self, surrounded_counter=False):
         print('###################################################')
         print('GOT INTO: ' + str(MODE.COUNTER))
         targets = self.advisor.state['boost']
@@ -318,7 +322,7 @@ class StrategyAnalyst():
         if targets != []:
             counter = CounterAgent(self.advisor, targets)
             self.counter_possible_moves = counter.counter()
-            valid_next_move = self._analyse_best_move(self.counter_possible_moves)
+            valid_next_move = self._analyse_best_move(self.counter_possible_moves, flight=False, surrounded_eating= surrounded_counter)
             if valid_next_move:
                 print('COUNTER MODE IS RETURNING NEXT MOVE: ' + str(self.counter_possible_moves[0][0]))
                 return self.counter_possible_moves[0][0]

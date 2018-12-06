@@ -160,9 +160,10 @@ class StrategyAdvisor():
         # Pac-Man might be at a crossroad. Choose unsafe corridor if available.
         pac_corridor = None
         for corr in pac_corridors:
-            if corr.safe == CORRIDOR_SAFETY.UNSAFE:
-                pac_corridor = corr
-                break
+            for ghost in [ghost for ghost in self.state['ghosts'] if ghost[1] == False]:
+                if ghost[0] in corr.coordinates:
+                    pac_corridor = corr
+                    break
         if pac_corridor == None:
             pac_corridor = pac_corridors[0]
         self.pacman_info.update_corridor(pac_corridor)

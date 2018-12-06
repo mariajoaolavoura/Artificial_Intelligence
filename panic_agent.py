@@ -138,45 +138,43 @@ class PanicAgent:
 
     def calc_adj_and_safe(self, crossroad, avoid_corridor):
 
+        aux = []
         adj_corrs = []
-        adj_corrs += [cA for [cA, cB] in self.advisor.map_.corr_adjacencies if crossroad in cA.ends]
-        adj_corrs += [cB for [cA, cB] in self.advisor.map_.corr_adjacencies if crossroad in cB.ends]
+        safe_corrs = []
+        aux += [cA for [cA, cB] in self.advisor.map_.corr_adjacencies if crossroad in cA.ends]
+        aux += [cB for [cA, cB] in self.advisor.map_.corr_adjacencies if crossroad in cB.ends]
         print('#################################')
         print('#################################')
         #remove pacman corridor
-        adj_corrs = [c for c in adj_corrs if c != self.pac_info.corridor]
-        adj_corrs = list(set(adj_corrs))
+        aux = [c for c in aux if c != self.pac_info.corridor]
+        aux = list(set(aux))
 
         # set corridors as unsafe
-        for ghost in [ghost for ghost in self.advisor.state['ghosts'] if ghost[1] == False]:
-            for corr in adj_corrs:
+        for corr in aux:
+            ghost_in_corr = False
+            for ghost in [ghost for ghost in self.advisor.state['ghosts'] if ghost[1] == False]:
                 if ghost[0] in corr.coordinates:
-                    corr.safe = CORRIDOR_SAFETY.UNSAFE
-                else:
-                    corr.safe = CORRIDOR_SAFETY.SAFE
+                    ghost_in_corr = True
+                    print('@@@@: ghost ' + str(ghost[0]) + 'in corr ' + str(corr))
+            
+            if not ghost_in_corr:
+                safe_corrs += [corr]
+            adj_corrs += [corr]
 
         print('PANIC: calculating adjacent corridors ' + str(adj_corrs))
         if avoid_corridor != None:
             adj_corrs = [c for c in adj_corrs if c != avoid_corridor]
+            safe_corrs = [c for c in safe_corrs if c != avoid_corridor]
             print('#################################')
             print('#################################')
             print('PANIC: avoid corridor is ' + str(avoid_corridor))
             print('PANIC: filtered avoid corridor from adjacent corridors ' + str(adj_corrs))
             print('#################################')
             print('#################################')
-        # aux = []
-        # for c in adj_corrs:
-        #     for coord in c.coordinates:
-        #         if coord not in self.pac_info.corridor.coordinates: 
-        #             aux += [c]
-        #             break
-        for c in adj_corrs:
-            print('--> safe ' + str(c) + ', ' + str(c.safe))
-        # adj = aux
-        safe = [c for c in adj_corrs if c.safe == CORRIDOR_SAFETY.SAFE]
-        print('PANIC: calculating adjacent SAFE corridors ' + str(safe))
 
-        return adj_corrs, safe
+        print('PANIC: calculating adjacent SAFE corridors ' + str(safe_corrs))
+
+        return adj_corrs, safe_corrs
                 
 
     def calc_next_coord(self, pacman, crossroad, next_corridor):
