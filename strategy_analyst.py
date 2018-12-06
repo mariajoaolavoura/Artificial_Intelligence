@@ -190,9 +190,14 @@ class StrategyAnalyst():
                 if ghost.side_interception(path):
                     print('invalid: pacman will be intercepted')
                     return False
-                else:
-                    #pass
-                    print('valid: ghost nearby cannot intercept')
+
+        # probable interception in the longer run
+        if flight == True:
+            for ghost in self.advisor.ghosts_info:
+                if ghost.crossroad_to_pacman == crossroad:
+                    if ghost.side_interception(path):
+                        print('invalid: pacman will probably be intercepted in the long run')
+                        return False
                     
     
         print('MOVE IS REMAING VALID')
