@@ -64,19 +64,27 @@ class StrategyAdvisor():
         logger.debug("########################################################")
 
         unsafe_corridors = []
+        # logger.debug("#########################################################")
         for ghost in [ghost for ghost in self.state['ghosts'] if ghost[1] == False]: # non zombie ghosts
             for [cA, cB] in self.map_.corr_adjacencies:
+                cA.safe = CORRIDOR_SAFETY.SAFE
+                cB.safe = CORRIDOR_SAFETY.SAFE
+                #logger.debug("ANALYSING ADJ CORRIDORS:\n" + str(cA.safe) + ', ' + str(cB.safe))
                 if ghost[0] in cA.coordinates:     # pode dar erro: pesquisar [x,y] em (x,y)
                     cA.safe = CORRIDOR_SAFETY.UNSAFE
                     unsafe_corridors += [cA]
-                elif ghost[0] in cB.coordinates:
+                    # logger.debug("GHOST:\n" + str(ghost[0]))
+                    # logger.debug("ANALYSING ADJ CORRIDORS:\n" + str(cA) + ', ' + str(cB))
+                    # logger.debug("IF1 ADJ CORRIDORS:\n" + str(cA.safe) + ', ' + str(cB.safe))
+                if ghost[0] in cB.coordinates:
                     cB.safe = CORRIDOR_SAFETY.UNSAFE
                     unsafe_corridors += [cB]
-                else:
-                    cA.safe = CORRIDOR_SAFETY.SAFE
-                    cA.safe = CORRIDOR_SAFETY.SAFE
-        logger.debug("UNSAFE_CORRIDORS:\n" + str(unsafe_corridors))
-        return unsafe_corridors
+                    # logger.debug("GHOST:\n" + str(ghost[0]))
+                    # logger.debug("ANALYSING ADJ CORRIDORS:\n" + str(cA) + ', ' + str(cB))
+                    # logger.debug("IF2 ADJ CORRIDORS:\n" + str(cA.safe) + ', ' + str(cB.safe))
+                    
+        logger.debug("UNSAFE_CORRIDORS:\n" + str(list(set(unsafe_corridors))))
+        return list(set(unsafe_corridors))
             
 
 
@@ -156,10 +164,7 @@ class StrategyAdvisor():
                 pac_corridor = corr
                 break
         if pac_corridor == None:
-            for corr in pac_corridors:
-                if pacman in corr.coordinates:
-                    pac_corridor = corr
-                    break
+            pac_corridor = pac_corridors[0]
         self.pacman_info.update_corridor(pac_corridor)
         logger.debug("PACMAN CHOSEN CORRIDOR:\n" + str(pac_corridor))
 

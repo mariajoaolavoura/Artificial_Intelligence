@@ -47,7 +47,7 @@ class StrategyAnalyst():
             if next_move != None:
                 return next_move
         
-            #next_move = self._try_eating()
+            next_move = self._try_eating()
 
             next_move = self._try_flight(avoid_suggestion=False)
             if next_move != None:
