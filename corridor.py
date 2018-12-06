@@ -30,6 +30,14 @@ class Corridor():
             return self.dist_end0(coord)
         return self.dist_end1(coord)
 
+    def get_other_end(self,end):
+        if end == self.ends[0]:
+            return self.ends[1]
+        elif end == self.ends[1]:
+            return self.ends[0]
+        else:
+            return None
+
     def closest_end(self, coord):
         return self.dist_end0(coord) \
             if self.dist_end0(coord) <= self.dist_end1(coord) \
@@ -43,6 +51,7 @@ class Corridor():
         if len(self.coordinates) > 1:
             return self.coordinates[1]
         else:
+            print('GOT INTO THIS NONE')
             return None
 
     def get_coord_next_to_end1(self):

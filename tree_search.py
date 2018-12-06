@@ -317,9 +317,9 @@ class SearchTree:
                         return sorted(all_paths, key=lambda move: move[1])
 
             lnewnodes = []
-            print('TREE SEARCH actions: ' + str(self.problem.domain.actions(node.state)))
+            # print('TREE SEARCH actions: ' + str(self.problem.domain.actions(node.state)))
             for action in self.problem.domain.actions(node.state):
-                print('action: ' + str(action))
+                # print('action: ' + str(action))
 
                 new_state = self.problem.domain.result(node.state, action)
                 #print('result: ' + str(new_state))
@@ -332,19 +332,19 @@ class SearchTree:
                 # print('---> ' + str(self.lvisited))
                 # print(new_state in self.lvisited)
                 if all([c in self.problem.initial.coordinates for c in new_state.coordinates]):
-                    print('!!!!!: ' + str(self.problem.initial.coordinates) +', '+str(new_state.coordinates))
-                    print('continue1: ' + str([c in self.problem.initial.coordinates for c in new_state.coordinates]))
+                    # print('!!!!!: ' + str(self.problem.initial.coordinates) +', '+str(new_state.coordinates))
+                    # print('continue1: ' + str([c in self.problem.initial.coordinates for c in new_state.coordinates]))
                     continue
                 elif avoid_corridor != []:
                     if all([c in avoid_corridor.coordinates for c in new_state.coordinates]):
-                        print('!!!!!: ' + str(avoid_corridor.coordinates) +', '+str(new_state.coordinates))
-                        print('continue2: ' + str([c in avoid_corridor.coordinates for c in new_state.coordinates]))
+                        # print('!!!!!: ' + str(avoid_corridor.coordinates) +', '+str(new_state.coordinates))
+                        # print('continue2: ' + str([c in avoid_corridor.coordinates for c in new_state.coordinates]))
                         continue
                 elif new_state in self.lvisited:
-                    print('continue3')
+                    # print('continue3')
                     continue
                 
-                print('continue4')
+                # print('continue4')
                 cost = node.cost + self.problem.domain.cost(node.state, action)
                 heuristic = self.problem.domain.heuristic(curr_state=node.state, \
                                                             new_state=new_state, \

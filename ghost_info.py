@@ -11,6 +11,12 @@ class Ghost_Info():
         self.path = path
 
 
+    def is_coord_in_path(self, coord):
+        for c in [c for corr in self.path for c in corr.coordinates]:
+            if c == coord:
+                return True
+        return False
+
     def side_interception(self, pacman_path, flight=False):
         intercept_coord = None
         print('GHOST_INFO: ghost path[0] is ' + str(self.path[0]))

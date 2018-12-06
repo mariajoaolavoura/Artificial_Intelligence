@@ -4,6 +4,23 @@ from eating_agent import *
 from counter_agent import *
 from flight_agent import *
 from panic_agent import *
+import logging
+
+# logs are written to file advisor.log after the client is closed
+# possible messages: debug, info, warning, error, critical 
+# how to use: logger.typeOfMessage('message')
+logger = logging.getLogger('analyst')
+logger_format = '[%(lineno)s - %(funcName)20s() - %(levelname)s]\n %(message)s\n'
+#logger_format = '%(levelname)s:\t%(message)' # simpler format
+
+# currently writing over the logger file, change filemode to a to append
+logging.basicConfig(format=logger_format, filename='ANALYST.log', filemode='w', level=logging.DEBUG)
+
+# logger
+# logs are written to file strategy_advisor.log after the client is closed
+# possible messages: debug, info, warning, error, critical 
+# how to use: logger.typeOfMessage('message')
+logger = setup_logger('strategy_analyst', 'strategy_analyst.log')
 
 class StrategyAnalyst():
     """Creates the Strategy Analist, which coordinates the possible moves given
@@ -20,6 +37,8 @@ class StrategyAnalyst():
         self.eater_possible_moves = []
         self.counter_possible_moves = []
         self.fleer_possible_moves = []
+
+        self.trap_avoid_corridor = None
 
     
     def decide(self):
@@ -71,7 +90,7 @@ class StrategyAnalyst():
         
         
         # no strategy available, time to panic! Goes for the first safe corridor
-        panicked_for_a_way_out = self._panic()
+        panicked_for_a_way_out = self._panic(self.trap_avoid_corridor)
 
         # ----- no agent got a move - this should never happen
         if panicked_for_a_way_out == None:
@@ -146,12 +165,13 @@ class StrategyAnalyst():
             return True
         
         # The ghost and pacman are in opposite sides of the target
-        print('---> before condition: ' + str(ghost.dist_to_pacman) + ', ' + str(move[1]))
+        print('---> verify if ghost just after the target')
         tx,ty = move[0]
         gx,gy = ghost.position
         if gx==tx+1 or gx==tx-1 or gy==ty+1 or gy==ty-1:
             if gx==tx or gy==ty:
                 if move[1] == 1:
+                    print('---> ghost just after the target')
                     return False
 
         # ghost is in first corridor of path (dangerous)
@@ -182,11 +202,13 @@ class StrategyAnalyst():
                         return False
 
         # ghost just after the first corridor, and pacman just exiting it
+        print('---> ghost after first corridor')
         if pacman.dist_to_crossroad(crossroad) == 1 and ghost.dist_to_crossroad == 1:
             print('invalid: ghost just after the first corridor, and pacman just exiting it')
             return False
         
         # ghost not in the path, but in pursuit of pacman, will intercept
+        print('---> verify interception')
         if pacman.pursued_from_crossroad(crossroad):
             if ghost.position not in [c for corr in path for c in corr.coordinates]:
                 if ghost.side_interception(path):
@@ -195,12 +217,47 @@ class StrategyAnalyst():
 
         # probable interception in the longer run
         if flight or surrounded_eating:
+            print('---> verify probable interception in future')
             for ghost in self.advisor.ghosts_info:
                 if ghost.crossroad_to_pacman == crossroad:
                     if ghost.side_interception(path):
                         print('invalid: pacman will probably be intercepted in the long run')
                         return False
+
+        # next corridor is safe, but once inside pacman will be trapped
+        # ghost from behind is ate distance 1 or 2, which mean that no turning back is possible
+        if pacman.position in self.advisor.map_.crossroads:
+            print('---> verify if there will be a future trap')
+            if pacman.ghost_at_crossroad(pacman.get_other_crossroad(crossroad)) != None:
+                if pacman.dist_to_ghost_at_crossroad(pacman.get_other_crossroad(crossroad)) < 3:
                     
+                    if not flight:
+                        next_move = path[-2].get_coord_next_to_end(pacman.position)
+                    if flight:
+                        next_move = path[1].get_coord_next_to_end(pacman.position)
+                    logger.debug('ANALYST: next_move ' + str(next_move))
+                    corr = None
+                    for c in self.advisor.map_.corridors:
+                        if next_move in c.coordinates:
+                            corr = c
+                            break
+                    
+
+                    if pacman.ghost_at_crossroad(crossroad).is_coord_in_path(corr.get_other_end(crossroad)):
+                        
+                        # logger.debug('ANALYST: corr ' + str(corr))
+                        # logger.debug('ANALYST: corr.get_other_end(crossroad) ' + str(corr.get_other_end(crossroad)))
+                        # logger.debug('ANALYST: next_move_dist_to_end ' + str(corr.dist_to_end(next_move, corr.get_other_end(crossroad))))
+                        next_move_dist_to_end = corr.dist_to_end(next_move, corr.get_other_end(crossroad))
+                        # logger.debug('ANALYST: pacman.dist_to_ghost_at_crossroad(crossroad) ' + str(pacman.dist_to_ghost_at_crossroad(crossroad)))
+                        # logger.debug('ANALYST: corr.cost ' + str(corr.cost))
+                        # logger.debug('ANALYST: other_ghost_dist_to_end ' + str(pacman.dist_to_ghost_at_crossroad(crossroad) - corr.cost))
+                        other_ghost_dist_to_end = pacman.dist_to_ghost_at_crossroad(crossroad) - corr.cost
+                        if next_move_dist_to_end >= other_ghost_dist_to_end:
+                            print('invalid: next crossroad is safe but pacman will be trapped')
+                            self.trap_avoid_corridor = corr
+                            return False
+
     
         print('MOVE IS REMAING VALID')
         print(' ------------ \n')
@@ -300,6 +357,7 @@ class StrategyAnalyst():
 
             #print('--> move: ' + str(m[2][-1].coordinates[0]) + ' at cost ' + str(m[1]) + ' path starts with ' + str(m[2][-2]))
             print('in flight mode, analysing move: ' + str(move[2][0].coordinates[0]))
+            print('FLIGHT: NEXT MOVE ' + str(next_move))
             valid_next_move = self._analyse_best_move(possible_moves=next_move, flight=True)
             if valid_next_move:
                 print('FLIGHT MODE IS RETURNING NEXT MOVE: ' + str(next_move[0][0]))
@@ -348,6 +406,7 @@ class StrategyAnalyst():
 
             #print('--> move: ' + str(m[2][-1].coordinates[0]) + ' at cost ' + str(m[1]) + ' path starts with ' + str(m[2][-2]))
             print('in flight mode, analysing move: ' + str(move[2][0].coordinates[0]))
+            print('FLIGHT: NEXT MOVE ' + str(next_move))
             valid_next_move = self._analyse_best_move(possible_moves=next_move, flight=True)
             if valid_next_move:
                 print('FLIGHT MODE IS RETURNING NEXT MOVE: ' + str(next_move[0][0]))
@@ -355,12 +414,12 @@ class StrategyAnalyst():
 
         return None
     
-    def _panic(self):
+    def _panic(self, avoid_corridor):
         print('###################################################')
         print('GOT INTO: ' + str(MODE.PANIC))
 
         panicker = PanicAgent(self.advisor)
-        next_move = panicker.panic()
+        next_move = panicker.panic(avoid_corridor)
         print('PANIC MODE IS RETURNING NEXT MOVE: ' + str(next_move))
         return next_move
     

@@ -81,6 +81,15 @@ class Pacman_Info():
         else:
             return None
 
+    def get_other_crossroad(self, crossroad):
+        if crossroad == self.crossroad0:
+            return self.crossroad1
+        if crossroad == self.crossroad1:
+            return self.crossroad0
+        else:
+            return None
+
+
     def semaphore(self, crossroad):
         if crossroad == self.crossroad0:
             return self.semaphore0
