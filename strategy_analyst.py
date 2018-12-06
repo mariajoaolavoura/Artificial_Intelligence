@@ -48,6 +48,8 @@ class StrategyAnalyst():
                 return next_move
         
             next_move = self._try_eating()
+            if next_move != None:
+                return next_move
 
             next_move = self._try_flight(avoid_suggestion=False)
             if next_move != None:
@@ -80,7 +82,7 @@ class StrategyAnalyst():
 
 
 
-    def _analyse_best_move(self, possible_moves, flight=False):
+    def _analyse_best_move(self, possible_moves, flight=False, surrounded_eating=False):
         """ Auxiliary method whose objective is to verify if the best move given
         by an Agent (Pursuit, Eating and Counter) is valid and does no lead
         Pac-Man to suicide or entrapment
@@ -192,7 +194,7 @@ class StrategyAnalyst():
                     return False
 
         # probable interception in the longer run
-        if flight == True:
+        if flight or surrounded_eating:
             for ghost in self.advisor.ghosts_info:
                 if ghost.crossroad_to_pacman == crossroad:
                     if ghost.side_interception(path):
