@@ -202,46 +202,39 @@ async def agent_loop(server_address = "localhost:8000", agent_name="student"):
         await websocket.send(json.dumps({"cmd": "join", "name": agent_name}))
         msg = await websocket.recv()
         game_properties = json.loads(msg)
+        
         #----------------------------------------------------------------------#
+        # for debug purposes (save scores and stress testing)
+        # create apropriated logger based on ghosts and level
+        if game_properties['ghosts'] == []:
+            name = 'scores_empty.log'
+        else:
+            name = 'scores_ghosts_level' + str(game_properties['ghosts_level']) + '.log'
+
+        score_logger = setup_logger('scores', name, mode='a', format='%(message)s\n')
         
-        
+        #----------------------------------------------------------------------#
         # Create the pacman agent
         pacman = Pacman_agent(Map(game_properties['map']))
-        lives = 3
+        lives = game_properties['lives']
+        
         # play!
         while True:
             #------------------------------------------------------------------#
             r = await websocket.recv()
-            start = time()      # saved on key_times.log
-            state = json.loads(r) #receive game state
+            start = time()          # saved on key_times.log
+            state = json.loads(r)   # receive game state
 
-            # for debug purposes : times
-            start = time()      # saved on key_times.log
-
-            # # game over (unnecessary for actual play
-            # if not 'lives' in state:
-            #     print(state)
-            #     print("GAME OVER")
-            #     sys.exit(0)
-
+            #------------------------------------------------------------------#
+            # lost a life
             if state['lives'] != lives:
                 lives = state['lives']
                 print('\n############\nPACMAN HAS LOST A LIFE\n#############\n')
                 stop0 = time()
                 print('Last move time: ' + str((stop0-start) * 1000))
-                sys.exit(1)
+                sys.stderr.write("\033[93mLOST A LIFE\033[0m\n")
+                #sys.exit(1)
             
-            #------------------------------------------------------------------#
-            # for debug purposes (save scores and stress testing)
-            
-            # create apropriated logger based on ghosts and level
-            if game_properties['ghosts'] == []:
-                name = 'scores_empty.log'
-            else:
-                name = 'scores_ghosts_level' + str(game_properties['ghosts_level']) + '.log'
-
-            score_logger = setup_logger('scores', name, mode='a', format='%(message)s\n')
-
             # game won (ended)
             if state['energy'] == [] and state['boost'] == []:
                 sys.stderr.write("\n\033[92mGAME ENDED. SCORE IS " + str(state['score']) + "\033[0m")
@@ -255,22 +248,18 @@ async def agent_loop(server_address = "localhost:8000", agent_name="student"):
                 return
 
             #------------------------------------------------------------------#
-            #print(state)
             # get next move from pacman agent
             key = pacman.get_next_move(state)
             stop1 = time()
             print('Last move time: ' + str((stop1-start) * 1000))
-            
-           
 
             #-send new key-----------------------------------------------------#
             await websocket.send(json.dumps({"cmd": "key", "key": key}))
 
+            #------------------------------------------------------------------#
             # debug purposes (time)
             stop = time()            
             time_logger.debug(str(state['step']) + " " + str(key) + "-> " + str((stop-start) * 1000))
-
-            #------------------------------------------------------------------#
 
 loop = asyncio.get_event_loop()
 SERVER = os.environ.get('SERVER', 'localhost')
@@ -278,5 +267,4 @@ PORT = os.environ.get('PORT', '8000')
 NAME = os.environ.get('NAME', 'student')
 loop.run_until_complete(agent_loop("{}:{}".format(SERVER,PORT), NAME))
 
-#------------------------------------------------------------------------------#
 #------------------------------------------------------------------------------#

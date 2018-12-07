@@ -112,3 +112,12 @@ gnome-terminal
 *.score
 
 pacmanScript\.sh
+
+.vscode/*
+old/*
+our_tests/scores/*
+our_tests/old_scores/*
+our_tests/iter_logs/*
+our_tests/backup_scores/*
+our_tests/averages/*
+

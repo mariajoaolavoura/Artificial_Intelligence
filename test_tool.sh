@@ -19,14 +19,15 @@ average () {
     if [ -f $1 ]; then
         s=${1%%.*}
         if [[ $2 == 1 ]]; then
-            printf "\t${s:18}" 
+            printf "\t${s:28}" 
         else
-            printf "\t${s:7}" 
+            printf "\t${s:17}" 
         fi
         
         awk 'NF' $1 > aaaaaa #trim empty lines
         awk '{s+=$1}END{print "\t",(NR?s/NR:"NaN")}' RS="\n" aaaaaa
-        rm -f aaaaaa    
+        awk '{s+=$1}END{print "\t",(NR?s/NR:"NaN")}' RS="\n" aaaaaa >> our_tests/averages/av_$i
+        rm -f aaaaaa   
     fi  
 }
 
@@ -48,25 +49,25 @@ max () {
 print_last_averages () {
     echo -e "\n--------------------\nLast averages: "
 
-    average 'old_scores/scores.log'
-    average 'old_scores/scores_ghosts_level0.log' 1
-    average 'old_scores/scores_ghosts_level1.log' 1
-    average 'old_scores/scores_ghosts_level2.log' 1
+    average 'our_tests/old_scores/scores.log'
+    average 'our_tests/old_scores/scores_ghosts_level0.log' 1
+    average 'our_tests/old_scores/scores_ghosts_level1.log' 1
+    average 'our_tests/old_scores/scores_ghosts_level2.log' 1
 }
 
 # print run info
 print_run_info () {
     echo -e "--------------------\nThis run:\n"
-    average 'scores.log'
-    average 'scores_ghosts_level0.log'
-    average 'scores_ghosts_level1.log'
-    average 'scores_ghosts_level2.log'
+    average 'our_tests/scores/scores.log'
+    average 'our_tests/scores/scores_ghosts_level0.log'
+    average 'our_tests/scores/scores_ghosts_level1.log'
+    average 'our_tests/scores/scores_ghosts_level2.log'
     echo -e "\n\tCrashes:\t" $1
     echo -e "\tTimes (seg):"
     printf "\n\t\tAver:\t" 
-    average_time time.txt
+    average_time 'our_tests/times.txt'
     printf "\t\tMax:\t"
-    max time.txt
+    max 'our_tests/times.txt'
 }
 
 # trap ctrl-c and exit
@@ -82,35 +83,35 @@ if [ $1 -eq 1 ]; then
 else
     echo -e "Pacman Test Tool ($1 iterations)\n"
 fi
-# save old scores 
-mkdir -p old_scores
-mv scores* old_scores/ > /dev/null 2>&1
-mkdir -p backup_scores
-mkdir -p iter_logs
 
-# debug
-#cat 'scores.log'
-#cat 'scores_ghosts_level0.log'
-#cat 'scores_ghosts_level1.log'
-#cat 'scores_ghosts_level2.log'
+# create needed dirs
+mkdir -p our_tests/
+mkdir -p our_tests/averages/
+mkdir -p our_tests/scores
+mkdir -p our_tests/old_scores
+mkdir -p our_tests/backup_scores
+mkdir -p our_tests/iter_logs
+
+# save old scores 
+mv scores* our_tests/old_scores/ > /dev/null 2>&1
 
 declare -i crash_count
 crash_count=0
 
-# run $1 times
+# run $1 timese
 for i in $(seq 1 $1); do 
     echo -e "Execution #$i"
-    /usr/bin/time -f "%e" -a -o "time.txt" --quiet python3 student.py > iter_logs/output_$i.txt #2> tmp_error.txt  
+    /usr/bin/time -f "%e" -a -o "times.txt" --quiet python3 student.py > our_tests/iter_logs/output_$i.txt #2> tmp_error.txt  
     
     printf "\nTime was: " 
-    sed "${i}q;d" time.txt
+    sed "${i}q;d" times.txt
     
     #printf "\nOutput was: "
     #cat iter_logs/output$i.txt
     
     # copy save of scores
     if [ $? -eq 0 ]; then 
-        cp scores* backup_scores/
+        cp scores* our_tests/backup_scores/
     
     # program failed, restore scores
     else    
@@ -121,29 +122,24 @@ for i in $(seq 1 $1); do
         
         crash_count=crash_count+1
         
-        mv -f backup_scores/scores* .. > /dev/null 2>&1
+        mv -f our_tests/backup_scores/scores* .. > /dev/null 2>&1
     fi
 
-    # debug
-    # echo -e "---------\n"
-    # cat 'scores.log'
-    # cat 'scores_ghosts_level0.log'
-    # cat 'scores_ghosts_level1.log'
-    # cat 'scores_ghosts_level2.log'
+    mv key_times.log our_tests/iter_logs/key_times_$i.log
     
     echo -e "---------------------\n"
 done
 
 echo -e "\nAll $1 iterations done\n\n"
 
+# clean up
+rm -f tmp_error.txt
+mv scores* our_tests/scores/
+mv times.txt our_tests/
+
 # print results
 print_run_info $crash_count
 print_last_averages
-echo -e "\nIf an average is NaN it's not an error.\nIt means a script execution failed or was canceled."
-
-# clean up
-rm -f tmp_error.txt
-rm -f time.txt
+echo -e "\nIf an average is NaN it's not an error.\nIt means a script execution failed, was canceled or the client was exited using sys.exit."
 
 echo -e "\n"
-
