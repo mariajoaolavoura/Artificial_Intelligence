@@ -1,7 +1,7 @@
 from game_consts import CORRIDOR_SAFETY
 
 class Corridor():
-    """Represents an uninterrupted path of adjacente coordinates with a
+    """Represents an uninterrupted path of adjacent coordinates with a
     crossroad at each end
 
     Args:
@@ -10,8 +10,13 @@ class Corridor():
     Attr:
         coordinates: list of coordinates of the Corridor
         length: length of coordinates without crossroad ends
-
+        cost: distance of going through the Corridor from one crossroad
+              to the other
+        ends: the two exit coordinates of the Corridor
+        safe: Enumerate CORRIDOR_SAFETY where UNSAFE means a ghost is inside the Corridor
+              and SAFE means that no ghost is inside the Corridor 
     """
+
     def __init__(self, coordinates):
         self.coordinates = coordinates
         self.length = len(coordinates) - 2 if len(coordinates) > 1 else 0
@@ -44,6 +49,16 @@ class Corridor():
             else self.dist_end1(coord)
 
     def sub_corridors(self, coord):
+        """Creates two Corridors spliting this coordinates at the given
+        coordinate. The coordinate will be the end of both new Corridors
+
+        Args:
+            coord: coordinate where to split Corridor
+
+        Returns:
+            tuple with two new Corridor objects where 'coord' will be the end0 of
+            one and end1 of the other
+        """
         index = self.coordinates.index(coord)
         return Corridor(self.coordinates[:index+1]), Corridor(self.coordinates[index:])
 
@@ -69,11 +84,24 @@ class Corridor():
             return None
 
     def get_next_coord_to_the_side_of_crossroad(self, initial, crossroad):
-        
+        """Given any initial coordinate, calculates the adjacent coordinate
+        to the side of given Crossroad
+
+        Args:
+            initial: coordinate from where to get adjacent
+            crossroad: the crossroad in the side of Corridor, of the coordinate
+            wanted
+
+        Returns:
+            the coordinate adjacent to 'initial' in the side of 'crossroad'
+            returns None if initial == crossroad or if given values are no valid
+        """
+        # verify that crossroad exists
         if crossroad == None:
             print('CORRIDOR: crossroad is None')
             return None
 
+        # calculate index of 'initial'
         initial_index = None
         for i in range(len(self.coordinates)):
             if initial == self.coordinates[i]:
@@ -81,12 +109,13 @@ class Corridor():
                 break
         
         if initial_index == None or initial == crossroad:
-            if initial_index == None:
-                print('CORRIDOR: initial index not found')
-            else:
-                print('CORRIDOR: pacman is in the crossroad is trying to go to the side of')
+            # if initial_index == None:
+            #     print('CORRIDOR: initial index not found')
+            # else:
+            #     print('CORRIDOR: pacman is in the crossroad is trying to go to the side of')
             return None
 
+        # calculate adjacent coordinate
         if crossroad == self.ends[0]:
             return self.coordinates[initial_index-1]
         elif crossroad == self.ends[1]:
