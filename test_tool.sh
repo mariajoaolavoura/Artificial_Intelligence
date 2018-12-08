@@ -26,7 +26,7 @@ average () {
         
         awk 'NF' $1 > aaaaaa #trim empty lines
         awk '{s+=$1}END{print "\t",(NR?s/NR:"NaN")}' RS="\n" aaaaaa
-        awk '{s+=$1}END{print "\t",(NR?s/NR:"NaN")}' RS="\n" aaaaaa >> our_tests/averages/av_$i
+        awk '{s+=$1}END{print "\t",(NR?s/NR:"NaN")}' RS="\n" aaaaaa >> our_tests/averages   # for batch processing on run_consts_tests
         rm -f aaaaaa   
     fi  
 }
@@ -143,3 +143,5 @@ print_last_averages
 echo -e "\nIf an average is NaN it's not an error.\nIt means a script execution failed, was canceled or the client was exited using sys.exit."
 
 echo -e "\n"
+
+
