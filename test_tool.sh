@@ -26,7 +26,11 @@ average () {
         
         awk 'NF' $1 > aaaaaa #trim empty lines
         awk '{s+=$1}END{print "\t",(NR?s/NR:"NaN")}' RS="\n" aaaaaa
-        awk '{s+=$1}END{print "\t",(NR?s/NR:"NaN")}' RS="\n" aaaaaa >> our_tests/averages   # for batch processing on run_consts_tests
+
+        if [[ $2 != 1 ]]; then
+            echo "ADDDING THE VALUE "
+            awk '{s+=$1}END{print "\t",(NR?s/NR:"NaN")}' RS="\n" aaaaaa >> our_tests/averages_run   # for batch processing on run_consts_tests
+        fi
         rm -f aaaaaa   
     fi  
 }
@@ -49,7 +53,7 @@ max () {
 print_last_averages () {
     echo -e "\n--------------------\nLast averages: "
 
-    average 'our_tests/old_scores/scores.log'
+    average 'our_tests/old_scores/scores.log' 1
     average 'our_tests/old_scores/scores_ghosts_level0.log' 1
     average 'our_tests/old_scores/scores_ghosts_level1.log' 1
     average 'our_tests/old_scores/scores_ghosts_level2.log' 1
@@ -93,7 +97,7 @@ mkdir -p our_tests/backup_scores
 mkdir -p our_tests/iter_logs
 
 # save old scores 
-mv scores* our_tests/old_scores/ > /dev/null 2>&1
+mv our_tests/scores/scores* our_tests/old_scores/ > /dev/null 2>&1
 
 declare -i crash_count
 crash_count=0
@@ -108,10 +112,11 @@ for i in $(seq 1 $1); do
     
     #printf "\nOutput was: "
     #cat iter_logs/output$i.txt
-    
+    mv scores* our_tests/scores/
+
     # copy save of scores
     if [ $? -eq 0 ]; then 
-        cp scores* our_tests/backup_scores/
+        cp our_tests/scores/* our_tests/backup_scores/
     
     # program failed, restore scores
     else    
@@ -134,7 +139,7 @@ echo -e "\nAll $1 iterations done\n\n"
 
 # clean up
 rm -f tmp_error.txt
-mv scores* our_tests/scores/
+#mv our_tests/scores/scores* our_tests/scores/
 mv times.txt our_tests/
 
 # print results

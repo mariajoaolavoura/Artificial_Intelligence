@@ -69,7 +69,7 @@ GHOST_PURSUIT_MULTIPLIER = $k_value
 
 
 def setup_logger(name, log_file, level=logging.DEBUG, mode='w', format='[%(lineno)s - %(funcName)20s() - %(levelname)s] %(message)s\n'):
-    """Function setup as many loggers as you want"""
+    #Function setup as many loggers as you want
 
     # currently writing over the logger file, change filemode to a to append
     handler = logging.FileHandler(log_file, mode)        
