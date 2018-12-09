@@ -112,7 +112,7 @@ for i in $(seq 1 $1); do
     
     #printf "\nOutput was: "
     #cat iter_logs/output$i.txt
-    mv scores* our_tests/scores/
+    
 
     # copy save of scores
     if [ $? -eq 0 ]; then 
@@ -136,6 +136,7 @@ for i in $(seq 1 $1); do
 done
 
 echo -e "\nAll $1 iterations done\n\n"
+mv scores* our_tests/scores/
 
 # clean up
 rm -f tmp_error.txt
