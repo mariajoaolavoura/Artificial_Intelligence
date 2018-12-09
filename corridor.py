@@ -35,6 +35,11 @@ class Corridor():
             return self.dist_end0(coord)
         return self.dist_end1(coord)
 
+    def dist_between_coords(self, coord1, coord2):
+        if coord1 not in self.coordinates or coord2 not in self.coordinates:
+            return None
+        return abs(self.coordinates.index(coord1)-self.coordinates.index(coord2))
+
     def get_other_end(self,end):
         if end == self.ends[0]:
             return self.ends[1]
@@ -66,7 +71,7 @@ class Corridor():
         if len(self.coordinates) > 1:
             return self.coordinates[1]
         else:
-            print('GOT INTO THIS NONE')
+            print('CORRIDOR: GOT INTO THIS NONE')
             return None
 
     def get_coord_next_to_end1(self):

@@ -81,9 +81,8 @@ debug = True
         #*      Strategy Advisor analyses:
         #*          Corridor Safety
         #*          Crossroads Semaphores
-        #*          Distance to ghosts
-        #*      Strategy Advisor advises a Game Mode
-        #* Pac-Man calls Game Mode Agent to get next move
+        #*          Distance t\from ghosts to pacman
+        #* Pac-Man calls Strategy Analyst
         #*      Game Mode tries to find the next move
         #* Pac-Man analyses next move
         #*      Is it specific (only one solution)
@@ -138,8 +137,9 @@ class Pacman_agent():
         
 
         # get advice on the next move
+        print('before strategy advisor')
         strategy_advisor = StrategyAdvisor(self.map_, state)
-        #mode_handler = strategy_advisor.advise()
+        print('after strategy advisor')
 
         # first always try to eat
         strategy_analyst = StrategyAnalyst(strategy_advisor)

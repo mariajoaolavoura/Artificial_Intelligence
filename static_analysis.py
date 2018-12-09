@@ -33,7 +33,12 @@ class Static_Analysis():
         self.corridors = self.create_corridors(self.pathways, self.crossroads)
         self.corridors = [ Corridor(corr) for corr in self.corridors ]
         self.corr_adjacencies =self.create_corridor_adjacencies(self.corridors)
-        self.ghosts_den = []   
+        self.ghosts_den = []
+
+        sum = 0
+        for corr in self.corridors:
+            sum += len(corr.coordinates)
+        print('AVERAGE CORRIDOR LENGTH: ' + str(sum/len(self.corridors)))
         
 
 

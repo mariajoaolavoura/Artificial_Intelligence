@@ -15,7 +15,7 @@ class PanicAgent:
         self.semaphore1 = advisor.pacman_info.semaphore1
 
 
-    def panic(self, avoid_corridor):
+    def panic(self, avoid_coordinates):
         '''
         args:
         advisor: instance of Strategy_Advisor
@@ -26,15 +26,17 @@ class PanicAgent:
                 self.calculate_pacman_corridor()
                 self.ghosts_info = self.calculate_ghosts_info()
         '''
+        print('PANIC: avoid coordinates ' + str(avoid_coordinates))
     
-        pac_adj0, pac_safe_corr0 = self.calc_adj_and_safe(self.pac_info.crossroads[0], avoid_corridor)
+        pac_adj0, pac_safe_corr0, pac_unsafe_corr0 = self.calc_adj_and_safe(self.pac_info.crossroads[0], avoid_coordinates)
         escape_corridors0 = pac_safe_corr0 if pac_safe_corr0 != [] else pac_adj0
 
-        pac_adj1, pac_safe_corr1 = self.calc_adj_and_safe(self.pac_info.crossroads[1], avoid_corridor)
+        pac_adj1, pac_safe_corr1, pac_unsafe_corr1 = self.calc_adj_and_safe(self.pac_info.crossroads[1], avoid_coordinates)
         escape_corridors1 = pac_safe_corr1 if pac_safe_corr1 != [] else pac_adj1
 
         all_adjacent_corridors = pac_adj0 + pac_adj1
         all_safe_adjacent_corridors = pac_safe_corr0 + pac_safe_corr1
+        all_unsafe_adjacent_corridors = pac_unsafe_corr0 + pac_unsafe_corr1
         all_escape_corridors = escape_corridors0 + escape_corridors1
 
         print('PANICKING INIT:')
@@ -136,15 +138,15 @@ class PanicAgent:
         return self.calc_next_coord(pacman=self.pacman, crossroad=None , next_corridor=next_corr)
 
 
-    def calc_adj_and_safe(self, crossroad, avoid_corridor):
+    def calc_adj_and_safe(self, crossroad, avoid_coordinates):
 
         aux = []
         adj_corrs = []
         safe_corrs = []
+        unsafe_corrs = []
         aux += [cA for [cA, cB] in self.advisor.map_.corr_adjacencies if crossroad in cA.ends]
         aux += [cB for [cA, cB] in self.advisor.map_.corr_adjacencies if crossroad in cB.ends]
-        print('#################################')
-        print('#################################')
+
         #remove pacman corridor
         aux = [c for c in aux if c != self.pac_info.corridor]
         aux = list(set(aux))
@@ -155,26 +157,20 @@ class PanicAgent:
             for ghost in [ghost for ghost in self.advisor.state['ghosts'] if ghost[1] == False]:
                 if ghost[0] in corr.coordinates:
                     ghost_in_corr = True
-                    print('@@@@: ghost ' + str(ghost[0]) + 'in corr ' + str(corr))
             
             if not ghost_in_corr:
+                corr.safe = CORRIDOR_SAFETY.SAFE
                 safe_corrs += [corr]
+            if ghost_in_corr:
+                corr.safe = CORRIDOR_SAFETY.UNSAFE
+                unsafe_corrs += [corr]
             adj_corrs += [corr]
 
-        print('PANIC: calculating adjacent corridors ' + str(adj_corrs))
-        if avoid_corridor != None:
-            adj_corrs = [c for c in adj_corrs if c != avoid_corridor]
-            safe_corrs = [c for c in safe_corrs if c != avoid_corridor]
-            print('#################################')
-            print('#################################')
-            print('PANIC: avoid corridor is ' + str(avoid_corridor))
-            print('PANIC: filtered avoid corridor from adjacent corridors ' + str(adj_corrs))
-            print('#################################')
-            print('#################################')
+        if avoid_coordinates != []:
+            adj_corrs = [corr for corr in adj_corrs if all([av not in corr.coordinates for av in avoid_coordinates])]
+            safe_corrs = [corr for corr in safe_corrs if all([av not in corr.coordinates for av in avoid_coordinates])]
 
-        print('PANIC: calculating adjacent SAFE corridors ' + str(safe_corrs))
-
-        return adj_corrs, safe_corrs
+        return adj_corrs, safe_corrs, unsafe_corrs
                 
 
     def calc_next_coord(self, pacman, crossroad, next_corridor):
@@ -200,7 +196,7 @@ class PanicAgent:
         if next_corridor != []:
             # crossroad is None
             if crossroad == None:
-                crossroad = [c for c in next_corridor.coordinates if c in self.pac_info.corridor.coordinates][0]
+                crossroad = [c for c in next_corridor[0].coordinates if c in self.pac_info.corridor.coordinates][0]
                 next_move = self.pac_info.corridor.get_next_coord_to_the_side_of_crossroad(pacman, crossroad)
                 if next_move != None:
                     return next_move
@@ -214,23 +210,35 @@ class PanicAgent:
                     return next_move
                 else:
                     print(next_corridor)
-                    return next_corridor.get_coord_next_to_end(crossroad)
+                    return next_corridor[0].get_coord_next_to_end(crossroad)
 
 
     #escolhe corr com ghost mais afastado
     def calc_next_corridor(self, pac_adj):
-
+        
+        print('pac_adj: ' + str(pac_adj))
+        safe_corrs = []
         for corr in pac_adj:
             if corr.safe == CORRIDOR_SAFETY.SAFE:
+                safety_number = self.long_range_safety(corr.ends[0])
+                safety_number += self.long_range_safety(corr.ends[1])
+                safe_corrs += [(corr, safety_number)]
                 print('PANIC: calculated next corridor as safe: ' + str(corr))
-                return corr
+        
+        if len(safe_corrs) != 0:
+            safe_corrs = sorted(safe_corrs, key=lambda t: t[1])
+            print('PANIC: calculated next corridor as safe: ' + str(corr))
+            return safe_corrs[0]
 
         corridors_with_ghost = []
-        for ghost in self.advisor.ghosts_info:
-            for corr in pac_adj:
-                if ghost.position in corr.coordinates:
-                    corridors_with_ghost += [(corr, ghost.dist_to_pacman)]
-                    break
+        corridors_with_ghost = [(corr, ghost.dist_to_pacman) for ghost in self.advisor.ghosts_info \
+                                                            for corr in pac_adj]
+        print('corridors_with_ghost: ' + str(corridors_with_ghost))
+        # for ghost in self.advisor.ghosts_info:
+        #     for corr in pac_adj:
+        #         if ghost.position in corr.coordinates:
+        #             corridors_with_ghost += [(corr, ghost.dist_to_pacman)]
+        #             break
         print('PANIC: calculated next corridor as unsafe: ' + str(sorted(corridors_with_ghost, key=lambda t: t[1], reverse=True)[0][0]))
         return sorted(corridors_with_ghost, key=lambda t: t[1], reverse=True)[0][0]
 
@@ -249,3 +257,8 @@ class PanicAgent:
         else:
             next_corr = self.calc_next_corridor(escape_corridors1)
             return self.calc_next_coord(self.pacman, self.crossroad1, next_corr)
+
+    def long_range_safety(self, crossroad):
+        _, _, unsafe_corrs = self.calc_adj_and_safe(crossroad, [])
+        return len(unsafe_corrs)
+

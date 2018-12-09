@@ -19,21 +19,23 @@ class Ghost_Info():
 
     def side_interception(self, pacman_path, flight=False):
         intercept_coord = None
-        print('GHOST_INFO: ghost path[0] is ' + str(self.path[0]))
-        print('GHOST_INFO: ghost path[1] is ' + str(self.path[1]))
-        path = [c for c in self.path[1].coordinates]
-        print('GHOST_INFO: ghost path of interception is: ' + str(path))
+        # print('GHOST_INFO: ghost path is ' + str(self.path))
+        # print('GHOST_INFO: ghost path[-1] is ' + str(self.path[-1]))
+        # print('GHOST_INFO: ghost path[-2] is ' + str(self.path[-2]))
+        path = [c for c in self.path[-2].coordinates]
+        # print('GHOST_INFO: ghost path of interception is: ' + str(path))
         pacman_path_coords = [c for corr in pacman_path for c in corr.coordinates]
-        print('GHOST_INFO: pacman path coordinates are: ' + str(pacman_path_coords))
+        # print('GHOST_INFO: pacman path coordinates are: ' + str(pacman_path_coords))
         for c in path:
             if c in pacman_path_coords:
                 found_interception = True
                 intercept_coord = c
                 break
-        ghost_intercept_dist = self.path[1].dist_to_end(self.position, intercept_coord)
-        print('GHOST_INFO: ghost coordinate of interception is: ' + str(intercept_coord))
         if intercept_coord == None:
             return False
+        ghost_intercept_dist = self.path[-2].dist_to_end(self.position, intercept_coord)
+        # print('GHOST_INFO: ghost coordinate of interception is: ' + str(intercept_coord))
+        
 
         pac_intercept_dist = 0
         if flight == False:
@@ -56,7 +58,7 @@ class Ghost_Info():
 
 
     def __str__(self):
-        return 'ghost('+str(self.position)+')'
+        return 'ghost('+str(self.position)+', '+str(self.dist_to_pacman)+')'
 
     def __repr__(self):
         return self.__str__()

@@ -94,16 +94,6 @@ class SearchProblem:
     def update_domain(self, corridor, sub_corr, sub_corr0, sub_corr1):
         
         new_adjacencies = []
-        debug = self.debug
-        if debug:
-            print()
-            print("initial_pos: " + str(self.initial_pos))
-            print("goal_pos: " + str(self.goal_pos))
-            print("corridor: " + str(corridor))
-            print("sub_corr: " + str(sub_corr))
-            print("sub_corr0: " + str(sub_corr0))
-            print("sub_corr1: " + str(sub_corr1))
-
 
         if corridor.coordinates != sub_corr0.coordinates and corridor.coordinates != sub_corr1.coordinates:
 
@@ -295,12 +285,15 @@ class SearchTree:
 
 
     # procurar todos os caminhos para a solucao
-    def all_path_search(self, avoid_corridor):
-
+    def all_path_search(self, avoid_coordinates):
+        # print()
+        # print('TREE SEARCH - NEW SEARCH')
+        # print('avoid_coordinates are ' + str(avoid_coordinates))
+        # print('goal is ' + str(self.problem.goal))
         all_paths = []
         
         while self.open_nodes != []:
-            #print('TREE SEARCH: open nodes: ' + str(self.open_nodes))
+            # print('TREE SEARCH: open nodes: ' + str(self.open_nodes))
             node = self.open_nodes.pop()
 
             if self.problem.goal_test(node.state):
@@ -331,20 +324,36 @@ class SearchTree:
                 # print(all([c in avoid_corridor.coordinates for c in new_state.coordinates]))
                 # print('---> ' + str(self.lvisited))
                 # print(new_state in self.lvisited)
+                # print('initial: ' + str(self.problem.initial))
+                # print('new_state: ' +str(new_state))
                 if all([c in self.problem.initial.coordinates for c in new_state.coordinates]):
-                    # print('!!!!!: ' + str(self.problem.initial.coordinates) +', '+str(new_state.coordinates))
-                    # print('continue1: ' + str([c in self.problem.initial.coordinates for c in new_state.coordinates]))
+                    # print('avoided because returned to pacman')
                     continue
-                elif avoid_corridor != []:
-                    if all([c in avoid_corridor.coordinates for c in new_state.coordinates]):
-                        # print('!!!!!: ' + str(avoid_corridor.coordinates) +', '+str(new_state.coordinates))
-                        # print('continue2: ' + str([c in avoid_corridor.coordinates for c in new_state.coordinates]))
-                        continue
+                elif avoid_coordinates != []:
+                    # print([(av, self.problem.goal) for av in avoid_coordinates])
+                    if all([av not in self.problem.goal.coordinates for av in avoid_coordinates]):
+                        # print([(av, new_state) for av in avoid_coordinates])
+                        # print(new_state.coordinates)
+                        # print(avoid_coordinates)
+                        if any([av in new_state.coordinates for av in avoid_coordinates]):
+                            # print('avoided because reached avoid coordinate (normal way)')
+                            # print('!!!!!: ' + str(avoid_coordinates) +', '+str(new_state.coordinates))
+                            # print('continue2:')
+                            continue
+                    elif any([av in self.problem.goal.coordinates for av in avoid_coordinates]):
+                        if any([av in new_state.coordinates for av in avoid_coordinates]):
+                            if self.problem.initial.coordinates[0] in new_state.coordinates:
+                                # print('avoided because reached avoid coordinate (ghost is avoid coord)')
+                                # print('!!!!!: ' + str(avoid_coordinates) +', '+str(self.problem.goal)+\
+                                # ', '+str(self.problem.initial))
+                                # print('continue3')
+                                continue
+
                 elif new_state in self.lvisited:
-                    # print('continue3')
+                    # print('avoided because already visited')
                     continue
                 
-                # print('continue4')
+                # print('NOT avoided')
                 cost = node.cost + self.problem.domain.cost(node.state, action)
                 heuristic = self.problem.domain.heuristic(curr_state=node.state, \
                                                             new_state=new_state, \

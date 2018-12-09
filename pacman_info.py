@@ -41,6 +41,36 @@ class Pacman_Info():
         # print(str(self.dist_to_crossroad0) + ', ' + str(self.dist_to_crossroad1))
         # print("##########################################")
 
+    def update_safeties(self, ghost):
+        if ghost.crossroad_to_pacman == self.crossroad0:
+            self.ghost_at_crossroad0 = ghost
+            self.dist_to_ghost_at_crossroad0 = ghost.dist_to_pacman
+            safe_dist = ghost.dist_to_crossroad - self.dist_to_crossroad0
+            if safe_dist <= 0:
+                self.semaphore0 = SEMAPHORE.RED
+            elif safe_dist > 0 and safe_dist <= SAFE_DIST_TO_CROSSROAD:
+                self.semaphore0 = SEMAPHORE.YELLOW
+            else:
+                self.semaphore0 = SEMAPHORE.GREEN
+            if ghost.dist_to_crossroad <= 0:
+                self.crossroad0_is_blocked = True
+            if ghost.dist_to_pacman <= SAFE_DIST_TO_GHOST:
+                self.pursued_from_crossroad0 = True
+        elif ghost.crossroad_to_pacman == self.crossroad1:
+            self.ghost_at_crossroad1 = ghost
+            self.dist_to_ghost_at_crossroad1 = ghost.dist_to_pacman
+            safe_dist = ghost.dist_to_crossroad - self.dist_to_crossroad1
+            if safe_dist <= 0:
+                self.semaphore1 = SEMAPHORE.RED
+            elif safe_dist > 0 and safe_dist <= SAFE_DIST_TO_CROSSROAD:
+                self.semaphore1 = SEMAPHORE.YELLOW
+            else:
+                self.semaphore1 = SEMAPHORE.GREEN
+            if ghost.dist_to_crossroad <= 0:
+                self.crossroad1_is_blocked = True
+            if ghost.dist_to_pacman <= SAFE_DIST_TO_GHOST:
+                self.pursued_from_crossroad1 = True
+
     def dist_to_crossroad(self, crossroad):
         if crossroad == self.crossroad0:
             return self.dist_to_crossroad0
