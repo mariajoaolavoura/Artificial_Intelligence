@@ -184,7 +184,7 @@ class StrategyAnalyst():
         print('crossroad: ' + str(crossroad))
         print('ghost at crossroad is: ' + str(ghost))
         for g in self.advisor.ghosts_info:
-            #pass
+            pass
             print(g.print())
         
 
@@ -255,16 +255,14 @@ class StrategyAnalyst():
 
         # next corridor is safe, but once inside pacman will be trapped
         # ghost from behind is ate distance 1 or 2, which mean that no turning back is possible
-
-        
-        if pacman.position in self.advisor.map_.crossroads and self.ghosts_in_pursuit >= 2:
+        if pacman.position in self.advisor.map_.crossroads and self.ghosts_in_pursuit >= 0:
             print('###')
             print(pacman.position)
             print(self.advisor.map_.crossroads)
             print('###')
             #ignore trap because there is a Boost inside the new corridor
             if counter == True:
-                if cost < ghost.dist_to_pacman-cost:
+                if cost < (ghost.dist_to_pacman - cost):
                     print('valid: trap ignored because pacman will catch boost')
                     return True
 
@@ -292,13 +290,13 @@ class StrategyAnalyst():
 
                     if pacman.ghost_at_crossroad(crossroad).is_coord_in_path(corr.get_other_end(crossroad)):
                         
-                        # print('ANALYST: corr ' + str(corr))
-                        # print('ANALYST: corr.get_other_end(crossroad) ' + str(corr.get_other_end(crossroad)))
-                        # print('ANALYST: next_move_dist_to_end ' + str(corr.dist_to_end(next_move, corr.get_other_end(crossroad))))
+                        print('ANALYST: corr ' + str(corr))
+                        print('ANALYST: corr.get_other_end(crossroad) ' + str(corr.get_other_end(crossroad)))
+                        print('ANALYST: next_move_dist_to_end ' + str(corr.dist_to_end(next_move, corr.get_other_end(crossroad))))
                         next_move_dist_to_end = corr.dist_to_end(next_move, corr.get_other_end(crossroad))
-                        # print('ANALYST: pacman.dist_to_ghost_at_crossroad(crossroad) ' + str(pacman.dist_to_ghost_at_crossroad(crossroad)))
-                        # print('ANALYST: corr.cost ' + str(corr.cost))
-                        # print('ANALYST: other_ghost_dist_to_end ' + str(pacman.dist_to_ghost_at_crossroad(crossroad) - corr.cost))
+                        print('ANALYST: pacman.dist_to_ghost_at_crossroad(crossroad) ' + str(pacman.dist_to_ghost_at_crossroad(crossroad)))
+                        print('ANALYST: corr.cost ' + str(corr.cost))
+                        print('ANALYST: other_ghost_dist_to_end ' + str(pacman.dist_to_ghost_at_crossroad(crossroad) - corr.cost))
                         other_ghost_dist_to_end = pacman.dist_to_ghost_at_crossroad(crossroad) - corr.cost
                         if next_move_dist_to_end >= other_ghost_dist_to_end-1:
                             print('invalid: next crossroad is safe but pacman will be trapped')

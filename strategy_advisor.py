@@ -97,7 +97,7 @@ class StrategyAdvisor():
         ghosts_at_cross0 = []
         ghosts_at_cross1 = []
         for [ghost,zombie,timeout] in self.non_zombie_ghosts:
-            #print('BEGIN FOR')
+            ## print('BEGIN FOR')
             domain = Pathways(self.map_.corr_adjacencies, ghost, self.map_)
             for corr in self.unsafe_corridors:
                 if ghost in corr.coordinates:
@@ -105,8 +105,8 @@ class StrategyAdvisor():
                     break
                 else:
                     ghost_corr = None
-            #print('GHOST POSITION: ' + str(ghost))
-            #print('GHOST CORRIDOR: ' + str(ghost_corr))
+            ## print('GHOST POSITION: ' + str(ghost))
+            ## print('GHOST CORRIDOR: ' + str(ghost_corr))
             # calculate trajectory of every ghost towards Pac-Man
             if ghost_corr != None: # if ghost is not in ghosts_den
                 
@@ -127,9 +127,9 @@ class StrategyAdvisor():
                                     avoid_coordinates += [av]
                 else:
                     avoid_coordinates += [avoid]
-                print('avoid coordinatesA: ' + str(avoid_coordinates))
+                # print('avoid coordinatesA: ' + str(avoid_coordinates))
                 _, cost1, path1 = my_tree.all_path_search(avoid_coordinates)[0]
-                #print('WHAT? ' + str(cost1) + ', ' + str(path1))
+                ## print('WHAT? ' + str(cost1) + ', ' + str(path1))
                 ghosts_at_cross1 += [Ghost_Info(ghost, zombie, timeout, \
                                      ghost_corr, cost1, self.pacman_info.crossroad1, \
                                      cost1 - self.pacman_info.dist_to_crossroad1, \
@@ -152,9 +152,9 @@ class StrategyAdvisor():
                                     avoid_coordinates += [av]
                 else:
                     avoid_coordinates += [avoid]
-                print('avoid coordinatesB: ' + str(avoid_coordinates))
+                # print('avoid coordinatesB: ' + str(avoid_coordinates))
                 _, cost0, path0 = my_tree.all_path_search(avoid_coordinates)[0]
-                #print('WHAT? ' + str(cost0) + ', ' + str(path0))
+                ## print('WHAT? ' + str(cost0) + ', ' + str(path0))
                 ghosts_at_cross0 += [Ghost_Info(ghost, zombie, timeout, \
                                      ghost_corr, cost0, self.pacman_info.crossroad0, \
                                      cost0 - self.pacman_info.dist_to_crossroad0, \
@@ -165,8 +165,8 @@ class StrategyAdvisor():
         g0 = sorted(ghosts_at_cross0, key=lambda ghost: ghost.dist_to_pacman)
         g1 = sorted(ghosts_at_cross1, key=lambda ghost: ghost.dist_to_pacman)
 
-        print('g0: ' + str(g0))
-        print('g1: ' + str(g1))
+        # print('g0: ' + str(g0))
+        # print('g1: ' + str(g1))
 
         self.ghosts_info = g0 + g1
         self.ghosts_at_cross0 = g0
@@ -178,8 +178,8 @@ class StrategyAdvisor():
 
         pac_all_corr = [corr for corr in self.map_.corridors if self.pacman_info.position in corr.coordinates]
         pac_unsafe_corr = [corr for corr in pac_all_corr if corr in self.unsafe_corridors]
-        print('pac_all_corr: ' + str(pac_all_corr))
-        print('pac_unsafe_corr: ' + str(pac_unsafe_corr))
+        # print('pac_all_corr: ' + str(pac_all_corr))
+        # print('pac_unsafe_corr: ' + str(pac_unsafe_corr))
         pac_corridor = None
         if len(pac_unsafe_corr) == 0:
             pac_corridor = pac_all_corr[0]
@@ -194,20 +194,20 @@ class StrategyAdvisor():
                 for corr in pac_unsafe_corr:
                     if ghost[0] in corr.coordinates:
                         aux += [(corr, ghost[0])]
-            print('aux: ' + str(aux))
+            # print('aux: ' + str(aux))
             dist = aux[0][0].dist_between_coords(self.pacman_info.position, aux[0][1])
             pac_corridor = aux[0][0]
-            print('DIST: ' + str(dist))
+            # print('DIST: ' + str(dist))
             for (corr,ghost) in aux:
-                print('analysing: ' + str(corr) + ', ' + str(ghost))
+                # print('analysing: ' + str(corr) + ', ' + str(ghost))
                 new_dist = corr.dist_between_coords(self.pacman_info.position, ghost)
-                print('NEW_DIST: ' + str(new_dist))
+                # print('NEW_DIST: ' + str(new_dist))
                 if new_dist < dist:
                     dist = new_dist
                     pac_corridor = corr
 
         
-        print('PAC_CORRIDOR: ' + str(pac_corridor))
+        # print('PAC_CORRIDOR: ' + str(pac_corridor))
         self.pacman_info.update_corridor(pac_corridor)
 
     
@@ -225,20 +225,20 @@ class StrategyAdvisor():
 
         # if there are no ghosts (all are zombie or in the den)
         if g0 == [] and g1 == []:
-            print('1')
+            # print('1')
             return
 
         # there is only on ghost
         if len(g0) == 1 and len(g1) == 1:
-            print('2')
+            # print('2')
             if g0[0].dist_to_pacman < g1[0].dist_to_pacman:
-                print('3')
+                # print('3')
                 self.pacman_info.update_safeties(g0[0])
             elif g0[0].dist_to_pacman > g1[0].dist_to_pacman:
-                print('4')
+                # print('4')
                 self.pacman_info.update_safeties(g1[0])
             else:
-                print('5')
+                # print('5')
                 self.pacman_info.update_safeties(g0[0])
                 self.pacman_info.update_safeties(g1[0])
             return
@@ -246,34 +246,34 @@ class StrategyAdvisor():
         # more than one ghost
         # the same ghost is closer to pacman from the crossroad0 and crossroad1
         if g0[0].position == g1[0].position:
-            print('6')
+            # print('6')
             # closer from crossroad0 - pick that one to cross0 and next on cross1
             if g0[0].dist_to_pacman < g1[0].dist_to_pacman:
-                print('7')
+                # print('7')
                 self.pacman_info.update_safeties(g0[0])
                 self.pacman_info.update_safeties(g1[1])
             # closer from crosroad1 - pick that one to cross1 and next on cross0
             elif g0[0].dist_to_pacman > g1[0].dist_to_pacman:
-                print('8')
+                # print('8')
                 self.pacman_info.update_safeties(g1[0])
                 self.pacman_info.update_safeties(g0[1])
             # same distance from both crossroads
             else:
-                print('9')
+                # print('9')
                 # evaluate distance o next closer ghost on cross0 and cross1
                 if g0[1].dist_to_pacman < g1[1].dist_to_pacman:
-                    print('10')
+                    # print('10')
                     self.pacman_info.update_safeties(g0[1])
                     self.pacman_info.update_safeties(g1[0])
                 else:
-                    print('11')
+                    # print('11')
                     self.pacman_info.update_safeties(g1[1])
                     self.pacman_info.update_safeties(g0[0])
         # closer ghosts from cross0 and cross1 are different
         else:
-            print('12')
+            # print('12')
             self.pacman_info.update_safeties(g0[0])
             self.pacman_info.update_safeties(g1[0])
 
-        print('pacman.ghost_at_crossroad0: ' + str(self.pacman_info.ghost_at_crossroad0))
-        print('pacman.ghost_at_crossroad1: ' + str(self.pacman_info.ghost_at_crossroad1))
+        # print('pacman.ghost_at_crossroad0: ' + str(self.pacman_info.ghost_at_crossroad0))
+        # print('pacman.ghost_at_crossroad1: ' + str(self.pacman_info.ghost_at_crossroad1))
