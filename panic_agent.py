@@ -210,7 +210,7 @@ class PanicAgent:
                     return next_move
                 else:
                     print(next_corridor)
-                    return next_corridor[0].get_coord_next_to_end(crossroad)
+                    return next_corridor.get_coord_next_to_end(crossroad)
 
 
     #escolhe corr com ghost mais afastado
