@@ -37,6 +37,7 @@ class StrategyAnalyst():
         self.eater_possible_moves = []
         self.counter_possible_moves = []
         self.fleer_possible_moves = []
+        self.ghosts_in_pursuit = 0
 
         self.avoid_coordinates = []
     
@@ -54,7 +55,7 @@ class StrategyAnalyst():
             return next_move
 
         # if there are no ghosts to pursue pacman counters if is surrounded or eats if not
-        ghosts_in_pursuit = 0
+        
         for ghost in self.advisor.ghosts_info:
 
             #!!!
@@ -73,13 +74,13 @@ class StrategyAnalyst():
             #!!!
 
             if ghost_manhattam_dist_to_pacman <= SAFE_DIST_TO_GHOST:
-                ghosts_in_pursuit += 1
+                self.ghosts_in_pursuit += 1
 
             # if ghost.dist_to_pacman <= SAFE_DIST_TO_GHOST:
             #     ghosts_in_pursuit += 1
 
         # counter (if not possible, try eating)
-        if ghosts_in_pursuit >= NUMBER_OF_GHOST_TO_OFFENSIVE:
+        if self.ghosts_in_pursuit >= NUMBER_OF_GHOST_TO_OFFENSIVE:
             
             next_move = self._try_counter(surrounded_counter=True)
             if next_move != None:
@@ -100,8 +101,8 @@ class StrategyAnalyst():
                 return next_move
 
             next_move = self._try_counter()
-            if next_move != None:
-                return next_move
+            # if next_move != None:
+            #     return next_move
             
             next_move = self._try_flight(avoid_suggestion=True)
             if next_move != None:
@@ -256,7 +257,7 @@ class StrategyAnalyst():
         # ghost from behind is ate distance 1 or 2, which mean that no turning back is possible
 
         
-        if pacman.position in self.advisor.map_.crossroads:
+        if pacman.position in self.advisor.map_.crossroads and self.ghosts_in_pursuit >= 2:
             print('###')
             print(pacman.position)
             print(self.advisor.map_.crossroads)
@@ -270,7 +271,7 @@ class StrategyAnalyst():
             if len(self.advisor.state['energy']) < 20 and self.advisor.state['lives'] >= 2:
                 return True
             
-            if len(self.advisor.state['energy']) < 10 and self.advisor.state['lives'] == 2:
+            if len(self.advisor.state['energy']) < 5 and self.advisor.state['lives'] == 2:
                 return True
 
             print('---> verify if there will be a future trap')
@@ -351,6 +352,18 @@ class StrategyAnalyst():
         print('###################################################')
         print('GOT INTO: ' + str(MODE.EATING))
         targets = self.advisor.state['energy'] + self.advisor.state['boost']
+
+        if len(self.advisor.state['energy']) > 50:
+            if self.ghosts_in_pursuit < NUMBER_OF_GHOST_TO_OFFENSIVE:
+                
+                remove_coords = []
+                for boost in self.advisor.state['boost']:
+                    for corr in self.advisor.map_.corridors:
+                        if boost in corr.coordinates:
+                            remove_coords += corr.coordinates
+                targets = [t for t in targets if t not in remove_coords]
+
+
         if targets != []:
             eater = EatingAgent(self.advisor, targets)
             self.eater_possible_moves = eater.eat()

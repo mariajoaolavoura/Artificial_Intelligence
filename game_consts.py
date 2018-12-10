@@ -33,7 +33,7 @@ SAFE_DIST_TO_GHOST = 7 #! test from 5 to 8
 # value from 0 to 1.
 # 0 -> Pac-Man does not pursue the ghots
 # 1 -> Pac-Man pursues ant ghost in maximum range until timeout
-GHOST_PURSUIT_MULTIPLIER = 0.4 #! test from 0.4 to 0.7
+GHOST_PURSUIT_MULTIPLIER = 0.5 #! test from 0.4 to 0.7
 # number of ghosts at unsafe distance to prefer offensive strategy (counter first)
 # the value must be double the ghosts, because ghosts are duplicated in ghosts_info
 NUMBER_OF_GHOST_TO_OFFENSIVE = 3 #! test from 3 to 4 only with 4 ghosts, less ghosts test with 3
