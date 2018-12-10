@@ -116,7 +116,7 @@ for i in $(seq 1 $1); do
 
     # copy save of scores
     if [ $? -eq 0 ]; then 
-        cp our_tests/scores/* our_tests/backup_scores/
+        cp scores* our_tests/backup_scores/
     
     # program failed, restore scores
     else    

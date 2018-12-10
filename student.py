@@ -1,5 +1,5 @@
 from game_consts import *
-from strategy_topographer import Static_Analysis
+from strategy_topographer import StrategyTopographer
 from pathways import Pathways
 from tree_search import SearchTree, SearchProblem
 from corridor import Corridor
