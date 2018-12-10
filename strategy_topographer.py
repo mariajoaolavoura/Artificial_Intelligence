@@ -10,7 +10,7 @@ debug = True
 logger = setup_logger('static_analysis', 'static_analysis.log')
 
 
-class Topographer():
+class StrategyTopographer():
     """Makes the static analysis of the Map instance for the game. 
 
     Args:

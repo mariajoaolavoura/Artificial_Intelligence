@@ -45,7 +45,6 @@ class EatingAgent:
 
     #--------------------------------------------------------------------------#
     # SEARCH FOR ENERGIES
-
         for energy in self.targets:
             
             # find this energy corridor
@@ -76,13 +75,13 @@ class EatingAgent:
     
     #--------------------------------------------------------------------------#
     # SORT MOVES BY WHERE A GHOST IS BLOCKING THE NEXT CORRIDOR
-        # f_moves = []
-        # for move in possible_moves:
-        #     if move[2][-3].safe == CORRIDOR_SAFETY.UNSAFE:
-        #         f_moves += [move]
+        f_moves = []
+        for move in possible_moves:
+            if move[2][-3].safe == CORRIDOR_SAFETY.UNSAFE:
+                f_moves += [move]
 
-        # possible_moves = [move for move in possible_moves if move not in f_moves]
-        # possible_moves += f_moves
+        possible_moves = [move for move in possible_moves if move not in f_moves]
+        possible_moves += f_moves
 
     #--------------------------------------------------------------------------#
     # SORT MOVES BY WHERE A GHOST IS BLOCKING PAC-MAN CORRIDOR
@@ -93,71 +92,6 @@ class EatingAgent:
 
         possible_moves = [move for move in possible_moves if move not in f_moves]
         possible_moves += f_moves
-
-    #--------------------------------------------------------------------------#
-    # DISCARD MOVES WHERE A GHOST IN PURSUIT IS CLOSER TO THE ENERGY THAN PAC-MAN
-    # # TODO after strategy_analyser is done, reverify if this last sort/discar works
-    #     f_moves = []
-    #     for move in possible_moves[:]:
-
-    #         _, cost, path = move
-    #         energy_inside_corr = False
-    #         clear_path = True
-            
-    #         # verify which ghost is blocking the path or if the path is clear
-    #         if pacman.ghost_at_crossroad0 != None:
-                
-    #             if any([c in pacman.ghost_at_crossroad0.position for corr in path for c in corr.coordinates]):
-    #                 clear_path = False
-    #                 ghost = pacman.ghost_at_crossroad0
-                    
-    #         if pacman.ghost_at_crossroad1 != None:
-    #             if any([c in pacman.ghost_at_crossroad1.position for corr in path for c in corr.coordinates]):
-    #                 clear_path = False
-    #                 ghost = pacman.ghost_at_crossroad1
-
-    #         if clear_path:
-    #             continue
-
-    #         # verify which crossroad is in the path
-    #         crossroad = None
-    #         if any([c in pacman.crossroad0 for corr in path for c in corr.coordinates]):
-    #             crossroad = pacman.crossroad0
-    #         elif any([c in pacman.crossroad1 for corr in path for c in corr.coordinates]):
-    #             crossroad = pacman.crossroad1
-
-    #         # if no crossroad is in the path, then the energy is inside the corridor
-    #         # it's needed to verify from which crossroad is the energy will be accessed
-    #         if crossroad == None:
-    #             energy_inside_corr = True
-    #             sub_corr0 = pacman.corridor.sub_corridors(pacman.position)[0].coordinates
-    #             sub_corr1 = pacman.corridor.sub_corridors(pacman.position)[1].coordinates
-    #             if any([ c in sub_corr0 for corr in path for c in corr.coordinates ]):
-    #                 crossroad = pacman.crossroad0
-    #             elif any([ c in sub_corr1 for corr in path for c in corr.coordinates ]):
-    #                 crossroad = pacman.crossroad1
-
-    #         # calculate distances of pacman and ghost to energy, according to
-    #         # if energy is inside or outside pacman corridor
-
-    #         # calculate distancies for when energy is in pacman corridor
-    #         if energy_inside_corr:
-    #             cross_to_energy = pacman.dist_to_crossroad(crossroad) - cost
-    #             ghost_dist_to_energy = ghost.dist_to_crossroad + cross_to_energy
-    #         # calculate distancies for when energy is NOT in pacman corridor
-    #         else:
-    #             cross_to_energy = cost - pacman.dist_to_crossroad(crossroad)
-    #             ghost_dist_to_energy = ghost.dist_to_crossroad - cross_to_energy
-            
-    #         # if pacman distance to energy is smaller than ghost's, discard move
-    #         if cost < ghost_dist_to_energy and pacman.pursued_from_crossroad(crossroad):
-    #             possible_moves.remove(move)
-    #         elif cost < ghost_dist_to_energy:
-    #             f_moves += [move]
-
-    #     # sort
-    #     possible_moves = [move for move in possible_moves if move not in f_moves]
-    #     possible_moves += f_moves
 
     #--------------------------------------------------------------------------#
     # RETURN OPTIONS

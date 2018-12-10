@@ -1,5 +1,5 @@
 from game_consts import *
-from static_analysis import Static_Analysis
+from strategy_topographer import Static_Analysis
 from pathways import Pathways
 from tree_search import SearchTree, SearchProblem
 from corridor import Corridor
@@ -116,7 +116,7 @@ class Pacman_agent():
         logger.warning('\n\n\n ========================== NEW EXECUTION ==========================\n')
         logger.debug('CREATING PACMAN AGENT\n')
 
-        self.map_ = Static_Analysis(map_)
+        self.map_ = StrategyTopographer(map_)
         self.debug = False
 
         logger.debug('CREATED PACMAN AGENT')

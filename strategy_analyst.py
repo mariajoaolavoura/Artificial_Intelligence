@@ -72,7 +72,7 @@ class StrategyAnalyst():
             ghost_manhattam_dist_to_pacman = min(heuristics)
             #!!!
 
-            if ghost_manhattam_dist_to_pacman <= SAFE_DIST_TO_GHOST -2:
+            if ghost_manhattam_dist_to_pacman <= SAFE_DIST_TO_GHOST:
                 ghosts_in_pursuit += 1
 
             # if ghost.dist_to_pacman <= SAFE_DIST_TO_GHOST:
