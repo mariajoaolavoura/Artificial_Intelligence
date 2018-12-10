@@ -194,12 +194,12 @@ class PanicAgent:
         if next_corridor != []:
             # crossroad is None
             if crossroad == None:
-                crossroad = [c for c in next_corridor.coordinates if c in self.pac_info.corridor.coordinates][0]
+                crossroad = [c for c in next_corridor.ends if c in self.pac_info.corridor.ends][0]
                 next_move = self.pac_info.corridor.get_next_coord_to_the_side_of_crossroad(pacman, crossroad)
                 if next_move != None:
                     return next_move
-                else:
-                    print('PANIC: calculate coordinate, SHOULD NOT BE NONE!')
+                else: # pacman is in the crossroad
+                    return next_corridor.get_coord_next_to_end(crossroad)
             # crossroad exists
             else:
                 # tries to get next coordinate to the side of crossroad
@@ -221,6 +221,7 @@ class PanicAgent:
                 safety_number = self.long_range_safety(corr.ends[0])
                 safety_number += self.long_range_safety(corr.ends[1])
                 safe_corrs += [(corr, safety_number)]
+                # safe_corrs += [(corr, len(corr.coordinates))]
                 print('PANIC: calculated next corridor as safe: ' + str(corr))
         
         if len(safe_corrs) != 0:
