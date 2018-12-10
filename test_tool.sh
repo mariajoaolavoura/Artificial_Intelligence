@@ -25,6 +25,7 @@ average () {
         fi
         
         awk 'NF' $1 > aaaaaa #trim empty lines
+        sed -i '/NaN/d' aaaaaa   #remove NaN
         awk '{s+=$1}END{print "\t",(NR?s/NR:"NaN")}' RS="\n" aaaaaa
 
         if [[ $2 != 1 ]]; then
