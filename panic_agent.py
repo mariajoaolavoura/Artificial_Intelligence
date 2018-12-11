@@ -218,6 +218,10 @@ class PanicAgent:
         safe_corrs = []
         for corr in pac_adj:
             if corr.safe == CORRIDOR_SAFETY.SAFE:
+
+                if any([c in self.advisor.state['energy'] for c in corr.coordinates]):
+                    return corr
+
                 safety_number = self.long_range_safety(corr.ends[0])
                 safety_number += self.long_range_safety(corr.ends[1])
                 safe_corrs += [(corr, safety_number)]
