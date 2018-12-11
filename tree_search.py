@@ -295,7 +295,7 @@ class SearchTree:
         while self.open_nodes != []:
             # print('TREE SEARCH: open nodes: ' + str(self.open_nodes))
             node = self.open_nodes.pop()
-
+            
             if self.problem.goal_test(node.state):
                 if node.parent != None:
                     path = self.get_path(node)
@@ -312,7 +312,7 @@ class SearchTree:
             lnewnodes = []
             # print('TREE SEARCH actions: ' + str(self.problem.domain.actions(node.state)))
             for action in self.problem.domain.actions(node.state):
-                # print('action: ' + str(action))
+                print('action: ' + str(action))
 
                 new_state = self.problem.domain.result(node.state, action)
                 #print('result: ' + str(new_state))
@@ -324,8 +324,14 @@ class SearchTree:
                 # print(all([c in avoid_corridor.coordinates for c in new_state.coordinates]))
                 # print('---> ' + str(self.lvisited))
                 # print(new_state in self.lvisited)
-                # print('initial: ' + str(self.problem.initial))
-                # print('new_state: ' +str(new_state))
+                
+                #print('new_state: ' +str(new_state))
+
+                if new_state == None:
+                    print('SOMETHING IS REALLY WRONG!')
+                    print('node.state: ' +str(node.state))
+                    print('initial: ' + str(self.problem.initial))
+                    
                 if all([c in self.problem.initial.coordinates for c in new_state.coordinates]):
                     # print('avoided because returned to pacman')
                     continue

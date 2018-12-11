@@ -105,8 +105,8 @@ class StrategyAdvisor():
                     break
                 else:
                     ghost_corr = None
-            ## print('GHOST POSITION: ' + str(ghost))
-            ## print('GHOST CORRIDOR: ' + str(ghost_corr))
+            print('GHOST POSITION: ' + str(ghost))
+            print('GHOST CORRIDOR: ' + str(ghost_corr))
             # calculate trajectory of every ghost towards Pac-Man
             if ghost_corr != None: # if ghost is not in ghosts_den
                 
@@ -127,13 +127,16 @@ class StrategyAdvisor():
                                     avoid_coordinates += [av]
                 else:
                     avoid_coordinates += [avoid]
-                # print('avoid coordinatesA: ' + str(avoid_coordinates))
+
+                print('avoid coordinatesA: ' + str(avoid_coordinates))
                 _, cost1, path1 = my_tree.all_path_search(avoid_coordinates)[0]
                 ## print('WHAT? ' + str(cost1) + ', ' + str(path1))
                 ghosts_at_cross1 += [Ghost_Info(ghost, zombie, timeout, \
                                      ghost_corr, cost1, self.pacman_info.crossroad1, \
                                      cost1 - self.pacman_info.dist_to_crossroad1, \
                                      path1)]
+
+
 
                 my_prob = SearchProblem(domain, self.pacman_info.corridor, pacman, \
                                         ghost_corr, ghost, \
@@ -152,6 +155,7 @@ class StrategyAdvisor():
                                     avoid_coordinates += [av]
                 else:
                     avoid_coordinates += [avoid]
+
                 # print('avoid coordinatesB: ' + str(avoid_coordinates))
                 _, cost0, path0 = my_tree.all_path_search(avoid_coordinates)[0]
                 ## print('WHAT? ' + str(cost0) + ', ' + str(path0))

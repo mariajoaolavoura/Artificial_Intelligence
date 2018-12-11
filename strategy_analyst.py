@@ -41,6 +41,7 @@ class StrategyAnalyst():
         self.ghosts_in_pursuit = 0
         self.move_risk_assessor = None
         self.avoid_coordinates = []
+        self.invalid_corridors = []
     
     def decide(self):
         """ Main method of the StartegyAnalyst class, which accomplishes the
@@ -57,19 +58,42 @@ class StrategyAnalyst():
             #!!!
             px, py = self.advisor.pacman_info.position
             gx, gy = ghost.position
-            
-            heuristics = []
-            internal_heuristic = abs(gx-px) + abs(gy-py)
-            heuristics += [internal_heuristic]
-            hor_tunnel_heuristic = self.advisor.map_.map_.hor_tiles - abs(gx-px) + abs(gy-py) if self.advisor.map_.hor_tunnel_exists else None
-            heuristics += [hor_tunnel_heuristic]
-            ver_tunnel_heuristic = abs(gx-px) + self.advisor.map_.map_.ver_tiles - abs(gy-py) if self.advisor.map_.ver_tunnel_exists else None
-            heuristics += [ver_tunnel_heuristic]
-            heuristics = [heur for heur in heuristics if heur != None]
-            ghost_manhattam_dist_to_pacman = min(heuristics)
-            #!!!
 
-            if ghost_manhattam_dist_to_pacman <= SAFE_DIST_TO_GHOST:
+            internal_hor_heuristic = abs(gx-px)
+            internal_ver_heuristic = abs(gy-py)
+            internal_heuristic = internal_hor_heuristic + internal_ver_heuristic
+
+            hor_tunnel_hor_heuristic = self.advisor.map_.map_.hor_tiles - abs(gx-px) if self.advisor.map_.hor_tunnel_exists else None
+            hor_tunnel_ver_heuristic = abs(gy-py) if self.advisor.map_.hor_tunnel_exists else None
+            
+            ver_tunnel_hor_heuristic = abs(gx-px) if self.advisor.map_.ver_tunnel_exists else None
+            ver_tunnel_ver_heuristic = self.advisor.map_.map_.ver_tiles - abs(gy-py) if self.advisor.map_.ver_tunnel_exists else None
+            
+            
+            if hor_tunnel_hor_heuristic != None:
+                hor_tunnel_heuristic = hor_tunnel_hor_heuristic + hor_tunnel_ver_heuristic
+            else:
+                hor_tunnel_heuristic = 1000 # will no be considered
+
+            if ver_tunnel_hor_heuristic != None:
+                ver_tunnel_heuristic = ver_tunnel_hor_heuristic + ver_tunnel_ver_heuristic
+            else:
+                ver_tunnel_heuristic = 1000 # will not be considered
+
+
+            if internal_heuristic < hor_tunnel_heuristic and internal_heuristic < ver_tunnel_heuristic:
+                dx = internal_hor_heuristic
+                dy = internal_ver_heuristic
+
+            if hor_tunnel_heuristic < internal_heuristic and hor_tunnel_heuristic < ver_tunnel_heuristic:
+                dx = hor_tunnel_hor_heuristic
+                dy = hor_tunnel_ver_heuristic
+
+            if ver_tunnel_heuristic < hor_tunnel_heuristic and ver_tunnel_heuristic < internal_heuristic:
+                dx = ver_tunnel_hor_heuristic
+                dy = ver_tunnel_ver_heuristic
+
+            if dx <= SAFE_DIST_TO_GHOST and dy <= SAFE_DIST_TO_GHOST:
                 self.ghosts_in_pursuit += 1
 
         self.move_risk_assessor = MoveRiskAssessor(self.advisor, self.ghosts_in_pursuit)
@@ -232,6 +256,15 @@ class StrategyAnalyst():
             if valid_next_move:
                 print('FLIGHT MODE IS RETURNING NEXT MOVE: ' + str(next_move[0][0]))
                 return next_move[0][0]
+            else:
+                if pacman.position in self.advisor.map_.crossroads:
+                    if next_move[0][2][1].coordinates == pacman.corridor.coordinates:
+                        self.invalid_corridors = [next_move[0][2][2]]
+                    else:
+                        self.invalid_corridors = [next_move[0][2][1]]
+                else:
+                    print('FLIGHT: ' + str(next_move))
+                    self.invalid_corridors += [next_move[0][2][2]]
 
  
         best_moves = self._get_best_moves_from_agent(eater_best_moves)
@@ -289,6 +322,14 @@ class StrategyAnalyst():
             if valid_next_move:
                 print('FLIGHT MODE IS RETURNING NEXT MOVE: ' + str(next_move[0][0]))
                 return next_move[0][0]
+            else:
+                if pacman.position in self.advisor.map_.crossroads:
+                    if next_move[0][2][1].coordinates == pacman.corridor.coordinates:
+                        self.invalid_corridors = [next_move[0][2][2]]
+                    else:
+                        self.invalid_corridors = [next_move[0][2][1]]
+                else:
+                    self.invalid_corridors += [next_move[0][2][2]]
 
         return None
     
@@ -298,7 +339,7 @@ class StrategyAnalyst():
 
         panicker = PanicAgent(self.advisor)
         # ignore one previously verified bad move (not possible to block more than one)
-        next_move = panicker.panic([])
+        next_move = panicker.panic(self.invalid_corridors)
         print('PANIC MODE IS RETURNING NEXT MOVE: ' + str(next_move))
         return next_move
     

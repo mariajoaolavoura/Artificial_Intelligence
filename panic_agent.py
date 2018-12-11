@@ -15,7 +15,7 @@ class PanicAgent:
         self.semaphore1 = advisor.pacman_info.semaphore1
 
 
-    def panic(self, avoid_coordinates):
+    def panic(self, invalid_corridors):
         '''Calculates the next move of Pac-Man based on the surrounding corridors
         and their safety. Choses one from the best possible outcomes.
 
@@ -33,11 +33,66 @@ class PanicAgent:
         '''
         # print('PANIC: avoid coordinates ' + str(avoid_coordinates))
     
-        pac_adj0, pac_safe_corr0, pac_unsafe_corr0 = self.calc_adj_and_safe(self.pac_info.crossroads[0], avoid_coordinates)
+        pac_adj0, pac_safe_corr0, pac_unsafe_corr0 = self.calc_adj_and_safe(self.pac_info.crossroads[0])
         escape_corridors0 = pac_safe_corr0 if pac_safe_corr0 != [] else pac_adj0
 
-        pac_adj1, pac_safe_corr1, pac_unsafe_corr1 = self.calc_adj_and_safe(self.pac_info.crossroads[1], avoid_coordinates)
+        pac_adj1, pac_safe_corr1, pac_unsafe_corr1 = self.calc_adj_and_safe(self.pac_info.crossroads[1])
         escape_corridors1 = pac_safe_corr1 if pac_safe_corr1 != [] else pac_adj1
+
+        aux0 = []
+        aux1 = []
+        aux_adj0 = []
+        aux_adj1 = []
+        aux_safe0 = []
+        aux_safe1 = []
+
+        for corr in invalid_corridors:
+
+            for c in pac_adj0:
+                if all([coord in c.coordinates for coord in corr.coordinates]):
+                    aux_adj0 += [c]
+
+            for c in pac_adj1:
+                if all([coord in c.coordinates for coord in corr.coordinates]):
+                    aux_adj0 += [c]
+
+            for c in pac_safe_corr0:
+                if all([coord in c.coordinates for coord in corr.coordinates]):
+                    aux_adj0 += [c]
+
+            for c in pac_safe_corr1:
+                if all([coord in c.coordinates for coord in corr.coordinates]):
+                    aux_adj0 += [c]
+
+            for c in escape_corridors0:
+                if all([coord in c.coordinates for coord in corr.coordinates]):
+                    aux_adj0 += [c]
+
+            for c in escape_corridors1:
+                if all([coord in c.coordinates for coord in corr.coordinates]):
+                    aux_adj0 += [c]
+
+
+        # if invalid_corridors != []:
+        #     aux_adj0 = [c for c in pac_adj0 if c not in invalid_corridors]
+        #     aux_adj1 = [c for c in pac_adj1 if c not in invalid_corridors]
+        #     aux_safe0 = [c for c in pac_safe_corr0 if c not in invalid_corridors]
+        #     aux_safe1 = [c for c in pac_safe_corr1 if c not in invalid_corridors]
+        #     aux0 = [c for c in escape_corridors0 if c not in invalid_corridors]
+        #     aux1 = [c for c in escape_corridors1 if c not in invalid_corridors]
+        
+        if aux0 != []:
+            escape_corridors0 = aux0
+        if aux1 != []:
+            escape_corridors1 = aux1
+        if aux_adj0 != []:
+            pac_adj0 = aux_adj0
+        if aux_adj1 != []:
+            pac_adj1 = aux_adj1
+        if aux_safe0 != []:
+            pac_safe_corr0 = aux_safe0
+        if aux_safe1 != []:
+            pac_safe_corr1 = aux_safe1
 
         all_adjacent_corridors = pac_adj0 + pac_adj1
         all_safe_adjacent_corridors = pac_safe_corr0 + pac_safe_corr1
@@ -136,7 +191,7 @@ class PanicAgent:
         return self.calc_next_coord(pacman=self.pacman, crossroad=None , next_corridor=next_corr)
 
 
-    def calc_adj_and_safe(self, crossroad, avoid_coordinates):
+    def calc_adj_and_safe(self, crossroad):
 
         aux = []
         adj_corrs = []
@@ -164,9 +219,9 @@ class PanicAgent:
                 unsafe_corrs += [corr]
             adj_corrs += [corr]
 
-        if avoid_coordinates != []:
-            adj_corrs = [corr for corr in adj_corrs if all([av not in corr.coordinates for av in avoid_coordinates])]
-            safe_corrs = [corr for corr in safe_corrs if all([av not in corr.coordinates for av in avoid_coordinates])]
+        # if avoid_coordinates != []:
+        #     adj_corrs = [corr for corr in adj_corrs if all([av not in corr.coordinates for av in avoid_coordinates])]
+        #     safe_corrs = [corr for corr in safe_corrs if all([av not in corr.coordinates for av in avoid_coordinates])]
 
         return adj_corrs, safe_corrs, unsafe_corrs
                 
@@ -262,6 +317,6 @@ class PanicAgent:
             return self.calc_next_coord(self.pacman, self.crossroad1, next_corr)
 
     def long_range_safety(self, crossroad):
-        _, _, unsafe_corrs = self.calc_adj_and_safe(crossroad, [])
+        _, _, unsafe_corrs = self.calc_adj_and_safe(crossroad)
         return len(unsafe_corrs)
 
