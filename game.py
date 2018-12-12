@@ -1,3 +1,4 @@
+import math
 import os
 import asyncio
 import json
@@ -81,7 +82,7 @@ class Game:
         
         self.map = Map(self.map.filename)
         self._step = 0
-        self._ghosts = [Ghost(self.map, level=self._l_ghosts) for g in range(0,self._n_ghosts)]
+        self._ghosts = [Ghost(i, self.map, level=self._l_ghosts) for i in range(0,self._n_ghosts)]
         self._pacman = self.map.pacman_spawn
         self._energy = self.map.energy
         self._boost = self.map.boost
@@ -101,6 +102,7 @@ class Game:
     def save_highscores(self):
         #update highscores
         logger.debug("Save highscores")
+        logger.info("FINAL SCORE <%s>: %s", self._player_name, self.score)
         self._highscores.append((self._player_name, self.score))
         self._highscores = sorted(self._highscores, key=lambda s: -1*s[1])[:MAX_HIGHSCORES]
     
@@ -129,6 +131,12 @@ class Game:
             self._score += ((self._timeout - self._step) // TIME_BONUS_STEPS) * POINT_TIME_BONUS 
             self.stop()
 
+    def in_range(self, p1, p2, d):
+        px, py = p1
+        gx, gy = p2
+        distance = math.hypot(px-gx, py-gy)
+        return distance <= d
+
     def collision(self):
         for g in self._ghosts:
             if g.pos == self._pacman and self._running:
@@ -141,6 +149,7 @@ class Game:
                         self._lives -= 1
                         self._pacman = self.map.pacman_spawn
                         g.respawn()
+                        [gg.respawn() for gg in self._ghosts if self.in_range(self._pacman, gg.pos, 2)]
                     if not self._lives:
                         self.stop()
                         return
@@ -163,7 +172,7 @@ class Game:
         self.collision()
        
         for ghost in self._ghosts:
-            ghost.update(self._state)
+            ghost.update(self._state, self._ghosts)
         self.collision()
         
         self._state = {"step": self._step,

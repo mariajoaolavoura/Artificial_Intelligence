@@ -54,48 +54,10 @@ class StrategyAnalyst():
         # if there are no ghosts to pursue pacman counters if is surrounded or eats if not
         
         for ghost in self.advisor.ghosts_info:
-
-            #!!!
-            px, py = self.advisor.pacman_info.position
-            gx, gy = ghost.position
-
-            internal_hor_heuristic = abs(gx-px)
-            internal_ver_heuristic = abs(gy-py)
-            internal_heuristic = internal_hor_heuristic + internal_ver_heuristic
-
-            hor_tunnel_hor_heuristic = self.advisor.map_.map_.hor_tiles - abs(gx-px) if self.advisor.map_.hor_tunnel_exists else None
-            hor_tunnel_ver_heuristic = abs(gy-py) if self.advisor.map_.hor_tunnel_exists else None
             
-            ver_tunnel_hor_heuristic = abs(gx-px) if self.advisor.map_.ver_tunnel_exists else None
-            ver_tunnel_ver_heuristic = self.advisor.map_.map_.ver_tiles - abs(gy-py) if self.advisor.map_.ver_tunnel_exists else None
-            
-            
-            if hor_tunnel_hor_heuristic != None:
-                hor_tunnel_heuristic = hor_tunnel_hor_heuristic + hor_tunnel_ver_heuristic
-            else:
-                hor_tunnel_heuristic = 1000 # will no be considered
-
-            if ver_tunnel_hor_heuristic != None:
-                ver_tunnel_heuristic = ver_tunnel_hor_heuristic + ver_tunnel_ver_heuristic
-            else:
-                ver_tunnel_heuristic = 1000 # will not be considered
-
-
-            if internal_heuristic < hor_tunnel_heuristic and internal_heuristic < ver_tunnel_heuristic:
-                dx = internal_hor_heuristic
-                dy = internal_ver_heuristic
-
-            if hor_tunnel_heuristic < internal_heuristic and hor_tunnel_heuristic < ver_tunnel_heuristic:
-                dx = hor_tunnel_hor_heuristic
-                dy = hor_tunnel_ver_heuristic
-
-            if ver_tunnel_heuristic < hor_tunnel_heuristic and ver_tunnel_heuristic < internal_heuristic:
-                dx = ver_tunnel_hor_heuristic
-                dy = ver_tunnel_ver_heuristic
-
-            if dx <= SAFE_DIST_TO_GHOST and dy <= SAFE_DIST_TO_GHOST:
+            if self._ghost_is_in_pursuit(ghost.position):
                 self.ghosts_in_pursuit += 1
-
+            
         self.move_risk_assessor = MoveRiskAssessor(self.advisor, self.ghosts_in_pursuit)
 
 
@@ -112,8 +74,8 @@ class StrategyAnalyst():
                 return next_move
         
             next_move = self._try_eating(surrounded_eating=True)
-            if next_move != None:
-                return next_move
+            # if next_move != None:
+            #     return next_move
 
             next_move = self._try_flight(avoid_suggestion=False)
             if next_move != None:
@@ -237,20 +199,18 @@ class StrategyAnalyst():
         
         for move in best_moves:
 
-            #print('ANALYST: best_moves is: ')
-            #print('-> move: ' + str(m[2][0].coordinates[0]) + ' at cost ' + str(m[1]))
+            print('ANALYST: best_moves is: ')
 
             # flee to a safe corridor (if possible, one in a best_move path)
             # args: target coordinate, coordinate to avoid
             targets = [(move[2][0].coordinates[0], [move[2][-2].get_coord_next_to_end(pacman.position)])]
             
-            #print('Flight targets: ' + str(targets))
+            print('Flight targets: ' + str(targets))
             
             fleer = FlightAgent(self.advisor, targets)
             next_move = fleer.flee()
 
-            #print('--> move: ' + str(m[2][-1].coordinates[0]) + ' at cost ' + str(m[1]) + ' path starts with ' + str(m[2][-2]))
-            print('in flight mode, analysing move: ' + str(move[2][0].coordinates[0]))
+
             print('FLIGHT: NEXT MOVE ' + str(next_move))
             valid_next_move = self.move_risk_assessor.analyse_best_move(possible_moves=next_move, flight=True)
             if valid_next_move:
@@ -279,22 +239,16 @@ class StrategyAnalyst():
             print('FLIGHT: path_coords: ' + str(path_coords))
             self.avoid_coordinates = []
             avoid = None
-            # TODO ele 'as vezes nao entra em nenhum dos ifs...
+
             if all([c in path_coords for c in sub_corr0.coordinates]):
-                print('GOT IN IF 1')
                 if avoid_suggestion:
-                    print('GOT IN IF 1.1')
                     avoid = sub_corr0.get_coord_next_to_end(pacman.position)
                 else:
-                    print('GOT IN IF 1.2')
                     avoid = sub_corr1.get_coord_next_to_end(pacman.position)
             elif all([c in path_coords for c in sub_corr1.coordinates]):
-                print('GOT IN IF 2')
                 if avoid_suggestion:
-                    print('GOT IN IF 2.1')
                     avoid = sub_corr1.get_coord_next_to_end(pacman.position)
                 else:
-                    print('GOT IN IF 2.2')
                     avoid = sub_corr0.get_coord_next_to_end(pacman.position)
             
             if avoid == None:
@@ -310,13 +264,11 @@ class StrategyAnalyst():
             # flee to a safe corridor (if possible, one in a best_move path)
             targets = [(move[2][0].coordinates[0], self.avoid_coordinates)]
             
-            #print('Flight targets: ' + str(targets))
+            print('Flight targets: ' + str(targets))
             
             fleer = FlightAgent(self.advisor, targets)
             next_move = fleer.flee()
 
-            #print('--> move: ' + str(m[2][-1].coordinates[0]) + ' at cost ' + str(m[1]) + ' path starts with ' + str(m[2][-2]))
-            print('in flight mode, analysing move: ' + str(move[2][0].coordinates[0]))
             print('FLIGHT: NEXT MOVE ' + str(next_move))
             valid_next_move = self.move_risk_assessor.analyse_best_move(possible_moves=next_move, flight=True)
             if valid_next_move:
@@ -342,4 +294,51 @@ class StrategyAnalyst():
         next_move = panicker.panic(self.invalid_corridors)
         print('PANIC MODE IS RETURNING NEXT MOVE: ' + str(next_move))
         return next_move
+
+
+#--------------------------------------------------------------------------#
+# AUXILIAR METHODS
+#--------------------------------------------------------------------------#
+
+    def _ghost_is_in_pursuit(self, ghost_position):
+
+            px, py = self.advisor.pacman_info.position
+            gx, gy = ghost_position
+
+            internal_hor_heuristic = abs(gx-px)
+            internal_ver_heuristic = abs(gy-py)
+            internal_heuristic = internal_hor_heuristic + internal_ver_heuristic
+
+            hor_tunnel_hor_heuristic = self.advisor.map_.map_.hor_tiles - abs(gx-px) if self.advisor.map_.hor_tunnel_exists else None
+            hor_tunnel_ver_heuristic = abs(gy-py) if self.advisor.map_.hor_tunnel_exists else None
+            
+            ver_tunnel_hor_heuristic = abs(gx-px) if self.advisor.map_.ver_tunnel_exists else None
+            ver_tunnel_ver_heuristic = self.advisor.map_.map_.ver_tiles - abs(gy-py) if self.advisor.map_.ver_tunnel_exists else None
+            
+            
+            if hor_tunnel_hor_heuristic != None:
+                hor_tunnel_heuristic = hor_tunnel_hor_heuristic + hor_tunnel_ver_heuristic
+            else:
+                hor_tunnel_heuristic = 1000 # will no be considered
+
+            if ver_tunnel_hor_heuristic != None:
+                ver_tunnel_heuristic = ver_tunnel_hor_heuristic + ver_tunnel_ver_heuristic
+            else:
+                ver_tunnel_heuristic = 1000 # will not be considered
+
+
+            if internal_heuristic < hor_tunnel_heuristic and internal_heuristic < ver_tunnel_heuristic:
+                dx = internal_hor_heuristic
+                dy = internal_ver_heuristic
+
+            if hor_tunnel_heuristic < internal_heuristic and hor_tunnel_heuristic < ver_tunnel_heuristic:
+                dx = hor_tunnel_hor_heuristic
+                dy = hor_tunnel_ver_heuristic
+
+            if ver_tunnel_heuristic < hor_tunnel_heuristic and ver_tunnel_heuristic < internal_heuristic:
+                dx = ver_tunnel_hor_heuristic
+                dy = ver_tunnel_ver_heuristic
+
+            if dx <= SAFE_DIST_TO_GHOST and dy <= SAFE_DIST_TO_GHOST:
+                self.ghosts_in_pursuit += 1
     

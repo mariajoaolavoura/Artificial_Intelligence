@@ -233,12 +233,6 @@ class SearchTree:
     # procurar a solucao
     def search(self):
 
-
-        debug = self.problem.debug
-
-        if debug:
-            print("initial position is :" + str(self.problem.initial_pos))
-
         while self.open_nodes != []:
      
             node = self.open_nodes.pop()
@@ -331,6 +325,11 @@ class SearchTree:
                     print('SOMETHING IS REALLY WRONG!')
                     print('node.state: ' +str(node.state))
                     print('initial: ' + str(self.problem.initial))
+                if self.problem.initial == None:
+                    print('SOMETHING IS REALLY WRONG!')
+                    print('node.state: ' +str(node.state))
+                    print('initial: ' + str(self.problem.initial))
+                    print('state: ' + str(self.problem.state))
                     
                 if all([c in self.problem.initial.coordinates for c in new_state.coordinates]):
                     # print('avoided because returned to pacman')

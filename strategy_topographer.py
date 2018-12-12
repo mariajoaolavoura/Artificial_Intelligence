@@ -35,10 +35,10 @@ class StrategyTopographer():
         self.corr_adjacencies =self.create_corridor_adjacencies(self.corridors)
         self.ghosts_den = []
 
-        sum = 0
-        for corr in self.corridors:
-            sum += len(corr.coordinates)
-        print('AVERAGE CORRIDOR LENGTH: ' + str(sum/len(self.corridors)))
+        # sum = 0
+        # for corr in self.corridors:
+        #     sum += len(corr.coordinates)
+        # print('AVERAGE CORRIDOR LENGTH: ' + str(sum/len(self.corridors)))
         
 
 
@@ -55,6 +55,7 @@ class StrategyTopographer():
         # find ghosts den. This area will not be used in any search or strategy
         # and should be avoided by PACMAN
         self.ghosts_den = self.get_ghosts_den(self.map_)
+        # self.ghosts_den = self.get_den_interior()
 
         pathways_hor = []
         for y in range(self.map_.ver_tiles):
@@ -248,8 +249,47 @@ class StrategyTopographer():
         # Should never reach this      
         return []
         
-    
 
+#------------------------------------------------------------------------------#
+
+#     def get_den_corners(self):
+
+#         ulc = self.ghosts_den[0]
+#         urc = self.ghosts_den[0]
+#         llc = self.ghosts_den[0]
+#         lrc = self.ghosts_den[0]
+#         for c in self.ghosts_den[1:]:
+#             # upper left corner
+#             if c[0] < ulc[0] and c[1] < ulc[1]:
+#                 ulc = c
+#             # upper right corner
+#             if c[0] > urc[0] and c[1] < urc[1]:
+#                 urc = c
+#             # lower left corner
+#             if c[0] < llc[0] and c[1] > llc[1]:
+#                 llc = c
+#             # lower righ corner
+#             if c[0] > lrc[0] and c[1] > lrc[1]:
+#                 lrc = c
+        
+#         return ulc, urc, llc, lrc
+
+# #------------------------------------------------------------------------------#
+
+#     def get_den_interior(self):
+
+#         ulc, urc, llc, lrc = self.get_den_corners()
+
+#         x = ulc[0]+1
+#         y = ulc[1]+1
+#         interior = []
+#         while x < lrc[0]:
+#             while y < lrc[1]:
+#                 interior += [[x,y]]
+#                 y = y+1
+#             x = x+1
+
+#         return interior
 #------------------------------------------------------------------------------#
 
     #* ##########   TESTED AND VERIFIED   ##########
