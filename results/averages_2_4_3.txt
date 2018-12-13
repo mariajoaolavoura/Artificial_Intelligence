@@ -1,0 +1,35 @@
+Map 2, 4 Ghosts, Ghosts Level 3
+
+
+game_consts__5_4_3.py -> 	 888.7
+game_consts__5_4_4.py -> 	 1017.4
+game_consts__5_5_3.py -> 	 930.6
+game_consts__5_5_4.py -> 	 940.8
+game_consts__5_6_3.py -> 	 1070.3
+game_consts__5_6_4.py -> 	 866.7
+game_consts__5_7_3.py -> 	 971.9
+game_consts__5_7_4.py -> 	 881.2
+game_consts__6_4_3.py -> 	 890.7
+game_consts__6_4_4.py -> 	 865.7
+game_consts__6_5_3.py -> 	 1043.7
+game_consts__6_5_4.py -> 	 1059.1
+game_consts__6_6_3.py -> 	 880.6
+game_consts__6_6_4.py -> 	 557.6
+game_consts__6_7_3.py -> 	 607.333
+game_consts__6_7_4.py -> 	 841
+game_consts__7_4_3.py -> 	 1042.4
+game_consts__7_4_4.py -> 	 972.1
+game_consts__7_5_3.py -> 	 916
+game_consts__7_5_4.py -> 	 915.5
+game_consts__7_6_3.py -> 	 986.7
+game_consts__7_6_4.py -> 	 1060.4
+game_consts__7_7_3.py -> 	 1127.5
+game_consts__7_7_4.py -> 	 1023.4
+game_consts__8_4_3.py -> 	 1004.3
+game_consts__8_4_4.py -> 	 939.6
+game_consts__8_5_3.py -> 	 966.8
+game_consts__8_5_4.py -> 	 1042
+game_consts__8_6_3.py -> 	 881.5
+game_consts__8_6_4.py -> 	 1025.7
+game_consts__8_7_3.py -> 	 1015.5
+game_consts__8_7_4.py -> 	 952.2
