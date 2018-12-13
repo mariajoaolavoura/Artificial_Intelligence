@@ -330,6 +330,9 @@ class SearchTree:
                     print('node.state: ' +str(node.state))
                     print('initial: ' + str(self.problem.initial))
                     print('state: ' + str(self.problem.state))
+
+                if new_state == None or self.problem.initial == None:
+                    throw 
                     
                 if all([c in self.problem.initial.coordinates for c in new_state.coordinates]):
                     # print('avoided because returned to pacman')
