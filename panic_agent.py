@@ -31,7 +31,6 @@ class PanicAgent:
         Returns:
         The cordinate where advises Pac-Man to go next
         '''
-        # print('PANIC: avoid coordinates ' + str(avoid_coordinates))
     
         pac_adj0, pac_safe_corr0, pac_unsafe_corr0 = self.calc_adj_and_safe(self.pac_info.crossroads[0])
         escape_corridors0 = pac_safe_corr0 if pac_safe_corr0 != [] else pac_adj0
@@ -71,15 +70,6 @@ class PanicAgent:
             for c in escape_corridors1:
                 if all([coord in c.coordinates for coord in corr.coordinates]):
                     aux_adj0 += [c]
-
-
-        # if invalid_corridors != []:
-        #     aux_adj0 = [c for c in pac_adj0 if c not in invalid_corridors]
-        #     aux_adj1 = [c for c in pac_adj1 if c not in invalid_corridors]
-        #     aux_safe0 = [c for c in pac_safe_corr0 if c not in invalid_corridors]
-        #     aux_safe1 = [c for c in pac_safe_corr1 if c not in invalid_corridors]
-        #     aux0 = [c for c in escape_corridors0 if c not in invalid_corridors]
-        #     aux1 = [c for c in escape_corridors1 if c not in invalid_corridors]
         
         if aux0 != []:
             escape_corridors0 = aux0
@@ -98,15 +88,6 @@ class PanicAgent:
         all_safe_adjacent_corridors = pac_safe_corr0 + pac_safe_corr1
         all_unsafe_adjacent_corridors = pac_unsafe_corr0 + pac_unsafe_corr1
         all_escape_corridors = escape_corridors0 + escape_corridors1
-
-        # print('PANICKING INIT:')
-        # print('---> pac_adj0: ' + str(pac_adj0))
-        # print('---> pac_safe_corr0: ' + str(pac_safe_corr0))
-        # print('---> escape_corridors0: ' + str(escape_corridors0))
-        # print('---> pac_adj1: ' + str(pac_adj1))
-        # print('---> pac_safe_corr1: ' + str(pac_safe_corr1))
-        # print('---> escape_corridors1: ' + str(escape_corridors1))
-
    
     #--------------------------------------------------------------------------#
     # PAC-MAN CORRIDOR IS UNSAFE (THERE IS A GHOSTS IN THE CORRIDOR)
@@ -114,12 +95,10 @@ class PanicAgent:
         # pacman is blocked from both sides - moves to the side with the farthest ghost
         if self.pac_info.crossroad0_is_blocked == True and self.pac_info.crossroad1_is_blocked == True:
             if self.pac_info.dist_to_ghost_at_crossroad0 >= self.pac_info.dist_to_ghost_at_crossroad1:
-                # choses crossroad0
-                # print('0 - blocked from both sides: goes for 0')
+                # 0 - blocked from both sides: goes for 0
                 return self.calc_next_coord(self.pacman, self.crossroad0, [])
             else:
-                # choses crossroad1
-                # print('1 - blocked from both sides: goes for 1')
+                # 1 - blocked from both sides: goes for 1
                 return self.calc_next_coord(self.pacman, self.crossroad1, [])
         
         # pacman is blocked only from one side - moves to the other side (probably)
@@ -139,21 +118,15 @@ class PanicAgent:
                 semaphore = self.pac_info.semaphore0
                 escape_corridors = escape_corridors0
 
-            # print('PANICKING BLOCKED FROM ONE SIDE:')
-            # print('---> bocked_cross: ' + str(blocked_cross))
-            # print('---> free_cross: ' + str(free_cross))
-            # print('---> semaphore: ' + str(semaphore))
-            # print('---> escape_corridors: ' + str(escape_corridors))
-
             # unblocked crossroad is not red - pacman can pass through it
             if semaphore == SEMAPHORE.YELLOW or semaphore == SEMAPHORE.GREEN:   
-                # print('2 - blocked from side: ' + str(blocked_cross) + ' goes for ' + str(free_cross) + 'which is yellow or green')
+                # 2 - blocked from side: ' + str(blocked_cross) + ' goes for ' + str(free_cross) + 'which is yellow or green
                 next_corr = self.calc_next_corridor(escape_corridors)
                 return self.calc_next_coord(self.pacman, free_cross, next_corr)
 
             # unblocked crossroad is red - pacman cannot go through it
             if semaphore == SEMAPHORE.RED:
-                # print('3 - blocked from side: ' + str(blocked_cross) + ' goes for ' + str(free_cross) + 'which is red')
+                # 3 - blocked from side: ' + str(blocked_cross) + ' goes for ' + str(free_cross) + 'which is red
                 return self.escape_to_farthest_ghost_side(free_cross, blocked_cross)
 
 
@@ -162,32 +135,32 @@ class PanicAgent:
 
         # both crossroads are red - chooses side with farthest ghost
         if self.semaphore0 == SEMAPHORE.RED and self.semaphore1 == SEMAPHORE.RED:
-            # print('4 - not blocked. Both crossroads are red: goes for farthest side')
+            # 4 - not blocked. Both crossroads are red: goes for farthest side
             return self.escape_to_farthest_ghost_side(self.crossroad0, self.crossroad1)
 
         # one crossroad is red - chooses the other crossroad
         if self.semaphore0 == SEMAPHORE.RED:
             next_corr = self.calc_next_corridor(escape_corridors1)
-            # print('5 - not blocked. crossroad ' + str(self.crossroad0) + ' is red, goes for the other')
+            # 5 - not blocked. crossroad ' + str(self.crossroad0) + ' is red, goes for the other
             return self.calc_next_coord(self.pacman, self.crossroad1, next_corr)
         if self.semaphore1 == SEMAPHORE.RED:
             next_corr = self.calc_next_corridor(escape_corridors0)
-            # print('6 - not blocked. crossroad ' + str(self.crossroad1) + ' is red, goes for the other')
+            # 6 - not blocked. crossroad ' + str(self.crossroad1) + ' is red, goes for the other
             return self.calc_next_coord(self.pacman, self.crossroad0, next_corr)
 
         # both crossroads are yellow - chooses farthest crossroad
         if self.semaphore0 == SEMAPHORE.YELLOW and self.semaphore1 == SEMAPHORE.YELLOW:
-            # print('7 - not blocked. both crossroads are yellow: goes for farthest side')
+            # 7 - not blocked. both crossroads are yellow: goes for farthest side
             return self.escape_to_farthest_crossroad(self.crossroad0, self.crossroad1, escape_corridors0, escape_corridors1)
 
         # crossroads are green or yellow - chooses a safe corridor
         if all_safe_adjacent_corridors != []:
             next_corr = self.calc_next_corridor(all_safe_adjacent_corridors)
-            # print('8 - not blocked. crossroads are green or yellow: goes for a safe corridor')
+            # 8 - not blocked. crossroads are green or yellow: goes for a safe corridor
             return self.calc_next_coord(pacman=self.pacman, crossroad=None , next_corridor=next_corr)
 
         next_corr = self.calc_next_corridor(all_adjacent_corridors)
-        # print('9 - not blocked. crossroads are green or yellow: goes for an unsafe corridor')
+        # 9 - not blocked. crossroads are green or yellow: goes for an unsafe corridor
         return self.calc_next_coord(pacman=self.pacman, crossroad=None , next_corridor=next_corr)
 
 
@@ -219,33 +192,35 @@ class PanicAgent:
                 unsafe_corrs += [corr]
             adj_corrs += [corr]
 
-        # if avoid_coordinates != []:
-        #     adj_corrs = [corr for corr in adj_corrs if all([av not in corr.coordinates for av in avoid_coordinates])]
-        #     safe_corrs = [corr for corr in safe_corrs if all([av not in corr.coordinates for av in avoid_coordinates])]
-
         return adj_corrs, safe_corrs, unsafe_corrs
                 
 
     def calc_next_coord(self, pacman, crossroad, next_corridor):
-        '''
-            Args:
-            pac_info:   advisor.pacman_info
-            end     :   crossroad do lado escolhido para o pacman fugir
-            adj_end :   lista de corredores adjacentes ao end
-                        - adj_end == [] é porque o pacman não consegue fugir pelo end
-                                        tanto por existir um fantasma no mesmo corredor desse lado
-                                        tanto por o end ser RED
+        '''Calculates the next position where Pac-Man should go to, according to
+        the next safe Corridor, and the Crossroad that connects Pac-Man's
+        Corridor to it
+        
+        Args:
+        pacman: Pac-Man position
+        crossroad: Crossroad that indicates which side of Pac-Man should move
+            in it's corridor
+        next_corridor : the Corridor considered as the safest to go to in the
+            next move
+
+        Returns:
+        The coordinates of the next position Pac-Man should go to
         '''
 
         next_move = None
 
+        # Pac-Man has to move within it's Corridor
         if next_corridor == []:
             if crossroad != None:
                 return self.advisor.pacman_info.corridor.get_next_coord_to_the_side_of_crossroad(pacman, crossroad)
             else:
                 return None
         
-        # corridor exists
+        # Pc-Man is at a crossroad and may move either into or out of it's Corridor
         if next_corridor != []:
             # crossroad is None
             if crossroad == None:
@@ -262,14 +237,12 @@ class PanicAgent:
                 if next_move != None:
                     return next_move
                 else:
-                    # print(next_corridor)
                     return next_corridor.get_coord_next_to_end(crossroad)
 
 
     #escolhe corr com ghost mais afastado
     def calc_next_corridor(self, pac_adj):
         
-        # print('pac_adj: ' + str(pac_adj))
         safe_corrs = []
         for corr in pac_adj:
             if corr.safe == CORRIDOR_SAFETY.SAFE:
@@ -280,24 +253,15 @@ class PanicAgent:
                 safety_number = self.long_range_safety(corr.ends[0])
                 safety_number += self.long_range_safety(corr.ends[1])
                 safe_corrs += [(corr, safety_number)]
-                # safe_corrs += [(corr, len(corr.coordinates))]
-                # print('PANIC: calculated next corridor as safe: ' + str(corr))
         
         if len(safe_corrs) != 0:
             safe_corrs = sorted(safe_corrs, key=lambda t: t[1])
-            # print('PANIC: calculated next corridor as safe: ' + str(corr))
             return safe_corrs[0][0]
 
         corridors_with_ghost = []
         corridors_with_ghost = [(corr, ghost.dist_to_pacman) for ghost in self.advisor.ghosts_info \
                                                             for corr in pac_adj]
-        # print('corridors_with_ghost: ' + str(corridors_with_ghost))
-        # for ghost in self.advisor.ghosts_info:
-        #     for corr in pac_adj:
-        #         if ghost.position in corr.coordinates:
-        #             corridors_with_ghost += [(corr, ghost.dist_to_pacman)]
-        #             break
-        # print('PANIC: calculated next corridor as unsafe: ' + str(sorted(corridors_with_ghost, key=lambda t: t[1], reverse=True)[0][0]))
+
         return sorted(corridors_with_ghost, key=lambda t: t[1], reverse=True)[0][0]
 
 

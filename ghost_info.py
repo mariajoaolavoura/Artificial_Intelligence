@@ -19,13 +19,9 @@ class Ghost_Info():
 
     def side_interception(self, pacman_path, flight=False):
         intercept_coord = None
-        # print('GHOST_INFO: ghost path is ' + str(self.path))
-        # print('GHOST_INFO: ghost path[-1] is ' + str(self.path[-1]))
-        # print('GHOST_INFO: ghost path[-2] is ' + str(self.path[-2]))
         path = [c for c in self.path[-2].coordinates]
-        # print('GHOST_INFO: ghost path of interception is: ' + str(path))
         pacman_path_coords = [c for corr in pacman_path for c in corr.coordinates]
-        # print('GHOST_INFO: pacman path coordinates are: ' + str(pacman_path_coords))
+
         for c in path:
             if c in pacman_path_coords:
                 found_interception = True
@@ -33,9 +29,7 @@ class Ghost_Info():
                 break
         if intercept_coord == None:
             return False
-        ghost_intercept_dist = self.path[-2].dist_to_end(self.position, intercept_coord)
-        # print('GHOST_INFO: ghost coordinate of interception is: ' + str(intercept_coord))
-        
+        ghost_intercept_dist = self.path[-2].dist_to_end(self.position, intercept_coord)    
 
         pac_intercept_dist = 0
         if flight == False:
@@ -53,7 +47,6 @@ class Ghost_Info():
                 else:
                     pac_intercept_dist += corr.cost
 
-        print('GHOST_INFO: pac dist to intersept: ' + str(pac_intercept_dist) + ' ghost dist to intercept: ' + str(ghost_intercept_dist))
         return pac_intercept_dist >= ghost_intercept_dist
 
 
