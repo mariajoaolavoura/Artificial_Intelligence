@@ -132,24 +132,17 @@ class Pacman_agent():
         Returns: the key corresponding to the next move of PACMAN
         """
 
-        #logger.debug(nt("\nEnergy size is : " + str(len(state['energy'])) + "\n")
-
-        
-
-        # get advice on the next move
-        print('before strategy advisor')
+        # get information on the current game situation
         strategy_advisor = StrategyAdvisor(self.map_, state)
-        print('after strategy advisor')
 
-        # first always try to eat
+        # devise a strategy to play and get the next advise move
         strategy_analyst = StrategyAnalyst(strategy_advisor)
         next_move = strategy_analyst.decide()
 
         # if next_move is None, the the game is finished
         if next_move == None:
-            sys.exit(0)
+            return None
 
-        # logger.debug("KEY IS " + str(self.calculate_key(state['pacman'], next_move)) + "\n\n")
         return self.calculate_key(state['pacman'], next_move)
         
 
@@ -203,6 +196,7 @@ async def agent_loop(server_address = "localhost:8000", agent_name="student"):
         msg = await websocket.recv()
         game_properties = json.loads(msg)
         
+
         #----------------------------------------------------------------------#
         # for debug purposes (save scores and stress testing)
         # create apropriated logger based on ghosts and level
@@ -213,45 +207,61 @@ async def agent_loop(server_address = "localhost:8000", agent_name="student"):
 
         score_logger = setup_logger('scores', name, mode='a', format='%(message)s\n')
         
+
         #----------------------------------------------------------------------#
         # Create the pacman agent
         pacman = Pacman_agent(Map(game_properties['map']))
         lives = game_properties['lives']
         
+
+        #----------------------------------------------------------------------#
+        #----------------------------------------------------------------------#
         # play!
         while True:
-            #------------------------------------------------------------------#
+
             r = await websocket.recv()
             start = time()          # saved on key_times.log
             state = json.loads(r)   # receive game state
+            previous_key = 'w' # W is for Winner
 
-            #------------------------------------------------------------------#
-            # lost a life
-            if state['lives'] != lives:
-                lives = state['lives']
-                print('\n############\nPACMAN HAS LOST A LIFE\n#############\n')
-                stop0 = time()
-                print('Last move time: ' + str((stop0-start) * 1000))
-                sys.stderr.write("\033[93mLOST A LIFE\033[0m\n")
-                #sys.exit(1)
+            try:
+
+                #------------------------------------------------------------------#
+                # lost a life
+                if state['lives'] != lives:
+                    lives = state['lives']
+                    print('\n############\nPACMAN HAS LOST A LIFE\n#############\n')
+                    stop0 = time()
+                    print('Last move time: ' + str((stop0-start) * 1000))
+                    sys.stderr.write("\033[93mLOST A LIFE\033[0m\n")
+
+                #------------------------------------------------------------------#
+                # game won (ended)
+                if state['energy'] == [] and state['boost'] == []:
+                    sys.stderr.write("\n\033[92mGAME ENDED. SCORE IS " + str(state['score']) + "\033[0m")
+                    score_logger.debug(str(state['score']))
+                    return
+
+                #------------------------------------------------------------------#
+                # game lost (no more lives)
+                if not state['lives']:
+                    sys.stderr.write("\n\033[91mGAME OVER. SCORE IS " + str(state['score'])  + "\033[0m")
+                    score_logger.debug(str(state['score']))
+                    return
+
+                #------------------------------------------------------------------#
+                # next move is None
+                key = pacman.get_next_move(state)
+                if key == None:
+                    key = previous_key
+                else:
+                    previous_key = key
+
             
-            # game won (ended)
-            if state['energy'] == [] and state['boost'] == []:
-                sys.stderr.write("\n\033[92mGAME ENDED. SCORE IS " + str(state['score']) + "\033[0m")
-                score_logger.debug(str(state['score']))
-                return
-
-            # game lost (no more lives)
-            if not state['lives']:
-                sys.stderr.write("\n\033[91mGAME OVER. SCORE IS " + str(state['score'])  + "\033[0m")
-                score_logger.debug(str(state['score']))
-                return
-
-            #------------------------------------------------------------------#
-            # get next move from pacman agent
-            key = pacman.get_next_move(state)
-            stop1 = time()
-            print('Last move time: ' + str((stop1-start) * 1000))
+            except Exception:
+                pass
+            except Exception('Tree_Search_Error'):
+                pass
 
             #-send new key-----------------------------------------------------#
             await websocket.send(json.dumps({"cmd": "key", "key": key}))

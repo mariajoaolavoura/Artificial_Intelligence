@@ -71,7 +71,6 @@ class Corridor():
         if len(self.coordinates) > 1:
             return self.coordinates[1]
         else:
-            print('CORRIDOR: GOT INTO THIS NONE')
             return None
 
     def get_coord_next_to_end1(self):
@@ -103,7 +102,6 @@ class Corridor():
         """
         # verify that crossroad exists
         if crossroad == None:
-            print('CORRIDOR: crossroad is None')
             return None
 
         # calculate index of 'initial'
@@ -114,10 +112,6 @@ class Corridor():
                 break
         
         if initial_index == None or initial == crossroad:
-            # if initial_index == None:
-            #     print('CORRIDOR: initial index not found')
-            # else:
-            #     print('CORRIDOR: pacman is in the crossroad is trying to go to the side of')
             return None
 
         # calculate adjacent coordinate
@@ -126,7 +120,6 @@ class Corridor():
         elif crossroad == self.ends[1]:
             return self.coordinates[initial_index+1]
         else:
-            print('CORRIDOR: crossroad is wrong')
             return None
 
     def __str__(self):

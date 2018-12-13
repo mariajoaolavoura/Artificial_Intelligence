@@ -82,7 +82,7 @@ average () {
 # "MAIN"
 # comment tests as needed
 
-NUM_ITERS=2
+NUM_ITERS=10
 
 
 # backup original file
@@ -101,8 +101,8 @@ killall python3 -q > /dev/null 2>&1
 # run_tests 1 0 0  
 
 # mapa de nıvel 2 conhecido, número de fantasmas 2, dificuldade 1
-echo -e "\e[34mMap 2, 2 Ghosts, Level 1\033[0m"
-run_tests 2 2 1 
+#echo -e "\e[34mMap 2, 2 Ghosts, Level 1\033[0m"
+#run_tests 2 2 1 
 
 # mapa de nıvel 2 conhecido, número de fantasmas 2, dificuldade 2
 #echo -e "\e[34mMap 2, 2 Ghosts, Level 2\033[0m"
@@ -115,8 +115,8 @@ run_tests 2 2 1
 #! WHEN THIS TEST IS RUN, RERUN GEENRATE CONST
 #! FILES FIRST WITH THE APROPRIATED VALUES
 # mapa de nıvel 2 conhecido, número de fantasmas 4, dificuldade 2
-#echo -e "\e[34mMap 2, 4 Ghosts, Level 2\033[0m"
-#run_tests 2 4 2 
+echo -e "\e[34mMap 2, 4 Ghosts, Level 2\033[0m"
+run_tests 2 4 3 
 
 # ---------------------------------------------
 # restore game_consts

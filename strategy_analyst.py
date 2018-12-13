@@ -101,7 +101,6 @@ class StrategyAnalyst():
 
         # ----- no agent got a move - this should never happen
         if panicked_for_a_way_out == None:
-            print('NO AGENT GOT A MOVE!!!')
             return None
 
         return panicked_for_a_way_out
@@ -124,8 +123,6 @@ class StrategyAnalyst():
 
 
     def _try_pursuit(self):
-        print('###################################################')
-        print('GOT INTO: ' + str(MODE.PURSUIT))
         targets = [ghost[0] for ghost in self.advisor.state['ghosts'] if ghost[1] == True]
 
         # verify that zombies ghosts are not in the den, if they are, don't pursue
@@ -136,13 +133,10 @@ class StrategyAnalyst():
             self.pursuer_possible_moves = pursuer.pursue()
             valid_next_move = self.move_risk_assessor.analyse_best_move(self.pursuer_possible_moves)
             if valid_next_move:
-                print('PURSUIT MODE IS RETURNING NEXT MOVE: ' + str(self.pursuer_possible_moves[0][0]))
                 return self.pursuer_possible_moves[0][0]
         return None
 
     def _try_eating(self, surrounded_eating=False):
-        print('###################################################')
-        print('GOT INTO: ' + str(MODE.EATING))
         targets = self.advisor.state['energy'] + self.advisor.state['boost']
 
         if len(self.advisor.state['energy']) > 50:
@@ -161,13 +155,10 @@ class StrategyAnalyst():
             self.eater_possible_moves = eater.eat()
             valid_next_move = self.move_risk_assessor.analyse_best_move(self.eater_possible_moves, flight=False, surrounded_eating=surrounded_eating)
             if valid_next_move:
-                print('EATING MODE IS RETURNING NEXT MOVE: ' + str(self.eater_possible_moves[0][0]))
                 return self.eater_possible_moves[0][0]
         return None
     
     def _try_counter(self, surrounded_counter=False):
-        print('###################################################')
-        print('GOT INTO: ' + str(MODE.COUNTER))
         targets = self.advisor.state['boost']
         # Pac-Man can only counter if there are boost targets
         if targets != []:
@@ -175,14 +166,10 @@ class StrategyAnalyst():
             self.counter_possible_moves = counter.counter()
             valid_next_move = self.move_risk_assessor.analyse_best_move(self.counter_possible_moves, flight=False, surrounded_eating= surrounded_counter, counter=True)
             if valid_next_move:
-                print('COUNTER MODE IS RETURNING NEXT MOVE: ' + str(self.counter_possible_moves[0][0]))
                 return self.counter_possible_moves[0][0]
         return None
         
     def _try_flight(self, avoid_suggestion=False):
-        print('###################################################')
-        print('GOT INTO: ' + str(MODE.FLIGHT))
-
         pacman = self.advisor.pacman_info
 
         # get best move from every agent
@@ -199,22 +186,15 @@ class StrategyAnalyst():
         
         for move in best_moves:
 
-            print('ANALYST: best_moves is: ')
-
             # flee to a safe corridor (if possible, one in a best_move path)
             # args: target coordinate, coordinate to avoid
             targets = [(move[2][0].coordinates[0], [move[2][-2].get_coord_next_to_end(pacman.position)])]
             
-            print('Flight targets: ' + str(targets))
-            
             fleer = FlightAgent(self.advisor, targets)
             next_move = fleer.flee()
 
-
-            print('FLIGHT: NEXT MOVE ' + str(next_move))
             valid_next_move = self.move_risk_assessor.analyse_best_move(possible_moves=next_move, flight=True)
             if valid_next_move:
-                print('FLIGHT MODE IS RETURNING NEXT MOVE: ' + str(next_move[0][0]))
                 return next_move[0][0]
             else:
                 if pacman.position in self.advisor.map_.crossroads:
@@ -223,7 +203,6 @@ class StrategyAnalyst():
                     else:
                         self.invalid_corridors = [next_move[0][2][1]]
                 else:
-                    print('FLIGHT: ' + str(next_move))
                     self.invalid_corridors += [next_move[0][2][2]]
 
  
@@ -234,9 +213,6 @@ class StrategyAnalyst():
             # define which corridor flight_mode will avoid
             sub_corr0, sub_corr1 = pacman.corridor.sub_corridors(pacman.position)
             path_coords = [c for corr in move[2] for c in corr.coordinates]
-            print('FLIGHT: sub_corr0: ' + str(sub_corr0))
-            print('FLIGHT: sub_corr1: ' + str(sub_corr1))
-            print('FLIGHT: path_coords: ' + str(path_coords))
             self.avoid_coordinates = []
             avoid = None
 
@@ -264,15 +240,11 @@ class StrategyAnalyst():
             # flee to a safe corridor (if possible, one in a best_move path)
             targets = [(move[2][0].coordinates[0], self.avoid_coordinates)]
             
-            print('Flight targets: ' + str(targets))
-            
             fleer = FlightAgent(self.advisor, targets)
             next_move = fleer.flee()
 
-            print('FLIGHT: NEXT MOVE ' + str(next_move))
             valid_next_move = self.move_risk_assessor.analyse_best_move(possible_moves=next_move, flight=True)
             if valid_next_move:
-                print('FLIGHT MODE IS RETURNING NEXT MOVE: ' + str(next_move[0][0]))
                 return next_move[0][0]
             else:
                 if pacman.position in self.advisor.map_.crossroads:
@@ -286,13 +258,9 @@ class StrategyAnalyst():
         return None
     
     def _panic(self):
-        print('###################################################')
-        print('GOT INTO: ' + str(MODE.PANIC))
-
         panicker = PanicAgent(self.advisor)
         # ignore one previously verified bad move (not possible to block more than one)
         next_move = panicker.panic(self.invalid_corridors)
-        print('PANIC MODE IS RETURNING NEXT MOVE: ' + str(next_move))
         return next_move
 
 

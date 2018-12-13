@@ -61,11 +61,6 @@ class SearchProblem:
         self.goal_pos = goal_pos
         self.state = state
         self.map_ = map_
-        self.debug = False and (goal_pos == [0,15] or goal_pos == [1,15])
-
-
-        if self.debug:
-            print("Analizing path: " + str(initial_pos) + " --> " + str(goal_pos))    
 
         self.initial = Corridor([self.initial_pos])
         
@@ -124,41 +119,31 @@ class SearchProblem:
                     
                     if corridor.coordinates == corrA.coordinates:
                         if any(e in sub_corr.ends for e in corrB.ends):
-                            #self.printd(debug, ("added: " + str([[sub_corr, corrB]])))
                             new_adjacencies += [[sub_corr, corrB]]
                         elif any(e in sub_corr1.ends for e in corrB.ends):
-                            #self.printd(debug, ("added: " + str([[sub_corr1, corrB]])))
                             new_adjacencies += [[sub_corr1, corrB]]
                         
                     elif corridor.coordinates == corrB.coordinates:                
                         if any(e in sub_corr.ends for e in corrA.ends):
-                            #self.printd(debug, "added: " + str([[sub_corr, corrA]]))
                             new_adjacencies += [[sub_corr, corrA]]
                         elif any(e in sub_corr1.ends for e in corrA.ends):
-                            #self.printd(debug, "added: " + str([[sub_corr1, corrA]]))
                             new_adjacencies += [[sub_corr1, corrA]]
 
                 if sub_corr1.coordinates == sub_corr.coordinates:
                     
                     if corridor.coordinates == corrA.coordinates:
                         if any(e in sub_corr.ends for e in corrB.ends):
-                            #self.printd(debug, "added: " + str([[sub_corr, corrB]]))
                             new_adjacencies += [[sub_corr, corrB]]
                         elif any(e in sub_corr0.ends for e in corrB.ends):
-                            #self.printd(debug, "added: " + str([[sub_corr1, corrB]]))
                             new_adjacencies += [[sub_corr0, corrB]]
                         
                     elif corridor.coordinates == corrB.coordinates:                
                         if any(e in sub_corr.ends for e in corrA.ends):
-                            #self.printd(debug, "added: " + str([[sub_corr, corrA]]))
                             new_adjacencies += [[sub_corr, corrA]]
                         elif any(e in sub_corr0.ends for e in corrA.ends):
-                            #self.printd(debug, "added: " + str([[sub_corr1, corrA]]))
                             new_adjacencies += [[sub_corr0, corrA]]
 
             self.domain.adjacencies = [[A,B] for [A, B] in self.domain.adjacencies if (corridor != A and corridor != B)]
-            # if debug:
-            #     print('new_adjacencies: ' + str(new_adjacencies))
             self.domain.adjacencies += new_adjacencies
 
 
@@ -166,12 +151,6 @@ class SearchProblem:
             self.domain.adjacencies += [[sub_corr, sub_corr0]]
         if sub_corr.coordinates != sub_corr1.coordinates:
             self.domain.adjacencies += [[sub_corr, sub_corr1]]
-
-
-    def printd (self, valid, string):
-        if valid:
-            print(string)
-
     
     def goal_test(self, state):
         return all([ coord in self.goal.coordinates for coord in state.coordinates])
@@ -306,62 +285,30 @@ class SearchTree:
             lnewnodes = []
             # print('TREE SEARCH actions: ' + str(self.problem.domain.actions(node.state)))
             for action in self.problem.domain.actions(node.state):
-                print('action: ' + str(action))
 
                 new_state = self.problem.domain.result(node.state, action)
-                #print('result: ' + str(new_state))
                 
                 #if starting point is found, does nothing and continue to another iteration
-                # print('---> ' + str([c in self.problem.initial.coordinates for c in new_state.coordinates]))
-                # print(all([c in self.problem.initial.coordinates for c in new_state.coordinates]))
-                # print('---> ' + str([c in avoid_corridor.coordinates for c in new_state.coordinates]))
-                # print(all([c in avoid_corridor.coordinates for c in new_state.coordinates]))
-                # print('---> ' + str(self.lvisited))
-                # print(new_state in self.lvisited)
-                
-                #print('new_state: ' +str(new_state))
-
-                if new_state == None:
-                    print('SOMETHING IS REALLY WRONG!')
-                    print('node.state: ' +str(node.state))
-                    print('initial: ' + str(self.problem.initial))
-                if self.problem.initial == None:
-                    print('SOMETHING IS REALLY WRONG!')
-                    print('node.state: ' +str(node.state))
-                    print('initial: ' + str(self.problem.initial))
-                    print('state: ' + str(self.problem.state))
-
                 if new_state == None or self.problem.initial == None:
-                    throw 
+                    raise Exception('Tree_Search_Error')
                     
                 if all([c in self.problem.initial.coordinates for c in new_state.coordinates]):
-                    # print('avoided because returned to pacman')
                     continue
+
                 elif avoid_coordinates != []:
-                    # print([(av, self.problem.goal) for av in avoid_coordinates])
+
                     if all([av not in self.problem.goal.coordinates for av in avoid_coordinates]):
-                        # print([(av, new_state) for av in avoid_coordinates])
-                        # print(new_state.coordinates)
-                        # print(avoid_coordinates)
+
                         if any([av in new_state.coordinates for av in avoid_coordinates]):
-                            # print('avoided because reached avoid coordinate (normal way)')
-                            # print('!!!!!: ' + str(avoid_coordinates) +', '+str(new_state.coordinates))
-                            # print('continue2:')
                             continue
                     elif any([av in self.problem.goal.coordinates for av in avoid_coordinates]):
                         if any([av in new_state.coordinates for av in avoid_coordinates]):
                             if self.problem.initial.coordinates[0] in new_state.coordinates:
-                                # print('avoided because reached avoid coordinate (ghost is avoid coord)')
-                                # print('!!!!!: ' + str(avoid_coordinates) +', '+str(self.problem.goal)+\
-                                # ', '+str(self.problem.initial))
-                                # print('continue3')
                                 continue
 
                 elif new_state in self.lvisited:
-                    # print('avoided because already visited')
                     continue
                 
-                # print('NOT avoided')
                 cost = node.cost + self.problem.domain.cost(node.state, action)
                 heuristic = self.problem.domain.heuristic(curr_state=node.state, \
                                                             new_state=new_state, \
@@ -377,10 +324,8 @@ class SearchTree:
 
             self.add_to_open(lnewnodes)
             self.lvisited.extend(node.state for node in lnewnodes)
-        #print('TREE SEARCH: returning because open nodes is empty')
+
         return sorted(all_paths, key=lambda move: move[1])
-
-
 
 
     # juntar novos nos a lista de nos abertos de acordo com a estrategia

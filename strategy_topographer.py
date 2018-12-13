@@ -34,12 +34,7 @@ class StrategyTopographer():
         self.corridors = [ Corridor(corr) for corr in self.corridors ]
         self.corr_adjacencies =self.create_corridor_adjacencies(self.corridors)
         self.ghosts_den = []
-
-        # sum = 0
-        # for corr in self.corridors:
-        #     sum += len(corr.coordinates)
-        # print('AVERAGE CORRIDOR LENGTH: ' + str(sum/len(self.corridors)))
-        
+        self.average_corridor_cost = self.calc_average_corridor_cost()
 
 
     #* ##########   TESTED AND VERIFIED   ##########
@@ -55,7 +50,7 @@ class StrategyTopographer():
         # find ghosts den. This area will not be used in any search or strategy
         # and should be avoided by PACMAN
         self.ghosts_den = self.get_ghosts_den(self.map_)
-        # self.ghosts_den = self.get_den_interior()
+        self.ghosts_den = self.get_den_interior()
 
         pathways_hor = []
         for y in range(self.map_.ver_tiles):
@@ -66,10 +61,6 @@ class StrategyTopographer():
 
         pathways_hor = [ p for p in pathways_hor if p not in self.ghosts_den ]
         pathways_ver = sorted(pathways_hor, key=lambda y: (x,y))
-
-        logger.debug("GHOST_DEN:\n" + str(self.ghosts_den) + "\n")
-        logger.debug("PATHWAYS_HOR:\n" + str(pathways_hor) + "\n")
-        logger.debug("PATHWAYS_VER:\n" + str(pathways_ver) + "\n")
 
         return pathways_hor, pathways_ver
 
@@ -101,8 +92,6 @@ class StrategyTopographer():
             if adj > 2:
                 crossroads += [[x,y]]
 
-        logger.debug("CROSSROADS:\n" + str(crossroads) + "\n")
-
         return crossroads
 
 #------------------------------------------------------------------------------#
@@ -120,7 +109,6 @@ class StrategyTopographer():
 
         # get ghots spawn point (which is itself part of the den)
         spawn = map_.ghost_spawn
-        logger.debug("Spawn point is: " + str(spawn))
         
         # list of the 4 corners of the den (den is a rectangle)
         den_corners = []
@@ -142,8 +130,6 @@ class StrategyTopographer():
             to_visit = to_visit[1:] 
             
             adj_walls = []
-            
-            logger.debug("Analyzing " + str((current_pos, current_dirs)))
 
             for current_dir in current_dirs:
                 current_dir_x, current_dir_y = current_dir    
@@ -152,26 +138,16 @@ class StrategyTopographer():
                 # New position is obtained traveling in the current_direction from the (current_x, current_y)
                 new_pos = current_x + current_dir_x, current_y + current_dir_y
 
-                logger.debug("Following direction "   + str(current_dir) + " from " + str((current_x, current_y)))
-                logger.debug("Remaining directions: " + str(remaining_dirs))
-                logger.debug("New pos to analyze: "   + str(new_pos))
-
                 # if it's a wall, add the new position to the list of the adjacent walls
-                if (self.map_.is_wall(new_pos)):
-                    logger.debug("Detected wall at " + str(new_pos) + " dir " + str(current_dir))
-                    
+                if (self.map_.is_wall(new_pos)):                    
                     adj_walls += [new_pos]
                   
                 # if it's not a wall, add the new position to the positions to visit. 
                 else:
-                    logger.debug("No Detected wall.\n Adding " +  str(new_pos) + " to visit")
-
                     # from the new position we can go to the remaning_dirs + the oposite direction of where it came from 
                     # (thus avoiding repetead points, ie going back)
                     possible_dirs = [current_dir] + [dir_ for dir_ in remaining_dirs if dir_ != (current_dir_x * -1, current_dir_y * -1)]
                     to_visit += [(new_pos, possible_dirs)]
-
-                    logger.debug("New to_visit is: " + str(to_visit))
             
             # the current point is a candidate to be a corner (2 adjacent walls)
             if len(adj_walls) == 2: 
@@ -182,21 +158,16 @@ class StrategyTopographer():
                 # without being a corner (see point (3, 15) of the original map, for example)
                 wall1_x, wall1_y = adj_walls[0]
                 wall2_x, wall2_y = adj_walls[1]
-                logger.debug("Analyzing corner with wall " + str((wall1_x, wall1_y)) + " and " + str((wall2_x, wall2_y)))
                 
                 if (abs(wall1_x - wall2_x) == 1 and abs(wall1_y - wall2_y) == 1):
                     # we can have repeteaded corners 
                     # we can reach corners from different paths
-                    logger.debug("Adding valid corner")
-                    logger.debug(den_corners + [(current_x, current_y)])
                     den_corners = list(set(den_corners + [(current_x, current_y)]))
                     
                     # Found all den corners (a rectangular den has 4 corners)
                     # Since the den is rectangular so, we can define the bounds of the den 
                     # and its inside points using the corners
                     if (len(den_corners) == 4):
-                        logger.debug("Found all 4 corners")
-                        logger.debug("Den corners " + str(den_corners))
                         
                         # previously
                         #return den_corners
@@ -216,10 +187,7 @@ class StrategyTopographer():
 
                         for i in range(small_x, big_x + 1, 1):
                             for j in range(small_y, big_y + 1, 1):
-                                logger.debug("Den point is " + str((i, j)))
                                 den += [[i, j]]
-
-                        logger.debug("Returning " + str(den) + " (length " + str(len(den)) + ")")
 
                         return den
 
@@ -233,17 +201,13 @@ class StrategyTopographer():
                     # visit[0][0/1] -> pos_x/pos_y
                     if (current_x < spawn[0]):
                         if (current_y > spawn[0]): # left up corner
-                            logger.debug("Clean left up area")
                             to_visit = [visit for visit in to_visit if visit[0][0] > spawn[0] or (visit[0][0]  < spawn[0] and visit[0][1] < spawn[1])]
                         if (current_y < spawn[0]): # left down corner
-                            logger.debug("Clean left down area")
                             to_visit = [visit for visit in to_visit if visit[0][0] > spawn[0] or (visit[0][0]  < spawn[0] and visit[0][1] > spawn[1])]
                     elif (current_x > spawn[0]):
                         if (current_y > spawn[0]): # right up corner
-                            logger.debug("Clean right up area")
                             to_visit = [visit for visit in to_visit if visit[0][0] < spawn[0] or (visit[0][0]  > spawn[0] and visit[0][1] < spawn[1])]
                         if (current_y < spawn[0]): # right down corner
-                            logger.debug("Clean right down area")
                             to_visit = [visit for visit in to_visit if visit[0][0] < spawn[0] or (visit[0][0]  > spawn[0] and visit[0][1] > spawn[1])]
                                
         # Should never reach this      
@@ -252,44 +216,44 @@ class StrategyTopographer():
 
 #------------------------------------------------------------------------------#
 
-#     def get_den_corners(self):
+    def get_den_corners(self):
 
-#         ulc = self.ghosts_den[0]
-#         urc = self.ghosts_den[0]
-#         llc = self.ghosts_den[0]
-#         lrc = self.ghosts_den[0]
-#         for c in self.ghosts_den[1:]:
-#             # upper left corner
-#             if c[0] < ulc[0] and c[1] < ulc[1]:
-#                 ulc = c
-#             # upper right corner
-#             if c[0] > urc[0] and c[1] < urc[1]:
-#                 urc = c
-#             # lower left corner
-#             if c[0] < llc[0] and c[1] > llc[1]:
-#                 llc = c
-#             # lower righ corner
-#             if c[0] > lrc[0] and c[1] > lrc[1]:
-#                 lrc = c
+        ulc = self.ghosts_den[0]
+        urc = self.ghosts_den[0]
+        llc = self.ghosts_den[0]
+        lrc = self.ghosts_den[0]
+        for c in self.ghosts_den[1:]:
+            # upper left corner
+            if c[0] < ulc[0] and c[1] < ulc[1]:
+                ulc = c
+            # upper right corner
+            if c[0] > urc[0] and c[1] < urc[1]:
+                urc = c
+            # lower left corner
+            if c[0] < llc[0] and c[1] > llc[1]:
+                llc = c
+            # lower righ corner
+            if c[0] > lrc[0] and c[1] > lrc[1]:
+                lrc = c
         
-#         return ulc, urc, llc, lrc
+        return ulc, urc, llc, lrc
 
 # #------------------------------------------------------------------------------#
 
-#     def get_den_interior(self):
+    def get_den_interior(self):
 
-#         ulc, urc, llc, lrc = self.get_den_corners()
+        ulc, urc, llc, lrc = self.get_den_corners()
 
-#         x = ulc[0]+1
-#         y = ulc[1]+1
-#         interior = []
-#         while x < lrc[0]:
-#             while y < lrc[1]:
-#                 interior += [[x,y]]
-#                 y = y+1
-#             x = x+1
+        x = ulc[0]+1
+        y = ulc[1]+1
+        interior = []
+        while x < lrc[0]:
+            while y < lrc[1]:
+                interior += [[x,y]]
+                y = y+1
+            x = x+1
 
-#         return interior
+        return interior
 #------------------------------------------------------------------------------#
 
     #* ##########   TESTED AND VERIFIED   ##########
@@ -326,8 +290,7 @@ class StrategyTopographer():
                 [x,y] = [a,b]
                 continue
 
-            # if horizontally adjacent, add to adjacencies, add to current
-            # horizontal corridor
+            # if horizontally adjacent, add to current horizontal corridor
             if a == x+1:
                 corridor += [[a,b]]
                 if [a,b] in crossroads:
@@ -393,10 +356,6 @@ class StrategyTopographer():
         # connect corridors
         corridors = self.connect_corridors(corridors, tunnel_points, crossroads)
 
-        for c in corridors:
-            logger.debug("CORRIDORS:\n" + str(c) + "\n")
-        logger.debug("TUNNEL POINTS:\n" + str(tunnel_points) + "\n")
-
         return corridors
 
 #------------------------------------------------------------------------------#
@@ -413,7 +372,6 @@ class StrategyTopographer():
         a list of complete corridors
         """
 
-        # TODO turn this into a function to be utilized to sort corridors and to sort tunnels
         # connect vertical and horizontal adjacent corridors
         connected = []
         while corridors != []:
@@ -468,8 +426,6 @@ class StrategyTopographer():
         tunnels = [ corr for corr in corridors \
                             if corr[0] in tunnel_points \
                             or corr[len(corr)-1] in tunnel_points ]
-        logger.debug("CORRIDORS TO BE TUNNELED:\n" + str(corridors) + "\n")
-        logger.debug("TUNNELS separated:\n" + str(tunnels) + "\n")
         return tunnels
 
 #------------------------------------------------------------------------------#
@@ -501,8 +457,6 @@ class StrategyTopographer():
                 o_tun = [tun for tun in tunnels if tun[0][1] == 0]
                 connected += [tun + o_tun[0]]
                 tunnels.remove(o_tun[0])
-
-        logger.debug("TUNNELS:\n" + str(connected) + "\n")
         
         for corr in connected:
             hor = [x for [x,y] in corr]
@@ -511,8 +465,6 @@ class StrategyTopographer():
                 self.ver_tunnel_exists = True
             if all([y == ver[0] for y in ver]):
                 self.hor_tunnel_exists = True
-        
-        logger.debug('TUNNELS EXIST:\n' + str(self.hor_tunnel_exists) + ', ' + str(self.ver_tunnel_exists) + '\n')
 
         return connected
 
@@ -537,7 +489,11 @@ class StrategyTopographer():
                 or corridors[i].ends[1] == corridors[j].ends[1]):
                     corridor_adjacencies += [ [corridors[i], corridors[j]] ]
 
-        for a in corridor_adjacencies:
-            logger.debug("CORRIDOR_ADJACENCIES:\n" + str(a) + "\n")
-
         return corridor_adjacencies
+
+
+    def calc_average_corridor_cost(self):
+        sum = 0
+        for corr in self.corridors:
+            sum += corr.cost
+        return sum / len(self.corridors)  

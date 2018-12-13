@@ -37,9 +37,7 @@ class Pacman_Info():
         self.crossroad1 = corridor.ends[1]
         self.dist_to_crossroad0 = corridor.dist_end0(self.position)
         self.dist_to_crossroad1 = corridor.dist_end1(self.position)
-        # print("##########################################")
-        # print(str(self.dist_to_crossroad0) + ', ' + str(self.dist_to_crossroad1))
-        # print("##########################################")
+
 
     def update_safeties(self, ghost):
         if ghost.crossroad_to_pacman == self.crossroad0:
@@ -71,6 +69,7 @@ class Pacman_Info():
             if ghost.dist_to_pacman <= SAFE_DIST_TO_GHOST:
                 self.pursued_from_crossroad1 = True
 
+
     def dist_to_crossroad(self, crossroad):
         if crossroad == self.crossroad0:
             return self.dist_to_crossroad0
@@ -78,6 +77,7 @@ class Pacman_Info():
             return self.dist_to_crossroad1
         else:
             return None
+
 
     def pursued_from_crossroad(self, crossroad):
         if crossroad == self.crossroad0:
@@ -87,6 +87,7 @@ class Pacman_Info():
         else:
             return None
 
+
     def pursued_from_other_crossroad(self, crossroad):
         if crossroad == self.crossroad0:
             return self.pursued_from_crossroad1
@@ -94,6 +95,7 @@ class Pacman_Info():
             return self.pursued_from_crossroad0
         else:
             return None
+
 
     def ghost_at_crossroad(self, crossroad):
         if crossroad == self.crossroad0:
@@ -103,6 +105,7 @@ class Pacman_Info():
         else:
             return None
 
+
     def dist_to_ghost_at_crossroad(self, crossroad):
         if crossroad == self.crossroad0:
             return self.dist_to_ghost_at_crossroad0
@@ -110,6 +113,7 @@ class Pacman_Info():
             return self.dist_to_ghost_at_crossroad1
         else:
             return None
+
 
     def get_other_crossroad(self, crossroad):
         if crossroad == self.crossroad0:
@@ -127,6 +131,7 @@ class Pacman_Info():
             return self.semaphore1
         else:
             return None
+    
     
     def __str__(self):
         string = \

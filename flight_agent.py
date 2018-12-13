@@ -33,13 +33,10 @@ class FlightAgent:
 
         pacman = self.advisor.pacman_info
         domain = Pathways(self.advisor.map_.corr_adjacencies, self.advisor.state['energy'] + self.advisor.state['boost'], self.advisor.map_)
-        
-        #print("targets = " + str(self.targets))
 
         all_paths_list = []
 
         for target in self.targets:
-            print('FLIGHT AGENT: analysing target: ' + str(target))
             corridor = None
             for corr in self.advisor.map_.corridors:
                 if target[0] in corr.coordinates:
@@ -51,7 +48,6 @@ class FlightAgent:
             my_tree = SearchTree(my_prob, "a*")
             search_results = my_tree.all_path_search(target[1])
   
-            print('FLIGHT AGENT: result is: ' + str(search_results))
             all_paths_list += [search_results]   
 
         return [move for possible_moves in all_paths_list for move in possible_moves]
