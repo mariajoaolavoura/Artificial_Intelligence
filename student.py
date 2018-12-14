@@ -1,4 +1,4 @@
-from game_consts import *
+import game_consts
 from strategy_topographer import StrategyTopographer
 from pathways import Pathways
 from tree_search import SearchTree, SearchProblem
@@ -209,11 +209,20 @@ async def agent_loop(server_address = "localhost:8000", agent_name="student"):
         
 
         #----------------------------------------------------------------------#
+        # Define game constants TODO
+        num_ghosts = game_properties['ghosts']
+        ghosts_level = game_properties['ghosts_level']
+        #print((num_ghosts, ghosts_level))
+
+        # DOING THIS ASSIGNMENT WORKS BUT PLEASE KEEP import game_consts instead of from game_consts import *
+        #print("A " + str(game_consts.SAFE_DIST_TO_CROSSROAD))
+        #game_consts.SAFE_DIST_TO_CROSSROAD = 20
+       # print("B: " + str(game_consts.SAFE_DIST_TO_CROSSROAD))
+
         # Create the pacman agent
         pacman = Pacman_agent(Map(game_properties['map']))
         lives = game_properties['lives']
         
-
         #----------------------------------------------------------------------#
         #----------------------------------------------------------------------#
         # play!
@@ -230,22 +239,22 @@ async def agent_loop(server_address = "localhost:8000", agent_name="student"):
                 # lost a life
                 if state['lives'] != lives:
                     lives = state['lives']
-                    print('\n############\nPACMAN HAS LOST A LIFE\n#############\n')
+                    #print('\n############\nPACMAN HAS LOST A LIFE\n#############\n')
                     stop0 = time()
-                    print('Last move time: ' + str((stop0-start) * 1000))
-                    sys.stderr.write("\033[93mLOST A LIFE\033[0m\n")
+                    #print('Last move time: ' + str((stop0-start) * 1000))
+                    print("\033[93mLOST A LIFE\033[0m\n")
 
                 #------------------------------------------------------------------#
                 # game won (ended)
                 if state['energy'] == [] and state['boost'] == []:
-                    sys.stderr.write("\n\033[92mGAME ENDED. SCORE IS " + str(state['score']) + "\033[0m")
+                    print("\n\033[92mGAME ENDED. SCORE IS " + str(state['score']) + "\033[0m")
                     score_logger.debug(str(state['score']))
                     return
 
                 #------------------------------------------------------------------#
                 # game lost (no more lives)
                 if not state['lives']:
-                    sys.stderr.write("\n\033[91mGAME OVER. SCORE IS " + str(state['score'])  + "\033[0m")
+                    print("\n\033[91mGAME OVER. SCORE IS " + str(state['score'])  + "\033[0m")
                     score_logger.debug(str(state['score']))
                     return
 
