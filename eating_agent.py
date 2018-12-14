@@ -7,8 +7,7 @@ class EatingAgent:
     """Creates the Eating Agent, which calculates the path to all accessible
     targets, and sorts them by cost and safety with the following criteria:
     1 - cost
-    2 - if being pursued, distance of pacman to target smaller than ghost's
-    3 - proximity of ghost in path to target
+    2 - distance of ghost that is in Pac-Man's path
 
     Attr:
     advisor: provides extensive information about the current situation of the map

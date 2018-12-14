@@ -10,6 +10,12 @@ class Pathways(SearchDomain):
         self.map_ = map_
 
     def actions(self,corridor):
+        """Calculates the next action(corridor adjacency) for the tre_search.
+        Avoids searches if the target is immediately surrounded by al sides
+
+        Args:
+        corridor: current node
+        """
         actlist = []
 
         for (corr1, corr2) in self.adjacencies:
@@ -46,6 +52,9 @@ class Pathways(SearchDomain):
 
 
     def heuristic(self, curr_state, new_state, goal, hor_tunnel=False, ver_tunnel=False):
+        """Calculates the heuristic cost of current position to goal. Uses the
+        Manhattan distance adapted to a circular map.
+        """
         c_ends = curr_state.ends
         n_ends = new_state.ends
 

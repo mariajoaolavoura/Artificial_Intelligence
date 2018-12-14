@@ -290,7 +290,7 @@ class SearchTree:
                 
                 #if starting point is found, does nothing and continue to another iteration
                 if new_state == None or self.problem.initial == None:
-                    raise Exception('Tree_Search_Error')
+                    raise ValueError
                     
                 if all([c in self.problem.initial.coordinates for c in new_state.coordinates]):
                     continue

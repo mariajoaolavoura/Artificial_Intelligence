@@ -4,23 +4,6 @@ from pathways import Pathways
 from corridor import Corridor
 from ghost_info import Ghost_Info
 from pacman_info import Pacman_Info
-import logging
-
-# logs are written to file advisor.log after the client is closed
-# possible messages: debug, info, warning, error, critical 
-# how to use: logger.typeOfMessage('message')
-logger = logging.getLogger('advisor')
-logger_format = '[%(lineno)s - %(funcName)20s() - %(levelname)s]\n %(message)s\n'
-#logger_format = '%(levelname)s:\t%(message)' # simpler format
-
-# currently writing over the logger file, change filemode to a to append
-logging.basicConfig(format=logger_format, filename='advisor.log', filemode='w', level=logging.DEBUG)
-
-# logger
-# logs are written to file strategy_advisor.log after the client is closed
-# possible messages: debug, info, warning, error, critical 
-# how to use: logger.typeOfMessage('message')
-logger = setup_logger('strategy_advisor', 'strategy_advisor.log')
 
 class StrategyAdvisor():
     """Analyses corridors safety (if contains ghost or not) and crossroads
@@ -161,8 +144,7 @@ class StrategyAdvisor():
         self.ghosts_at_cross0 = g0
         self.ghosts_at_cross1 = g1
 
-#------------------------------------------------------------------------------#
-
+# --auxiliar method to previous method-----------------------------------------#
     def _get_avoid_coordinates(self, sub_corr):
         pacman = self.pacman_info.position
         avoid_coordinates = []

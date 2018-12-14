@@ -2,6 +2,24 @@ from corridor import Corridor
 from game_consts import *
 
 class Pacman_Info():
+    """Creates the Pac-Man Info, which is a collection of information on Pac-Man
+    in a specific moment of gameplay.
+
+    Attr:
+    position: the coordinates of the ghost
+    corridor: the corridor where Pac-Man is positioned
+    crossrods (crossroad0 & crossroad1): the extremities of 'corridor'
+    dist_to_crossroad0(1): distance of Pac-Man to each crossroad  
+    semaphore0(1): Enumerate that identifies danger of corresponding crossroad
+    dist_to_ghost_at_crossroad_0(1): distance to the closest ghost attacking at
+        crossroad
+    crossroad0(1)_is_blocked: boolean flag that indicates a ghost is inside
+        'corridor' and at which side
+    pursued_from_crossroad0(1): boolean flag that indicates is in pursuit distance
+        of Pac-Man and will attack from that crossroad
+    ghost_at_crossroad0(1): the closest 'Ghost_Info' that will attack at the
+        crossroad, contains all information on said ghost
+    """
 
     def __init__(self, pacman):
         self.position = pacman

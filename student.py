@@ -17,9 +17,8 @@ from counter_agent import *
 from pursuit_agent import *
 from flight_agent import *
 from time import time
+import logging
 
-#$ PORT=80 SERVER=pacman-aulas.ws.atnog.av.it.pt python client.py
-# to kill server: fuser 8000/tcp
 
 # logger
 # logs are written to file student.log after the client is closed
@@ -28,72 +27,6 @@ from time import time
 logger = setup_logger('student', 'student.log')
 time_logger = setup_logger('key_times', 'key_times.log', format='%(message)s\n')
 time_logger.debug("TIMES IN MILISECONDS (*1000)")
-
-# for debug purposes
-debug = True
-
-
-#! ##########   PAC-MAN AGENT GLOBAL STRATEGY   ##########
-
-    #! ###    CONCEPTS    ###
-
-    #! Corridor
-        #* A list of path coordinates with only two adjacent coordinates
-        #* and two crossroads as ends
-
-    #! Crossroad
-        #* A coordinate that joins corridors. The crossroad belong to all
-        #* corridors it joins
-
-    #! Corridor SAFE vs UNSAFE
-        #* SAFE - Has no ghosts
-        #* UNSAFE - Has one or more ghosts
-
-    #! Crossroad GREEN - YELLOW - RED
-        #* Refers to the crossroads directly accessible to Pac-Man (the
-        #* ends of it's corridor)
-        #* GREEN - No ghosts in proximity
-        #* YELLOW - There are ghosts at a dangerous distance of the crossroad
-        #*          (default = 1). Pac-Man can escape if he goes directly through
-        #*          that end
-        #* RED - Considering that the ghosts is in pursuit of Pac-Man, it is
-        #*       impossible for Pac-Man to escape from that end before the ghost
-        #*       gets to it (or the ghost is already inside Pac-Man's Corridor)
-
-
-    #! Strategy Game Modes
-        #* EATING_MODE - Pac-Man is safe. Focus on eating energies. Tries to
-        #*               find closest energies through safest paths
-        #* COUNTER_MODE - Pac-Man is almost surrounded. Focus on eating boosts.
-        #* PURSUIT_MODE - Pac-Man is safe and there are zombie ghosts.
-        #*               Focus on eating ghosts.
-        #* FLIGHT_MODE - Pac-Man is almost surrounded. There are no boosts
-        #*               available. Focus on finding the closest safest Corridor.
-
-    #! Static Analysis of Map provides
-        #* pathways
-        #* corridors
-        #* crossroads
-        #* corridor_adjacencies
-    
-    #! Strategy Guidelines
-        #* Pac-Man Agent calls Strategy Advisor
-        #*      Strategy Advisor analyses:
-        #*          Corridor Safety
-        #*          Crossroads Semaphores
-        #*          Distance t\from ghosts to pacman
-        #* Pac-Man calls Strategy Analyst
-        #*      Game Mode tries to find the next move
-        #* Pac-Man analyses next move
-        #*      Is it specific (only one solution)
-        #*          Pac-Man accepts next move
-        #*      It's not specific (strategy was not correct)
-        #*          Pac-Man calls Strategy Adjuster
-        #*              Strategy Adjuster evaluates new info and advises a new Game Mode
-        #*          Pac-Man call Game Mode Agent to get next move
-        #*              Game Mode tries to find a solution
-        #*          Pac-Man accepts best solution found (if more than one)
-
 
 
 class Pacman_agent():
@@ -113,13 +46,8 @@ class Pacman_agent():
     """
 
     def __init__(self, map_,): 
-        logger.warning('\n\n\n ========================== NEW EXECUTION ==========================\n')
-        logger.debug('CREATING PACMAN AGENT\n')
-
         self.map_ = StrategyTopographer(map_)
         self.debug = False
-
-        logger.debug('CREATED PACMAN AGENT')
 
 
     def get_next_move(self, state):
@@ -209,19 +137,35 @@ async def agent_loop(server_address = "localhost:8000", agent_name="student"):
         
 
         #----------------------------------------------------------------------#
-        # Define game constants TODO
+        # Define game constants
         num_ghosts = game_properties['ghosts']
         ghosts_level = game_properties['ghosts_level']
-        #print((num_ghosts, ghosts_level))
 
-        # DOING THIS ASSIGNMENT WORKS BUT PLEASE KEEP import game_consts instead of from game_consts import *
-        #print("A " + str(game_consts.SAFE_DIST_TO_CROSSROAD))
-        #game_consts.SAFE_DIST_TO_CROSSROAD = 20
-       # print("B: " + str(game_consts.SAFE_DIST_TO_CROSSROAD))
+        if num_ghosts < 2:
+            game_consts.SAFE_DIST_TO_GHOST = 7
+            game_consts.GHOST_PURSUIT_MULTIPLIER = 0.8 
+            game_consts.NUMBER_OF_GHOST_TO_OFFENSIVE = 1
+        
+        if num_ghosts == 2:
+            game_consts.SAFE_DIST_TO_GHOST = 8
+            game_consts.GHOST_PURSUIT_MULTIPLIER = 0.7 
+            game_consts.NUMBER_OF_GHOST_TO_OFFENSIVE = 3
+
+        if num_ghosts > 2 and ghosts_level <= 2:
+            game_consts.SAFE_DIST_TO_GHOST = 7
+            game_consts.GHOST_PURSUIT_MULTIPLIER = 0.6 
+            game_consts.NUMBER_OF_GHOST_TO_OFFENSIVE = 3
+
+        if num_ghosts > 2 and ghosts_level >= 3:
+            game_consts.SAFE_DIST_TO_GHOST = 8
+            game_consts.GHOST_PURSUIT_MULTIPLIER = 0.7 
+            game_consts.NUMBER_OF_GHOST_TO_OFFENSIVE = 3
 
         # Create the pacman agent
         pacman = Pacman_agent(Map(game_properties['map']))
         lives = game_properties['lives']
+        key = 'w'           # W is for Winner
+        previous_key = 'w'  # W is for Winner
         
         #----------------------------------------------------------------------#
         #----------------------------------------------------------------------#
@@ -231,7 +175,6 @@ async def agent_loop(server_address = "localhost:8000", agent_name="student"):
             r = await websocket.recv()
             start = time()          # saved on key_times.log
             state = json.loads(r)   # receive game state
-            previous_key = 'w' # W is for Winner
 
             try:
 
@@ -267,9 +210,7 @@ async def agent_loop(server_address = "localhost:8000", agent_name="student"):
                     previous_key = key
 
             
-            except Exception:
-                pass
-            except Exception('Tree_Search_Error'):
+            except ValueError:
                 pass
 
             #-send new key-----------------------------------------------------#

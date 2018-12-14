@@ -4,6 +4,15 @@ from corridor import *
 
 
 class PanicAgent:
+    """Creates Panic Agent, which is called after all other Execution Agents
+    advised moves have been considered invalid. It's objective is to find the
+    closest safest corridor
+
+    Attr:
+    advisor: provides extensive information about the current situation of the map
+    pac_info: Object with extensive information on Pac-Man
+    ... : various information extracted from 'pac_info' form visual code simplification
+    """
 
     def __init__(self, advisor):
         self.advisor = advisor

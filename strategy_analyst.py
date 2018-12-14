@@ -5,23 +5,6 @@ from counter_agent import *
 from flight_agent import *
 from panic_agent import *
 from move_risk_assessor import *
-import logging
-
-# logs are written to file advisor.log after the client is closed
-# possible messages: debug, info, warning, error, critical 
-# how to use: logger.typeOfMessage('message')
-logger = logging.getLogger('analyst')
-logger_format = '[%(lineno)s - %(funcName)20s() - %(levelname)s]\n %(message)s\n'
-#logger_format = '%(levelname)s:\t%(message)' # simpler format
-
-# currently writing over the logger file, change filemode to a to append
-logging.basicConfig(format=logger_format, filename='ANALYST.log', filemode='w', level=logging.DEBUG)
-
-# logger
-# logs are written to file strategy_advisor.log after the client is closed
-# possible messages: debug, info, warning, error, critical 
-# how to use: logger.typeOfMessage('message')
-logger = setup_logger('strategy_analyst', 'strategy_analyst.log')
 
 class StrategyAnalyst():
     """Creates the Strategy Analist, which coordinates the possible moves given
@@ -44,15 +27,16 @@ class StrategyAnalyst():
         self.invalid_corridors = []
     
     def decide(self):
-        """ Main method of the StartegyAnalyst class, which accomplishes the
-        class goal
+        """ Main method of the StrategyAnalyst class, which goal is to verify 
+        current game condition and call, accordingly, for advice in the next
+        Pac-Man's move from the Execution Agents. Relies on MoveRiskAssessor to
+        validate Execution Agents advices.
 
         Returns:
         The next advised position for Pac-Man to go to
         """
 
         # if there are no ghosts to pursue pacman counters if is surrounded or eats if not
-        
         for ghost in self.advisor.ghosts_info:
             
             if self._ghost_is_in_pursuit(ghost.position):

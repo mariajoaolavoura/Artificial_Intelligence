@@ -35,7 +35,7 @@ class CounterAgent:
             return None
 
     #--------------------------------------------------------------------------#
-    # 
+    #
 
         eating_agent = EatingAgent(self.advisor, self.targets)
         possible_moves = eating_agent.eat()
