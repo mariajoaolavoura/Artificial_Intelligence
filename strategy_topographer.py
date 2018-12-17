@@ -50,7 +50,7 @@ class StrategyTopographer():
         # find ghosts den. This area will not be used in any search or strategy
         # and should be avoided by PACMAN
         self.ghosts_den = self.get_ghosts_den(self.map_)
-        self.ghosts_den = self.get_den_interior()
+        #self.ghosts_den = self.get_den_interior()
 
         pathways_hor = []
         for y in range(self.map_.ver_tiles):
@@ -216,44 +216,44 @@ class StrategyTopographer():
 
 #------------------------------------------------------------------------------#
 
-    def get_den_corners(self):
+#     def get_den_corners(self):
 
-        ulc = self.ghosts_den[0]
-        urc = self.ghosts_den[0]
-        llc = self.ghosts_den[0]
-        lrc = self.ghosts_den[0]
-        for c in self.ghosts_den[1:]:
-            # upper left corner
-            if c[0] < ulc[0] and c[1] < ulc[1]:
-                ulc = c
-            # upper right corner
-            if c[0] > urc[0] and c[1] < urc[1]:
-                urc = c
-            # lower left corner
-            if c[0] < llc[0] and c[1] > llc[1]:
-                llc = c
-            # lower righ corner
-            if c[0] > lrc[0] and c[1] > lrc[1]:
-                lrc = c
+#         ulc = self.ghosts_den[0]
+#         urc = self.ghosts_den[0]
+#         llc = self.ghosts_den[0]
+#         lrc = self.ghosts_den[0]
+#         for c in self.ghosts_den[1:]:
+#             # upper left corner
+#             if c[0] < ulc[0] and c[1] < ulc[1]:
+#                 ulc = c
+#             # upper right corner
+#             if c[0] > urc[0] and c[1] < urc[1]:
+#                 urc = c
+#             # lower left corner
+#             if c[0] < llc[0] and c[1] > llc[1]:
+#                 llc = c
+#             # lower righ corner
+#             if c[0] > lrc[0] and c[1] > lrc[1]:
+#                 lrc = c
         
-        return ulc, urc, llc, lrc
+#         return ulc, urc, llc, lrc
 
-# #------------------------------------------------------------------------------#
+# # #------------------------------------------------------------------------------#
 
-    def get_den_interior(self):
+#     def get_den_interior(self):
 
-        ulc, urc, llc, lrc = self.get_den_corners()
+#         ulc, urc, llc, lrc = self.get_den_corners()
 
-        x = ulc[0]+1
-        y = ulc[1]+1
-        interior = []
-        while x < lrc[0]:
-            while y < lrc[1]:
-                interior += [[x,y]]
-                y = y+1
-            x = x+1
+#         x = ulc[0]+1
+#         y = ulc[1]+1
+#         interior = []
+#         while x < lrc[0]:
+#             while y < lrc[1]:
+#                 interior += [[x,y]]
+#                 y = y+1
+#             x = x+1
 
-        return interior
+#         return interior
 #------------------------------------------------------------------------------#
 
     #* ##########   TESTED AND VERIFIED   ##########
